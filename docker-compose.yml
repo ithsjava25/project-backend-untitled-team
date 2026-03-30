@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - "POSTGRES_DB=IssueHandlingSystem"
+      - "POSTGRES_USER=user"
+      - "POSTGRES_PASSWORD=myPass"
+    ports:
+      - "5432"
