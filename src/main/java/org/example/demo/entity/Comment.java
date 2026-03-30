@@ -20,4 +20,48 @@ public class Comment {
 
     @ManyToOne
     private Case caseEntity;
+
+    public Comment() {
+        // Empty constructor for JPA
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public Case getCaseEntity() {
+        return caseEntity;
+    }
+
+    public void setCaseEntity(Case caseEntity) {
+        this.caseEntity = caseEntity;
+    }
 }
