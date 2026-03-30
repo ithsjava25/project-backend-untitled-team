@@ -24,4 +24,5 @@ public class Case {
     private User assignedTo;
 
     private LocalDateTime createdAt;
+
 }
