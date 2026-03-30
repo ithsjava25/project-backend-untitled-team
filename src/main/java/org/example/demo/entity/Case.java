@@ -5,17 +5,23 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-public class User {
+public class Case {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
-    private String password;
+    private String title;
+    private String description;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @Enumerated(EnumType.ORDINAL)
+    private CaseStatus status;
+
+    @ManyToOne
+    private User owner;
+
+    @ManyToOne
+    private User assignedTo;
 
     private LocalDateTime createdAt;
 }
