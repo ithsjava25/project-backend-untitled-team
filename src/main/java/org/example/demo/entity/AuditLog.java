@@ -11,6 +11,7 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String action;
 
     private LocalDateTime timestamp;
@@ -23,6 +24,11 @@ public class AuditLog {
 
     public AuditLog() {
         // Empty constructor for JPA
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.timestamp = LocalDateTime.now();
     }
 
     public Long getId() {

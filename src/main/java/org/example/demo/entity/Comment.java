@@ -25,6 +25,11 @@ public class Comment {
         // Empty constructor for JPA
     }
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
     public Long getId() {
         return id;
     }

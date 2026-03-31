@@ -26,6 +26,11 @@ public class UploadedFile {
         // Empty constructor for JPA
     }
 
+    @PrePersist
+    protected void onCreate() {
+        this.uploadedAt = LocalDateTime.now();
+    }
+
     public Long getId() {
         return id;
     }
