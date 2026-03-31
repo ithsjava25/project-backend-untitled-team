@@ -15,11 +15,11 @@ public class Comment {
 
     private LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
-    @ManyToOne
-    private Case caseEntity;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CaseEntity caseEntity;
 
     public Comment() {
         // Empty constructor for JPA
@@ -57,11 +57,11 @@ public class Comment {
         this.author = author;
     }
 
-    public Case getCaseEntity() {
+    public CaseEntity getCaseEntity() {
         return caseEntity;
     }
 
-    public void setCaseEntity(Case caseEntity) {
+    public void setCaseEntity(CaseEntity caseEntity) {
         this.caseEntity = caseEntity;
     }
 }

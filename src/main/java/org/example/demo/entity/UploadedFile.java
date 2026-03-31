@@ -16,11 +16,11 @@ public class UploadedFile {
 
     private LocalDateTime uploadedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User uploadedBy;
 
-    @ManyToOne
-    private Case associatedCase;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CaseEntity associatedCaseEntity;
 
     public UploadedFile() {
         // Empty constructor for JPA
@@ -66,11 +66,11 @@ public class UploadedFile {
         this.uploadedBy = uploadedBy;
     }
 
-    public Case getAssociatedCase() {
-        return associatedCase;
+    public CaseEntity getAssociatedCase() {
+        return associatedCaseEntity;
     }
 
-    public void setAssociatedCase(Case associatedCase) {
-        this.associatedCase = associatedCase;
+    public void setAssociatedCase(CaseEntity associatedCaseEntity) {
+        this.associatedCaseEntity = associatedCaseEntity;
     }
 }

@@ -15,11 +15,11 @@ public class AuditLog {
 
     private LocalDateTime timestamp;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @ManyToOne
-    private Case caseEntity;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CaseEntity caseEntity;
 
     public AuditLog() {
         // Empty constructor for JPA
@@ -57,11 +57,11 @@ public class AuditLog {
         this.user = user;
     }
 
-    public Case getCaseEntity() {
+    public CaseEntity getCaseEntity() {
         return caseEntity;
     }
 
-    public void setCaseEntity(Case caseEntity) {
+    public void setCaseEntity(CaseEntity caseEntity) {
         this.caseEntity = caseEntity;
     }
 }

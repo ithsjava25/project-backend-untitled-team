@@ -3,9 +3,10 @@ package org.example.demo.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-public class Case {
+public class CaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,18 +15,27 @@ public class Case {
     private String title;
     private String description;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private CaseStatus status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User assignedTo;
+
+    @OneToMany(mappedBy = "caseEntity", fetch = FetchType.LAZY)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "associatedCaseEntity", fetch = FetchType.LAZY)
+    private List<UploadedFile> files;
+
+    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<AuditLog> auditLogs;
 
     private LocalDateTime createdAt;
 
-    public Case() {
+    public CaseEntity() {
         // Empty constructor for JPA
     }
 
@@ -75,6 +85,30 @@ public class Case {
 
     public void setAssignedTo(User assignedTo) {
         this.assignedTo = assignedTo;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<UploadedFile> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<UploadedFile> files) {
+        this.files = files;
+    }
+
+    public List<AuditLog> getAuditLogs() {
+        return auditLogs;
+    }
+
+    public void setAuditLogs(List<AuditLog> auditLogs) {
+        this.auditLogs = auditLogs;
     }
 
     public LocalDateTime getCreatedAt() {
