@@ -11,8 +11,10 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String text;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,10 +50,6 @@ public class Comment {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public User getAuthor() {

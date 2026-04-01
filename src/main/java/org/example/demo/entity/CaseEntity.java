@@ -12,27 +12,32 @@ public class CaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private CaseStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private User owner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User assignedTo;
 
-    @OneToMany(mappedBy = "caseEntity", fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "associatedCaseEntity", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "associatedCaseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UploadedFile> files;
 
     @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<AuditLog> auditLogs;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     public CaseEntity() {
@@ -118,9 +123,5 @@ public class CaseEntity {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }

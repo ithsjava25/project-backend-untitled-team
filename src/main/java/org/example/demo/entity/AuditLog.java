@@ -15,6 +15,7 @@ public class AuditLog {
     @Column(nullable = false)
     private AuditAction action;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
