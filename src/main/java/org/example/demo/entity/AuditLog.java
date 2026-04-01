@@ -11,8 +11,9 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String action;
+    private AuditAction action;
 
     private LocalDateTime timestamp;
 
@@ -26,6 +27,12 @@ public class AuditLog {
         // Empty constructor for JPA
     }
 
+    public AuditLog(AuditAction action, User user, CaseEntity caseEntity) {
+        this.action = action;
+        this.user = user;
+        this.caseEntity = caseEntity;
+    }
+
     @PrePersist
     protected void onCreate() {
         this.timestamp = LocalDateTime.now();
@@ -35,39 +42,19 @@ public class AuditLog {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getAction() {
+    public AuditAction getAction() {
         return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
     }
 
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public CaseEntity getCaseEntity() {
         return caseEntity;
-    }
-
-    public void setCaseEntity(CaseEntity caseEntity) {
-        this.caseEntity = caseEntity;
     }
 }
