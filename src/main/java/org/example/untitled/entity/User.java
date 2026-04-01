@@ -110,7 +110,7 @@ public class User {
     }
 
     public void setOwnedCases(List<CaseEntity> ownedCases) {
-        this.ownedCases = ownedCases;
+        this.ownedCases = ownedCases != null ? ownedCases : new ArrayList<>();
     }
 
     public List<CaseEntity> getAssignedCases() {
@@ -118,7 +118,7 @@ public class User {
     }
 
     public void setAssignedCases(List<CaseEntity> assignedCases) {
-        this.assignedCases = assignedCases;
+        this.assignedCases = assignedCases != null ? assignedCases : new ArrayList<>();
     }
 
     public List<Comment> getComments() {
@@ -126,7 +126,7 @@ public class User {
     }
 
     public void setComments(List<Comment> comments) {
-        this.comments = comments;
+        this.comments = comments != null ? comments : new ArrayList<>();
     }
 
     public List<UploadedFile> getUploadedFiles() {
@@ -134,7 +134,7 @@ public class User {
     }
 
     public void setUploadedFiles(List<UploadedFile> uploadedFiles) {
-        this.uploadedFiles = uploadedFiles;
+        this.uploadedFiles = uploadedFiles != null ? uploadedFiles : new ArrayList<>();
     }
 
     public List<AuditLog> getAuditLogs() {
@@ -142,7 +142,7 @@ public class User {
     }
 
     public void setAuditLogs(List<AuditLog> auditLogs) {
-        this.auditLogs = auditLogs;
+        this.auditLogs = auditLogs != null ? auditLogs : new ArrayList<>();
     }
 
     public LocalDateTime getCreatedAt() {
