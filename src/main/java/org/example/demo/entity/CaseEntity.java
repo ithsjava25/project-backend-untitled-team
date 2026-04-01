@@ -3,6 +3,7 @@ package org.example.demo.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,15 +28,14 @@ public class CaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User assignedTo;
 
-
     @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "associatedCaseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<UploadedFile> files;
+    private List<UploadedFile> files = new ArrayList<>();
 
-    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    private List<AuditLog> auditLogs;
+    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<AuditLog> auditLogs = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -3,6 +3,7 @@ package org.example.demo.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,20 +28,21 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
-    private List<CaseEntity> ownedCases;
+    private List<CaseEntity> ownedCases = new ArrayList<>();
 
     @OneToMany(mappedBy = "assignedTo", fetch = FetchType.LAZY)
-    private List<CaseEntity> assignedCases;
+    private List<CaseEntity> assignedCases = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "uploadedBy", fetch = FetchType.LAZY)
-    private List<UploadedFile> uploadedFiles;
+    private List<UploadedFile> uploadedFiles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<AuditLog> auditLogs;
+    private List<AuditLog> auditLogs = new ArrayList<>();
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     public User() {
@@ -134,9 +136,5 @@ public class User {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }

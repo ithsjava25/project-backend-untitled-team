@@ -11,15 +11,21 @@ public class UploadedFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String filename;
+
+    @Column(nullable = false)
     private String s3key;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime uploadedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private User uploadedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private CaseEntity associatedCaseEntity;
 
     public UploadedFile() {
@@ -57,10 +63,6 @@ public class UploadedFile {
 
     public LocalDateTime getUploadedAt() {
         return uploadedAt;
-    }
-
-    public void setUploadedAt(LocalDateTime uploadedAt) {
-        this.uploadedAt = uploadedAt;
     }
 
     public User getUploadedBy() {
