@@ -54,6 +54,17 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+    @PreRemove
+    protected void onRemove() {
+        boolean hasActiveCases = ownedCases.stream()
+                .anyMatch(c -> c.getStatus() == CaseStatus.OPEN
+                        || c.getStatus() == CaseStatus.IN_PROGRESS);
+        if (hasActiveCases) {
+            throw new IllegalStateException(
+                    "User '" + username + "' has active cases and cannot be deleted.");
+        }
+    }
+
     public Long getId() {
         return id;
     }
