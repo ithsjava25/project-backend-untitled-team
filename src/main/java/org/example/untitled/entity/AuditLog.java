@@ -21,7 +21,8 @@ public class AuditLog {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private CaseEntity caseEntity;
 
     public AuditLog() {

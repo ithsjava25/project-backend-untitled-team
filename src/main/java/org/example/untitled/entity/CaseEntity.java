@@ -34,7 +34,7 @@ public class CaseEntity {
     @OneToMany(mappedBy = "associatedCaseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UploadedFile> files = new ArrayList<>();
 
-    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "caseEntity", fetch = FetchType.LAZY)
     private List<AuditLog> auditLogs = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
