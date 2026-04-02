@@ -28,3 +28,6 @@ jobs:
 
       - name: Test with Maven
         run: mvn -B test --file pom.xml
+
+      - name: Verify with Maven
+        run: mvn -B verify --file pom.xml
