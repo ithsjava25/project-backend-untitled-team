@@ -1,0 +1,30 @@
+name: ci.yml
+on:
+  pull_request:
+    branches: [ "main" ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Java version
+        run: |
+          JAVA_VERSION=$(mvn help:evaluate "-Dexpression=maven.compiler.release" -q -DforceStdout)
+          echo "JAVA_VERSION=$JAVA_VERSION" >> $GITHUB_ENV
+
+      - name: Setup JDK ${env.JAVA_VERSION}
+        uses: actions/setup-java@v5.1.0
+        with:
+          java-version: ${env.JAVA_VERSION}
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Compile with Maven
+        run: mvn -B compile --file pom.xml
+
+      - name: Test with Maven
+        run: mvn -B test --file pom.xml
