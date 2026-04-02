@@ -16,10 +16,10 @@ jobs:
           JAVA_VERSION=$(mvn help:evaluate "-Dexpression=maven.compiler.release" -q -DforceStdout)
           echo "JAVA_VERSION=$JAVA_VERSION" >> $GITHUB_ENV
 
-      - name: Setup JDK ${env.JAVA_VERSION}
+      - name: Setup JDK ${{env.JAVA_VERSION}}
         uses: actions/setup-java@v5.1.0
         with:
-          java-version: ${env.JAVA_VERSION}
+          java-version: ${{env.JAVA_VERSION}}
           distribution: 'temurin'
           cache: maven
 
