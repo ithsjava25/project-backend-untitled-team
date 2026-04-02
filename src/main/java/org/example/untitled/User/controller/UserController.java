@@ -1,6 +1,6 @@
-package org.example.untitled.controller;
+package org.example.untitled.User.controller;
 
-import org.example.untitled.service.UserService;
+import org.example.untitled.User.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
