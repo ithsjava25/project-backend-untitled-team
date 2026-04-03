@@ -1,6 +1,7 @@
-package org.example.untitled.entity;
+package org.example.untitled.User;
 
 import jakarta.persistence.*;
+import org.example.untitled.usercase.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

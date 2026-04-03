@@ -1,4 +1,4 @@
-package org.example.untitled.entity;
+package org.example.untitled.usercase;
 
 public enum CaseStatus {
     OPEN,
