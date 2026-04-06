@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    UserRepository userRep;
-    UserMapper userMapper;
+    private final UserRepository userRep;
+    private final UserMapper userMapper;
 
-    public UserService(UserRepository userRep){
+    public UserService(UserRepository userRep, UserMapper userMapper) {
         this.userRep = userRep;
-        userMapper = new UserMapper();
+        this.userMapper = userMapper;
     }
 }
