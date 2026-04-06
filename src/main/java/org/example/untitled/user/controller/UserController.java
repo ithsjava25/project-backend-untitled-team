@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    UserService userService;
+    private final UserService userService;
 
-    private UserController(UserService service){
+    public UserController(UserService service){
         this.userService = service;
     }
 
