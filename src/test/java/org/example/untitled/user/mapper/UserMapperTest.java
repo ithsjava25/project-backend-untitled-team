@@ -22,9 +22,13 @@ class UserMapperTest {
         UserDto dto = new UserDto();
         dto.setId(99L);
         dto.setUsername("alice");
+        dto.setEmail("alice@example.com");
 
         User user = userMapper.toEntity(dto);
 
+        assertNotNull(user);
+        assertEquals("alice", user.getUsername());
+        assertEquals("alice@example.com", user.getEmail());
         assertNull(user.getId());
     }
 
@@ -33,9 +37,13 @@ class UserMapperTest {
         UserDto dto = new UserDto();
         dto.setRole(Role.ADMIN);
         dto.setUsername("alice");
+        dto.setEmail("alice@example.com");
 
         User user = userMapper.toEntity(dto);
 
+        assertNotNull(user);
+        assertEquals("alice", user.getUsername());
+        assertEquals("alice@example.com", user.getEmail());
         assertNull(user.getRole());
     }
 }
