@@ -1,5 +1,6 @@
 package org.example.untitled.usercase.mapper;
 
+import org.example.untitled.user.User;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.Comment;
 import org.example.untitled.usercase.UploadedFile;
@@ -19,14 +20,19 @@ public class CaseMapper {
         dto.setDescription(entity.getDescription());
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
-        if (entity.getOwner() != null) {
-            dto.setOwnerId(entity.getOwner().getId());
-            dto.setOwnerUsername(entity.getOwner().getUsername());
+
+        User owner = entity.getOwner();
+        if (owner != null) {
+            dto.setOwnerId(owner.getId());
+            dto.setOwnerUsername(owner.getUsername());
         }
-        if (entity.getAssignedTo() != null) {
-            dto.setAssignedToId(entity.getAssignedTo().getId());
-            dto.setAssignedToUsername(entity.getAssignedTo().getUsername());
+
+        User assigned = entity.getAssignedTo();
+        if (assigned != null) {
+            dto.setAssignedToId(assigned.getId());
+            dto.setAssignedToUsername(assigned.getUsername());
         }
+
         return dto;
     }
 
@@ -36,13 +42,17 @@ public class CaseMapper {
         dto.setId(comment.getId());
         dto.setText(comment.getText());
         dto.setCreatedAt(comment.getCreatedAt());
-        if (comment.getAuthor() != null) {
-            dto.setAuthorId(comment.getAuthor().getId());
-            dto.setAuthorUsername(comment.getAuthor().getUsername());
+
+        User author = comment.getAuthor();
+        if (author != null) {
+            dto.setAuthorId(author.getId());
+            dto.setAuthorUsername(author.getUsername());
         }
+
         if (comment.getCaseEntity() != null) {
             dto.setCaseId(comment.getCaseEntity().getId());
         }
+
         return dto;
     }
 
@@ -52,13 +62,17 @@ public class CaseMapper {
         dto.setId(file.getId());
         dto.setFilename(file.getFilename());
         dto.setUploadedAt(file.getUploadedAt());
-        if (file.getUploadedBy() != null) {
-            dto.setUploadedById(file.getUploadedBy().getId());
-            dto.setUploadedByUsername(file.getUploadedBy().getUsername());
+
+        User uploadedBy = file.getUploadedBy();
+        if (uploadedBy != null) {
+            dto.setUploadedById(uploadedBy.getId());
+            dto.setUploadedByUsername(uploadedBy.getUsername());
         }
+
         if (file.getAssociatedCase() != null) {
             dto.setCaseId(file.getAssociatedCase().getId());
         }
+
         return dto;
     }
 }
