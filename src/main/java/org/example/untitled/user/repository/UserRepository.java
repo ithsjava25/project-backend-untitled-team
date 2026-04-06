@@ -1,6 +1,6 @@
-package org.example.untitled.User.Repository;
+package org.example.untitled.user.repository;
 
-import org.example.untitled.User.User;
+import org.example.untitled.user.User;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 

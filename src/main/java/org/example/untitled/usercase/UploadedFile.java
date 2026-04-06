@@ -1,7 +1,7 @@
 package org.example.untitled.usercase;
 
 import jakarta.persistence.*;
-import org.example.untitled.User.User;
+import org.example.untitled.user.User;
 
 import java.time.LocalDateTime;
 

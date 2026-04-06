@@ -1,6 +1,6 @@
-package org.example.untitled.User.dto;
+package org.example.untitled.user.dto;
 
-import org.example.untitled.User.Role;
+import org.example.untitled.user.Role;
 
 import java.time.LocalDateTime;
 

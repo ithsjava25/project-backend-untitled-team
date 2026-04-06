@@ -1,4 +1,4 @@
-package org.example.untitled.User;
+package org.example.untitled.user;
 
 import jakarta.persistence.*;
 import org.example.untitled.usercase.*;
