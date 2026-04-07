@@ -6,12 +6,9 @@ import jakarta.validation.constraints.Positive;
 
 public class CreateCommentRequest {
 
-    @NotBlank
-    private String text;
+    @NotBlank private String text;
 
-    @NotNull
-    @Positive
-    private Long caseId;
+    @NotNull @Positive private Long caseId;
 
     public CreateCommentRequest() {}
 
