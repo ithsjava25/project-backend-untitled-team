@@ -1,8 +1,13 @@
 package org.example.untitled.usercase.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class CreateCaseRequest {
 
+    @NotBlank
     private String title;
+
+    @NotBlank
     private String description;
 
     public CreateCaseRequest() {}
