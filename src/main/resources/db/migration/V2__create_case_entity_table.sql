@@ -8,3 +8,6 @@ CREATE TABLE case_entity
     assigned_to_id BIGINT REFERENCES users (id),
     created_at     TIMESTAMP    NOT NULL
 );
+
+CREATE INDEX idx_case_entity_owner_id ON case_entity (owner_id);
+CREATE INDEX idx_case_entity_assigned_to_id ON case_entity (assigned_to_id);
