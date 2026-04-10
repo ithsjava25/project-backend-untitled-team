@@ -20,11 +20,17 @@ public class JwtService {
     @Value("${jwt.expiration-ms}")
     private long expirationMs;
 
+    private SecretKey signingKey;
+
     @PostConstruct
-    public void validateSecret() {
+    public void init() {
         if (secret == null || secret.isBlank()) {
             throw new IllegalStateException("JWT_SECRET environment variable is not set!");
         }
+        if (expirationMs <= 0) {
+            throw new IllegalStateException("jwt.expiration-ms must be a positive value");
+        }
+        signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -33,7 +39,7 @@ public class JwtService {
                 .claim("roles", userDetails.getAuthorities())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(getSigningKey())
+                .signWith(signingKey)
                 .compact();
     }
 
@@ -52,14 +58,9 @@ public class JwtService {
 
     private Claims extractClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-    }
-
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
