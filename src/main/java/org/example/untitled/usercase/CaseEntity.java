@@ -42,6 +42,7 @@ public class CaseEntity {
     private LocalDateTime createdAt;
 
     public CaseEntity() {
+        createdAt = LocalDateTime.now();
         // Empty constructor for JPA
     }
 

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns_th="https://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Ticket</title>
+</head>
+<body>
+<h1>Create Ticket</h1>
+<div>
+    <form th:action="@{/tickets/create}" th:object="ticketForm" method="post">
+        <header class="ticket-header">
+            <div class="ticket-title">
+                <p>Issue:</p>
+                <input th:field="*{title}" id="title">
+            </div>
+        </header>
+        <div class="ticket-body">
+            <p>Description:</p>
+            <textarea th:field="*{description}"></textarea>
+        </div>
+        <footer class="ticket-footer">
+            <div class="ticket-button">
+                <button type="submit">Create Ticket</button>
+            </div>
+        </footer>
+    </form>
+</div>
+
+</body>
+</html>

@@ -8,10 +8,10 @@ import org.example.untitled.usercase.UploadedFile;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.UploadedFileDto;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CaseMapperTest {
 
@@ -22,11 +22,6 @@ class CaseMapperTest {
         user.setId(id);
         user.setUsername(username);
         return user;
-    }
-
-    @BeforeEach
-    void setUp() {
-        caseMapper = new CaseMapper();
     }
 
     @Test
