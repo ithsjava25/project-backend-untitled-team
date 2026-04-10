@@ -5,6 +5,7 @@ import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.mapper.UserMapper;
 import org.example.untitled.user.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +23,16 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public boolean usernameExists(String username) {
-        return userRep.findByUsername(username).isPresent();
-    }
-
     public User register(RegisterRequest request) {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.USER);
-        return userRep.save(user);
+        try {
+            return userRep.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalStateException("Username or email already exists");
+        }
     }
 }
