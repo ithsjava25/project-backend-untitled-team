@@ -3,7 +3,7 @@ services:
     image: postgres:latest
     environment:
       - "POSTGRES_DB=IssueHandlingSystem"
-      - "POSTGRES_USER=${DB_USERNAME}"
-      - "POSTGRES_PASSWORD=${DB_PASSWORD}"
+      - "POSTGRES_USER=${DB_USERNAME:?DB_USERNAME is required}"
+      - "POSTGRES_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is required}"
     ports:
-      - "5432"
+      - "5432:5432"
