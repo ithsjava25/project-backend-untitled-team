@@ -8,7 +8,9 @@ import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.mapper.CaseMapper;
 import org.example.untitled.usercase.repository.CaseRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CaseService {
@@ -40,16 +42,16 @@ public class CaseService {
 
     public CaseEntityDto updateStatus(Long id, CaseStatus newStatus) {
         CaseEntity caseEntity = caseRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Ticket not found: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         caseEntity.setStatus(newStatus);
         return caseMapper.toDto(caseRepository.save(caseEntity));
     }
 
     public CaseEntityDto assignTicket(Long id, String username) {
         CaseEntity caseEntity = caseRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Ticket not found: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         User handler = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         caseEntity.setAssignedTo(handler);
         return caseMapper.toDto(caseRepository.save(caseEntity));
     }
