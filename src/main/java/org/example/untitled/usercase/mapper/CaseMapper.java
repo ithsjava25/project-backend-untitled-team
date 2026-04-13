@@ -14,65 +14,46 @@ public class CaseMapper {
 
     public CaseEntityDto toDto(CaseEntity entity) {
         if (entity == null) return null;
-        CaseEntityDto dto = new CaseEntityDto();
-        dto.setId(entity.getId());
-        dto.setTitle(entity.getTitle());
-        dto.setDescription(entity.getDescription());
-        dto.setStatus(entity.getStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-
         User owner = entity.getOwner();
-        if (owner != null) {
-            dto.setOwnerId(owner.getId());
-            dto.setOwnerUsername(owner.getUsername());
-        }
-
         User assigned = entity.getAssignedTo();
-        if (assigned != null) {
-            dto.setAssignedToId(assigned.getId());
-            dto.setAssignedToUsername(assigned.getUsername());
-        }
-
-        return dto;
+        return new CaseEntityDto(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getDescription(),
+                entity.getStatus(),
+                owner.getId(),
+                owner.getUsername(),
+                assigned.getId(),
+                assigned.getUsername(),
+                entity.getCreatedAt()
+        );
     }
 
     public CommentDto toDto(Comment comment) {
         if (comment == null) return null;
-        CommentDto dto = new CommentDto();
-        dto.setId(comment.getId());
-        dto.setText(comment.getText());
-        dto.setCreatedAt(comment.getCreatedAt());
-
         User author = comment.getAuthor();
-        if (author != null) {
-            dto.setAuthorId(author.getId());
-            dto.setAuthorUsername(author.getUsername());
-        }
 
-        if (comment.getCaseEntity() != null) {
-            dto.setCaseId(comment.getCaseEntity().getId());
-        }
+        return new CommentDto(
+                comment.getId(),
+                comment.getText(),
+                author.getId(),
+                author.getUsername(),
+                comment.getCaseEntity().getId(),
+                comment.getCreatedAt()
 
-        return dto;
+        );
     }
 
     public UploadedFileDto toDto(UploadedFile file) {
         if (file == null) return null;
-        UploadedFileDto dto = new UploadedFileDto();
-        dto.setId(file.getId());
-        dto.setFilename(file.getFilename());
-        dto.setUploadedAt(file.getUploadedAt());
-
         User uploadedBy = file.getUploadedBy();
-        if (uploadedBy != null) {
-            dto.setUploadedById(uploadedBy.getId());
-            dto.setUploadedByUsername(uploadedBy.getUsername());
-        }
-
-        if (file.getAssociatedCase() != null) {
-            dto.setCaseId(file.getAssociatedCase().getId());
-        }
-
-        return dto;
+        return new UploadedFileDto(
+            file.getId(),
+            file.getFilename(),
+            uploadedBy.getId(),
+                uploadedBy.getUsername(),
+                file.getAssociatedCase().getId(),
+                file.getUploadedAt()
+        );
     }
 }
