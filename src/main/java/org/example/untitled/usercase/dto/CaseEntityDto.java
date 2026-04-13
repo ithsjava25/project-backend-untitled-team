@@ -1,6 +1,5 @@
 package org.example.untitled.usercase.dto;
 
-import jakarta.validation.constraints.Null;
 import org.example.untitled.usercase.CaseStatus;
 import org.springframework.beans.factory.annotation.Value;
 

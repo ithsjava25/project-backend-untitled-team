@@ -2,7 +2,6 @@ package org.example.untitled.usercase;
 
 import jakarta.persistence.*;
 import org.example.untitled.user.User;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

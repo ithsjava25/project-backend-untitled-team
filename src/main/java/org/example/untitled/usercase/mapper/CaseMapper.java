@@ -1,6 +1,5 @@
 package org.example.untitled.usercase.mapper;
 
-import jakarta.validation.constraints.Null;
 import org.example.untitled.user.User;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.Comment;
