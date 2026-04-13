@@ -1,6 +1,7 @@
 package org.example.untitled.user.service;
 
 import org.example.untitled.auth.dto.RegisterRequest;
+import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
@@ -33,7 +34,14 @@ public class UserService {
         try {
             return userRep.save(user);
         } catch (DataIntegrityViolationException e) {
-            throw new UserAlreadyExistsException(request.getUsername());
+            String message = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+            if (message.contains("email")) {
+                throw new EmailAlreadyExistsException(request.getEmail());
+            } else if (message.contains("username")) {
+                throw new UserAlreadyExistsException(request.getUsername());
+            } else {
+                throw e;
+            }
         }
     }
 }

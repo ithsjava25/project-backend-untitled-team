@@ -1,6 +1,7 @@
 package org.example.untitled.config;
 
 import org.example.untitled.exception.CaseNotFoundException;
+import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.exception.UserNotFoundException;
 import org.slf4j.Logger;
@@ -17,21 +18,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleUserAlreadyExists(UserAlreadyExistsException ex) {
-        log.warn(ex.getMessage());
+        log.warn("User already exists");
         return "errorpage";
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleUserNotFound(UserNotFoundException ex) {
-        log.warn(ex.getMessage());
+        log.warn("User not found");
         return "errorpage";
     }
 
     @ExceptionHandler(CaseNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleCaseNotFound(CaseNotFoundException ex) {
-        log.warn(ex.getMessage());
+        log.warn("Case not found");
+        return "errorpage";
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
+        log.warn("Email already exists");
         return "errorpage";
     }
 
