@@ -8,6 +8,11 @@ public class EmailAlreadyExistsException extends AppException {
         this.email = email;
     }
 
+    public EmailAlreadyExistsException(String email, Throwable cause) {
+        super("Email already exists", cause);
+        this.email = email;
+    }
+
     public String getEmail() {
         return email;
     }

@@ -36,9 +36,9 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             String message = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
             if (message.contains("email")) {
-                throw new EmailAlreadyExistsException(request.getEmail());
+                throw new EmailAlreadyExistsException(request.getEmail(), e);
             } else if (message.contains("username")) {
-                throw new UserAlreadyExistsException(request.getUsername());
+                throw new UserAlreadyExistsException(request.getUsername(), e);
             } else {
                 throw e;
             }
