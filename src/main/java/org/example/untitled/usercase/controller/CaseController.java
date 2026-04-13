@@ -1,7 +1,6 @@
 package org.example.untitled.usercase.controller;
 
 import java.util.List;
-import org.example.untitled.user.User;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.service.CaseService;
