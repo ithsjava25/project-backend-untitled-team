@@ -36,7 +36,7 @@ package org.example.untitled.config;
                                   session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                   .authorizeHttpRequests(
                           auth ->
-                                  auth.requestMatchers("/auth/**", "/", "/home", "/images/**", "/css/**")
+                                  auth.requestMatchers("/auth/**", "/", "/home", "/images/**", "/css/**", "/upload/**")
                                           .permitAll()                                                                                                            
                                           .anyRequest()
                                           .authenticated())                                                                                                       
