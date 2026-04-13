@@ -1,5 +1,6 @@
 package org.example.untitled.usercase.mapper;
 
+import jakarta.validation.constraints.Null;
 import org.example.untitled.user.User;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.Comment;
@@ -16,23 +17,37 @@ public class CaseMapper {
         if (entity == null) return null;
         User owner = entity.getOwner();
         User assigned = entity.getAssignedTo();
-        return new CaseEntityDto(
-                entity.getId(),
-                entity.getTitle(),
-                entity.getDescription(),
-                entity.getStatus(),
-                owner.getId(),
-                owner.getUsername(),
-                assigned.getId(),
-                assigned.getUsername(),
-                entity.getCreatedAt()
-        );
+
+        if (assigned == null){
+            return new CaseEntityDto(
+                    entity.getId(),
+                    entity.getTitle(),
+                    entity.getDescription(),
+                    entity.getStatus(),
+                    owner.getId(),
+                    owner.getUsername(),
+                    null,
+                    "",
+                    entity.getCreatedAt()
+            );
+        } else {
+            return new CaseEntityDto(
+                    entity.getId(),
+                    entity.getTitle(),
+                    entity.getDescription(),
+                    entity.getStatus(),
+                    owner.getId(),
+                    owner.getUsername(),
+                    assigned.getId(),
+                    assigned.getUsername(),
+                    entity.getCreatedAt()
+            );
+        }
     }
 
     public CommentDto toDto(Comment comment) {
         if (comment == null) return null;
         User author = comment.getAuthor();
-
         return new CommentDto(
                 comment.getId(),
                 comment.getText(),
@@ -40,7 +55,6 @@ public class CaseMapper {
                 author.getUsername(),
                 comment.getCaseEntity().getId(),
                 comment.getCreatedAt()
-
         );
     }
 

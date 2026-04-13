@@ -11,6 +11,7 @@ import org.example.untitled.usercase.dto.UploadedFileDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CaseMapperTest {
@@ -38,7 +39,7 @@ class CaseMapperTest {
 
         CaseEntityDto dto = caseMapper.toDto(entity);
 
-        assertEquals(1L, dto.id());
+        assertEquals(1L, dto.ownerId());
         assertEquals("alice", dto.ownerUsername());
     }
 
@@ -52,7 +53,7 @@ class CaseMapperTest {
         CaseEntityDto dto = caseMapper.toDto(entity);
 
         assertNull(dto.assignedToId());
-        assertNull(dto.assignedToUsername());
+        assertThat(dto.assignedToUsername()).isEqualTo("");
     }
 
     @Test
