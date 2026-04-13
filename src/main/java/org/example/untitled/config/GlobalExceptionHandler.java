@@ -1,9 +1,6 @@
 package org.example.untitled.config;
 
-import org.example.untitled.exception.CaseNotFoundException;
-import org.example.untitled.exception.EmailAlreadyExistsException;
-import org.example.untitled.exception.UserAlreadyExistsException;
-import org.example.untitled.exception.UserNotFoundException;
+import org.example.untitled.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -40,6 +37,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
         log.warn("Email already exists");
+        return "errorpage";
+    }
+
+    @ExceptionHandler(UserHasActiveCasesException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleUserHasActiveCases(UserHasActiveCasesException ex) {
+        log.warn("User has active cases");
         return "errorpage";
     }
 
