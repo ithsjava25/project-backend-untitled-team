@@ -62,7 +62,7 @@ public class User {
                 .anyMatch(c -> c.getStatus() == CaseStatus.OPEN
                         || c.getStatus() == CaseStatus.IN_PROGRESS);
         if (hasActiveCases) {
-            throw new UserHasActiveCasesException(username);
+            throw new UserHasActiveCasesException();
         }
     }
 
