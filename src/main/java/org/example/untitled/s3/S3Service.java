@@ -58,7 +58,7 @@ public class S3Service {
     }
 
     public String generateS3PreUploadUrl(String fileName, String contentType) {
-        String fileIn = UUID.randomUUID() + "-" +fileName;
+        String fileIn = UUID.randomUUID().toString().substring(0, 8) + "-" +fileName;
         PutObjectPresignRequest preReq = PutObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(10))
                 .putObjectRequest(objReq -> objReq
