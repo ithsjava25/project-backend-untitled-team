@@ -1,6 +1,5 @@
 package org.example.untitled.user.service;
 
-import java.util.List;
 import org.example.untitled.auth.dto.RegisterRequest;
 import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
@@ -15,23 +14,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
     private final UserRepository userRep;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(
-            UserRepository userRep, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+            UserRepository userRep, PasswordEncoder passwordEncoder) {
         this.userRep = userRep;
-        this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
     }
 
     public List<UserDto> getAllUsers() {
         return userRep.findAll().stream()
-                .map(userMapper::toDto)
+                .map(UserMapper::toDto)
                 .toList();
     }
 
@@ -39,7 +38,7 @@ public class UserService {
         User user = userRep.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + id));
         user.setRole(role);
-        return userMapper.toDto(userRep.save(user));
+        return UserMapper.toDto(userRep.save(user));
     }
 
     public User register(RegisterRequest request) {

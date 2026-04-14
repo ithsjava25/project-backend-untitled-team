@@ -1,0 +1,120 @@
+/* Reset & base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: #0f172a; /* deep dark blue */
+    color: #e5e7eb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Container */
+div {
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Title */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #f1f5f9;
+}
+
+/* Form card */
+form {
+    background: #1e293b;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    border: 1px solid #334155;
+}
+
+/* Sections */
+.ticket-header,
+.ticket-body {
+    margin-bottom: 20px;
+}
+
+.ticket-title label,
+.ticket-body label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #cbd5f5;
+}
+
+/* Inputs */
+input,
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #0f172a;
+    color: #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+/* Placeholder color */
+input::placeholder,
+textarea::placeholder {
+    color: #64748b;
+}
+
+/* Textarea size */
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Focus effect */
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+}
+
+/* Footer */
+.ticket-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Button */
+button {
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    color: black;
+    border: none;
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Button hover */
+button:hover {
+    background: linear-gradient(135deg, #67e8f9, #818cf8);
+    transform: translateY(-1px);
+}
+
+/* Button click */
+button:active {
+    transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    form {
+        padding: 20px;
+    }
+}
