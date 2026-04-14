@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface CaseRepository extends ListCrudRepository<CaseEntity, Long> {
 
     List<CaseEntity> findByAssignedTo(User assignedTo);
+
+    List<CaseEntity> findByOwner(User owner);
 }
