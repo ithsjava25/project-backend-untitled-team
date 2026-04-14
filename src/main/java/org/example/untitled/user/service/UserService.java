@@ -5,7 +5,6 @@ import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
-import org.example.untitled.user.mapper.UserMapper;
 import org.example.untitled.user.repository.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,13 +14,11 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRep;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(
-            UserRepository userRep, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+            UserRepository userRep, PasswordEncoder passwordEncoder) {
         this.userRep = userRep;
-        this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
     }
 
