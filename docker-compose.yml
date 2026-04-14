@@ -3,19 +3,7 @@ services:
     image: postgres:latest
     environment:
       - "POSTGRES_DB=IssueHandlingSystem"
-      - "POSTGRES_USER=user"
-      - "POSTGRES_PASSWORD=myPass"
+      - "POSTGRES_USER=${DB_USERNAME:?DB_USERNAME is required}"
+      - "POSTGRES_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is required}"
     ports:
-      - "5432"
-  garaged:
-    build:
-      context: ./garage
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    ports:
-      - "3900:3900"
-      - "3901:3901"
-      - "3902:3902"
-      - "3903:3903"
-    volumes:
-      - ./garage/garage.toml:/etc/garage.toml
+      - "5432:5432"

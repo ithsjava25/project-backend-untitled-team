@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.untitled.auth.dto.LoginRequest;
 import org.example.untitled.auth.dto.LoginResponse;
 import org.example.untitled.auth.dto.RegisterRequest;
+import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.security.JwtService;
 import org.example.untitled.user.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -58,7 +59,7 @@ public class AuthController {
         try {
             userService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (IllegalStateException e) {
+        } catch (UserAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
