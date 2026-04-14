@@ -50,7 +50,7 @@ class CaseMapperTest {
         CaseEntityDto dto = caseMapper.toDto(entity);
 
         assertNull(dto.assignedToId());
-        assertThat(dto.assignedToUsername()).isEqualTo("");
+        assertNull(dto.assignedToUsername());
     }
 
     @Test

@@ -28,7 +28,7 @@ public class CaseMapper {
                     owner.getId(),
                     owner.getUsername(),
                     null,
-                    "",
+                    null,
                     entity.getCreatedAt()
             );
         } else {
