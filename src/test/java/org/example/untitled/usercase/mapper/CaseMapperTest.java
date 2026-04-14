@@ -8,10 +8,8 @@ import org.example.untitled.usercase.UploadedFile;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.UploadedFileDto;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
