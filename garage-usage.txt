@@ -4,5 +4,7 @@ to allow the keys:
 ❯ docker exec project-backend-untitled-team-garaged-1 garage key info --show-secret my-admin-key
 
 
-Key id is access key in application.propertise
+Key id is s3.accesskey in application.propertise
 secret key is s3.secret-key
+
+place in .env file for security

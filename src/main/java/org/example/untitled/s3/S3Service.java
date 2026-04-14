@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class S3Service {
@@ -57,11 +58,12 @@ public class S3Service {
     }
 
     public String generateS3PreUploadUrl(String fileName, String contentType) {
+        String fileIn = UUID.randomUUID() + "-" +fileName;
         PutObjectPresignRequest preReq = PutObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(10))
                 .putObjectRequest(objReq -> objReq
                         .bucket(BUCKET_NAME)
-                        .key(fileName)
+                        .key(fileIn)
                         .contentType(contentType)
                         .build())
                 .build();

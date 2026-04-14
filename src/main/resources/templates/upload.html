@@ -31,8 +31,7 @@
     }
 
     async function uploadNewFile(){
-        const input = document.getElementById('fileInput');
-        if (input.files.length === 0) return;
+        var input = document.getElementById('fileInput').files;
         const file = input.files[0];
         const status = document.getElementById('status');
         status.innerText = "getting url";
@@ -58,6 +57,7 @@
 
                 status.innerText = 'Upload and notification has been successfully done';
                 fetchAFile();
+                input.innerText="";
             } else {
                 status.innerText = 'failed to upload' + putRes.status;
             }
