@@ -36,8 +36,8 @@ class CaseMapperTest {
 
         CaseEntityDto dto = caseMapper.toDto(entity);
 
-        assertEquals(1L, dto.getOwnerId());
-        assertEquals("alice", dto.getOwnerUsername());
+        assertEquals(1L, dto.ownerId());
+        assertEquals("alice", dto.ownerUsername());
     }
 
     @Test
