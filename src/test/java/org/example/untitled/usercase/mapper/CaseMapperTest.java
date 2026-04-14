@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CaseMapperTest {
 
@@ -25,11 +27,6 @@ class CaseMapperTest {
         return user;
     }
 
-    @BeforeEach
-    void setUp() {
-        caseMapper = new CaseMapper();
-    }
-
     @Test
     void toDto_caseEntity_shouldMapOwner() {
         CaseEntity entity = new CaseEntity();
@@ -39,8 +36,8 @@ class CaseMapperTest {
 
         CaseEntityDto dto = caseMapper.toDto(entity);
 
-        assertEquals(1L, dto.ownerId());
-        assertEquals("alice", dto.ownerUsername());
+        assertEquals(1L, dto.getOwnerId());
+        assertEquals("alice", dto.getOwnerUsername());
     }
 
     @Test

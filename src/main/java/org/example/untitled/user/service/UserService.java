@@ -5,24 +5,40 @@ import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
+import org.example.untitled.user.dto.UserDto;
 import org.example.untitled.user.mapper.UserMapper;
 import org.example.untitled.user.repository.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 public class UserService {
 
     private final UserRepository userRep;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(
-            UserRepository userRep, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+            UserRepository userRep, PasswordEncoder passwordEncoder) {
         this.userRep = userRep;
-        this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public List<UserDto> getAllUsers() {
+        return userRep.findAll().stream()
+                .map(UserMapper::toDto)
+                .toList();
+    }
+
+    public UserDto updateRole(Long id, Role role) {
+        User user = userRep.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + id));
+        user.setRole(role);
+        return UserMapper.toDto(userRep.save(user));
     }
 
     public User register(RegisterRequest request) {

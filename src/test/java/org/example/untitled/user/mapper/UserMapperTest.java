@@ -3,7 +3,6 @@ package org.example.untitled.user.mapper;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.dto.UserDto;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -11,13 +10,6 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
-
-    private UserMapper userMapper;
-
-    @BeforeEach
-    void setUp() {
-        userMapper = new UserMapper();
-    }
 
     @Test
     void toEntity_shouldNotMapId() {
@@ -28,7 +20,7 @@ class UserMapperTest {
                 LocalDateTime.now()
         );
 
-        User user = userMapper.toEntity(dto);
+        User user = UserMapper.toEntity(dto);
 
         assertNotNull(user);
         assertEquals("alice", user.getUsername());
@@ -45,7 +37,7 @@ class UserMapperTest {
                 LocalDateTime.now()
         );
 
-        User user = userMapper.toEntity(dto);
+        User user = UserMapper.toEntity(dto);
 
         assertNotNull(user);
         assertEquals("alice", user.getUsername());

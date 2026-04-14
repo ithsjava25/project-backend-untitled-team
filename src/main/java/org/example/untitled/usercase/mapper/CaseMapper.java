@@ -6,13 +6,15 @@ import org.example.untitled.usercase.Comment;
 import org.example.untitled.usercase.UploadedFile;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
+import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.UploadedFileDto;
-import org.springframework.stereotype.Component;
 
-@Component
 public class CaseMapper {
 
-    public CaseEntityDto toDto(CaseEntity entity) {
+    private CaseMapper() {
+    }
+
+    public static CaseEntityDto toDto(CaseEntity entity) {
         if (entity == null) return null;
         User owner = entity.getOwner();
         User assigned = entity.getAssignedTo();
@@ -44,7 +46,7 @@ public class CaseMapper {
         }
     }
 
-    public CommentDto toDto(Comment comment) {
+    public static CommentDto toDto(Comment comment) {
         if (comment == null) return null;
         User author = comment.getAuthor();
         return new CommentDto(
@@ -57,7 +59,7 @@ public class CaseMapper {
         );
     }
 
-    public UploadedFileDto toDto(UploadedFile file) {
+    public static UploadedFileDto toDto(UploadedFile file) {
         if (file == null) return null;
         User uploadedBy = file.getUploadedBy();
         return new UploadedFileDto(
@@ -68,5 +70,12 @@ public class CaseMapper {
                 file.getAssociatedCase().getId(),
                 file.getUploadedAt()
         );
+    }
+
+    public static CaseEntity toEntity(CreateCaseRequest dto) {
+        CaseEntity caseEntity = new CaseEntity();
+        caseEntity.setTitle(dto.getTitle());
+        caseEntity.setDescription(dto.getDescription());
+        return caseEntity;
     }
 }
