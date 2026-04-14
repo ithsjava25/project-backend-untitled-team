@@ -1,6 +1,7 @@
 package org.example.untitled.user;
 
 import jakarta.persistence.*;
+import org.example.untitled.exception.UserHasActiveCasesException;
 import org.example.untitled.usercase.*;
 
 import java.time.LocalDateTime;
@@ -61,8 +62,7 @@ public class User {
                 .anyMatch(c -> c.getStatus() == CaseStatus.OPEN
                         || c.getStatus() == CaseStatus.IN_PROGRESS);
         if (hasActiveCases) {
-            throw new IllegalStateException(
-                    "User '" + username + "' has active cases and cannot be deleted.");
+            throw new UserHasActiveCasesException();
         }
     }
 
