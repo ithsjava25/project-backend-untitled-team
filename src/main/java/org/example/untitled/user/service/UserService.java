@@ -1,17 +1,20 @@
 package org.example.untitled.user.service;
 
-import java.util.List;
 import org.example.untitled.auth.dto.RegisterRequest;
 import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
+import org.example.untitled.user.dto.UserDto;
+import org.example.untitled.user.mapper.UserMapper;
 import org.example.untitled.user.repository.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -27,7 +30,7 @@ public class UserService {
 
     public List<UserDto> getAllUsers() {
         return userRep.findAll().stream()
-                .map(userMapper::toDto)
+                .map(UserMapper::toDto)
                 .toList();
     }
 
@@ -35,7 +38,7 @@ public class UserService {
         User user = userRep.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + id));
         user.setRole(role);
-        return userMapper.toDto(userRep.save(user));
+        return UserMapper.toDto(userRep.save(user));
     }
 
     public User register(RegisterRequest request) {
