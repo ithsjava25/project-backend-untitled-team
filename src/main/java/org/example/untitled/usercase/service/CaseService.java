@@ -33,6 +33,8 @@ public class CaseService {
         if (createForm == null) {
             throw new IllegalArgumentException("ticketForm can not be null");
         }
+        if (user == null)
+            throw new IllegalArgumentException("User can not be null");
         if (caseRepository.existsByTitleAndOwner(createForm.getTitle(), user))
             throw new IllegalArgumentException(
                     "A ticket for this issue is already in the system"
