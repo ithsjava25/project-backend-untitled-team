@@ -8,9 +8,7 @@ import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.UploadedFileDto;
-import org.springframework.stereotype.Component;
 
-@Component
 public class CaseMapper {
 
     private CaseMapper() {

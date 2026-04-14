@@ -1,30 +1,18 @@
 package org.example.untitled.usercase.controller;
 
 import org.example.untitled.user.User;
-import org.example.untitled.usercase.dto.CreateCaseRequest;
-import org.example.untitled.usercase.service.CaseService;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-
-public class CaseController {
-
-    CaseService caseService;
-import java.util.List;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
+import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.service.CaseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/tickets")
@@ -43,13 +31,12 @@ public class CaseController {
         return "create_ticket";
     }
 
-    @PostMapping
+    @PostMapping("/tickets/create")
     public String processCreateTicket(@ModelAttribute("ticketForm") CreateCaseRequest ticketForm, User user) {
         caseService.saveTicket(ticketForm, user);
         return "redirect:/userpage";
     }
 
-}
     @GetMapping
     @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
     public ResponseEntity<List<CaseEntityDto>> getAllTickets() {

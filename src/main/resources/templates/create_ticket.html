@@ -8,16 +8,16 @@
 <body>
 <h1>Create Ticket</h1>
 <div>
-    <form th:action="@{/tickets/create}" th:object="ticketForm" method="post">
+    <form th:action="@{/tickets/create}" th:object="${ticketForm}" method="post">
         <header class="ticket-header">
             <div class="ticket-title">
-                <p>Issue:</p>
+                <label for="title">Issue:</label>
                 <input th:field="*{title}" id="title">
             </div>
         </header>
         <div class="ticket-body">
-            <p>Description:</p>
-            <textarea th:field="*{description}"></textarea>
+            <label for="description">Description:</label>
+            <textarea th:field="*{description}" id="description"></textarea>
         </div>
         <footer class="ticket-footer">
             <div class="ticket-button">

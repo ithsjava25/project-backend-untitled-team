@@ -43,8 +43,8 @@ form {
     margin-bottom: 20px;
 }
 
-.ticket-title p,
-.ticket-body p {
+.ticket-title label,
+.ticket-body label {
     font-weight: 600;
     margin-bottom: 6px;
     color: #cbd5f5;
