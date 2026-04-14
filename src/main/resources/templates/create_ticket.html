@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Create Ticket</title>
-    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 <h1>Create Ticket</h1>
 <div>
-    <form th:action="@{/tickets/create}" th:object="${ticketForm}" method="post">
+    <form th:action="@{/create}" th:object="${ticketForm}" method="post">
         <header class="ticket-header">
             <div class="ticket-title">
                 <label for="title">Issue:</label>
@@ -26,6 +26,5 @@
         </footer>
     </form>
 </div>
-
 </body>
 </html>

@@ -9,12 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/tickets")
 public class CaseController {
 
@@ -25,25 +26,27 @@ public class CaseController {
     }
 
 
-    @GetMapping("/tickets/create")
+    @GetMapping("/create")
     public String createTicketForm(Model model) {
         model.addAttribute("ticketForm", new CreateCaseRequest());
         return "create_ticket";
     }
 
-    @PostMapping("/tickets/create")
-    public String processCreateTicket(@ModelAttribute("ticketForm") CreateCaseRequest ticketForm, User user) {
+    @PostMapping("/create")
+    public String processCreateTicket(@ModelAttribute("ticketForm") CreateCaseRequest ticketForm, @AuthenticationPrincipal User user) {
         caseService.saveTicket(ticketForm, user);
         return "redirect:/userpage";
     }
 
     @GetMapping
+    @ResponseBody
     @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
     public ResponseEntity<List<CaseEntityDto>> getAllTickets() {
         return ResponseEntity.ok(caseService.getAllTickets());
     }
 
     @PutMapping("/{id}/status")
+    @ResponseBody
     @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> updateStatus(
             @PathVariable Long id, @RequestParam CaseStatus status) {
@@ -51,6 +54,7 @@ public class CaseController {
     }
 
     @PutMapping("/{id}/assign")
+    @ResponseBody
     @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> assignToSelf(
             @PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
