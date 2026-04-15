@@ -5,7 +5,7 @@ import org.example.untitled.user.User;
 import org.example.untitled.user.dto.UserDto;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +17,7 @@ class UserMapperTest {
                 "alice",
                 "alice@example.com",
                 Role.USER,
-                LocalDateTime.now()
+                Instant.now()
         );
 
         User user = UserMapper.toEntity(dto);
@@ -34,7 +34,7 @@ class UserMapperTest {
                 "alice",
                 "alice@example.com",
                 Role.ADMIN,
-                LocalDateTime.now()
+                Instant.now()
         );
 
         User user = UserMapper.toEntity(dto);
