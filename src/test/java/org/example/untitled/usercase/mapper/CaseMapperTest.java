@@ -10,6 +10,7 @@ import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.UploadedFileDto;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -33,8 +34,8 @@ class CaseMapperTest {
 
         CaseEntityDto dto = caseMapper.toDto(entity);
 
-        assertEquals(1L, dto.getOwnerId());
-        assertEquals("alice", dto.getOwnerUsername());
+        assertEquals(1L, dto.ownerId());
+        assertEquals("alice", dto.ownerUsername());
     }
 
     @Test
@@ -46,8 +47,8 @@ class CaseMapperTest {
 
         CaseEntityDto dto = caseMapper.toDto(entity);
 
-        assertNull(dto.getAssignedToId());
-        assertNull(dto.getAssignedToUsername());
+        assertNull(dto.assignedToId());
+        assertNull(dto.assignedToUsername());
     }
 
     @Test
@@ -62,10 +63,10 @@ class CaseMapperTest {
 
         CommentDto dto = caseMapper.toDto(comment);
 
-        assertEquals("This is a comment", dto.getText());
-        assertEquals(1L, dto.getAuthorId());
-        assertEquals("alice", dto.getAuthorUsername());
-        assertEquals(10L, dto.getCaseId());
+        assertEquals("This is a comment", dto.text());
+        assertEquals(1L, dto.authorId());
+        assertEquals("alice", dto.authorUsername());
+        assertEquals(10L, dto.caseId());
     }
 
     @Test
@@ -80,9 +81,9 @@ class CaseMapperTest {
 
         UploadedFileDto dto = caseMapper.toDto(file);
 
-        assertEquals("report.pdf", dto.getFilename());
-        assertEquals(1L, dto.getUploadedById());
-        assertEquals("alice", dto.getUploadedByUsername());
-        assertEquals(10L, dto.getCaseId());
+        assertEquals("report.pdf", dto.filename());
+        assertEquals(1L, dto.uploadedById());
+        assertEquals("alice", dto.uploadedByUsername());
+        assertEquals(10L, dto.caseId());
     }
 }
