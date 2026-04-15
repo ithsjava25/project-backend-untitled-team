@@ -43,9 +43,6 @@ public class SecurityConfig {
                                         .anyRequest()
                                         .authenticated())
                 .authenticationProvider(authenticationProvider())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -2,13 +2,13 @@
 <html xmlns_th="https://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Login</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <h1>Login</h1>
 <div>
-    <form th:action="@{/login}" th:object="${loginForm}" method="post">
+    <form th:action="@{/auth/login}" th:object="${loginForm}" method="post">
         <header class="login-header">
             <div class="login-username">
                 <label for="username">Username:</label>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns_th="https//www.thymeleaf.org" lang="en">
+<html xmlns:th="https://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
@@ -8,7 +8,7 @@
 <body>
 <h1>Register</h1>
 <div>
-    <form th:action="@{/user/register}" th:object="${registerForm}" method="post">
+    <form th:action="@{/auth/register}" th:object="${registerForm}" method="post">
         <header class="register-header">
             <div class="register-username">
                 <label for="username">Username:</label>

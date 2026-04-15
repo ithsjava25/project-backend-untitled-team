@@ -14,12 +14,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
+@Controller
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -39,25 +38,39 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @GetMapping("/login")
+    public String showLoginForm(Model model) {
+        model.addAttribute("loginForm", new LoginRequest());
+        return "login";
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    @ResponseBody
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginForm) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getUsername(), request.getPassword()));
+                            loginForm.getUsername(), loginForm.getPassword()));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginForm.getUsername());
         String token = jwtService.generateToken(userDetails);
         return ResponseEntity.ok(new LoginResponse(token));
     }
 
+    @GetMapping("/register")
+    public String showRegisterForm(Model model) {
+        model.addAttribute("registerForm", new RegisterRequest());
+        return "register_user";
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
+    @ResponseBody
+    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest registerForm) {
         try {
-            userService.register(request);
+            userService.register(registerForm);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (UserAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
