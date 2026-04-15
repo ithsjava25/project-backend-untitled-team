@@ -5,6 +5,7 @@ import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.service.CaseService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,7 +31,7 @@ public class CaseController {
 
     @PostMapping
     public ResponseEntity<CaseEntityDto> createTicket(
-            @RequestBody CreateCaseRequest request,
+            @Valid @RequestBody CreateCaseRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(caseService.createTicket(request, userDetails.getUsername()));
     }
@@ -44,7 +45,7 @@ public class CaseController {
     @PutMapping("/{id}")
     public ResponseEntity<CaseEntityDto> updateTicket(
             @PathVariable Long id,
-            @RequestBody CreateCaseRequest request,
+            @Valid @RequestBody CreateCaseRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(caseService.updateTicket(id, request, userDetails.getUsername()));
     }
