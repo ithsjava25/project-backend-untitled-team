@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "case_entity", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uq_case_entity_title_owner",
+                columnNames = {"title", "owner_id"}
+        )
+})
 public class CaseEntity {
 
     @Id
