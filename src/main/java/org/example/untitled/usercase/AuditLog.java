@@ -3,7 +3,7 @@ package org.example.untitled.usercase;
 import jakarta.persistence.*;
 import org.example.untitled.user.User;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 public class AuditLog {
@@ -17,7 +17,7 @@ public class AuditLog {
     private AuditAction action;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -38,7 +38,7 @@ public class AuditLog {
 
     @PrePersist
     protected void onCreate() {
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = Instant.now();
     }
 
     public Long getId() {
@@ -49,7 +49,7 @@ public class AuditLog {
         return action;
     }
 
-    public LocalDateTime getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 

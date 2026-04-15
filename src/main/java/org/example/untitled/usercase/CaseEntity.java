@@ -3,7 +3,7 @@ package org.example.untitled.usercase;
 import jakarta.persistence.*;
 import org.example.untitled.user.User;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,16 +45,16 @@ public class CaseEntity {
     private List<AuditLog> auditLogs = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     public CaseEntity() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
         // Empty constructor for JPA
     }
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
     }
 
     public Long getId() {
@@ -129,7 +129,7 @@ public class CaseEntity {
         this.auditLogs = auditLogs;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 }
