@@ -48,13 +48,14 @@ public class CaseEntity {
     private Instant createdAt;
 
     public CaseEntity() {
-        createdAt = Instant.now();
         // Empty constructor for JPA
     }
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = Instant.now();
+        if (this.createdAt == null) {
+            this.createdAt = Instant.now();
+        }
     }
 
     public Long getId() {
