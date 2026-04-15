@@ -55,6 +55,9 @@ public class CaseService {
         if (!caseEntity.getOwner().getUsername().equals(username)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
         }
+        if (caseRepository.existsByTitleAndOwnerAndIdNot(request.getTitle(), caseEntity.getOwner(), id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A ticket with this title already exists");
+        }
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
         return CaseMapper.toDto(caseRepository.save(caseEntity));
