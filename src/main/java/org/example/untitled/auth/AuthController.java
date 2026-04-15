@@ -46,7 +46,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @ResponseBody
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginForm) {
+    public ResponseEntity<LoginResponse> login(@Valid @ModelAttribute LoginRequest loginForm) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -68,7 +68,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseBody
-    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest registerForm) {
+    public ResponseEntity<Void> register(@Valid @ModelAttribute RegisterRequest registerForm) {
         try {
             userService.register(registerForm);
             return ResponseEntity.status(HttpStatus.CREATED).build();
