@@ -5,16 +5,20 @@ import org.example.untitled.user.User;
 import org.example.untitled.user.dto.UserDto;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
 
     @Test
     void toEntity_shouldNotMapId() {
-        UserDto dto = new UserDto();
-        dto.setId(99L);
-        dto.setUsername("alice");
-        dto.setEmail("alice@example.com");
+        UserDto dto = new UserDto(99L,
+                "alice",
+                "alice@example.com",
+                Role.USER,
+                LocalDateTime.now()
+        );
 
         User user = UserMapper.toEntity(dto);
 
@@ -26,10 +30,12 @@ class UserMapperTest {
 
     @Test
     void toEntity_shouldNotMapRole() {
-        UserDto dto = new UserDto();
-        dto.setRole(Role.ADMIN);
-        dto.setUsername("alice");
-        dto.setEmail("alice@example.com");
+        UserDto dto = new UserDto(99L,
+                "alice",
+                "alice@example.com",
+                Role.ADMIN,
+                LocalDateTime.now()
+        );
 
         User user = UserMapper.toEntity(dto);
 

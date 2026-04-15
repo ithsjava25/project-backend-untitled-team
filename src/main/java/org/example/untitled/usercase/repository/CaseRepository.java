@@ -11,4 +11,6 @@ public interface CaseRepository extends ListCrudRepository<CaseEntity, Long> {
 
     boolean existsByTitleAndOwner(String title, User user);
     List<CaseEntity> findByAssignedTo(User assignedTo);
+
+    List<CaseEntity> findByOwner(User owner);
 }
