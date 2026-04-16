@@ -1,6 +1,8 @@
 package org.example.untitled.usercase.service;
 
 import java.util.List;
+
+import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseEntity;
@@ -103,6 +105,9 @@ public class CaseService {
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         User handler = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        if (handler.getRole() != Role.HANDLER && handler.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler or admin");
+        }
         caseEntity.setAssignedTo(handler);
         return CaseMapper.toDto(caseRepository.save(caseEntity));
     }
