@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CommentService {
 
-    private CommentRepository commentRepository;
-    private CaseRepository caseRepository;
+    private final CommentRepository commentRepository;
+    private final CaseRepository caseRepository;
 
 
     public CommentService(CommentRepository commentRepository, CaseRepository caseRepository) {
@@ -26,9 +26,11 @@ public class CommentService {
             throw new IllegalArgumentException("CreateCommentRequest can't be null");
         if (ticket == null)
             throw new IllegalArgumentException("CaseEntityDTO can't be null");
+        var caseEntity = caseRepository.findById(ticket.id())
+                .orElseThrow(() -> new IllegalArgumentException("Ticket not found: " + ticket.id()));
         var entity = CommentMapper.toEntity(comment);
         entity.setAuthor(caseRepository.findOwnerById(ticket.id()));
-        entity.setCaseEntity(caseRepository.findCaseEntityById(ticket.id()));
+        entity.setCaseEntity(caseEntity);
         commentRepository.save(entity);
     }
 }

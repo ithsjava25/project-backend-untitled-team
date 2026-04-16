@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Close Ticket</title>
-    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
 </head>
 <body>
 <h1>Close Ticket</h1>
@@ -19,11 +19,11 @@
         </div>
     </div>
     <div>
-        <form th:action="@{/tickets/close}">
+        <form th:action="@{/tickets/close}" th:object="${comment}" method="post">
             <div>
                 <label for="text">Reason for closing</label>
-                <textarea th:field="${comment.text}" id="text"></textarea>
-                <input th:field="${ticket.id}" type="hidden">
+                <textarea th:field="*{text}" id="text"></textarea>
+                <input th:value="${ticket.id}" type="hidden" name="id">
             </div>
             <div class="ticket-footer">
                 <div class="ticket-button">
