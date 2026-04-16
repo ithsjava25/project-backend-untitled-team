@@ -111,4 +111,8 @@ public class CaseService {
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         return CaseMapper.toDto(caseEntity);
     }
+
+    public User findOwnerById(long id) {
+        return caseRepository.findOwnerById(id);
+    }
 }
