@@ -1,6 +1,7 @@
 package org.example.untitled.user.controller;
 
 import org.example.untitled.auth.dto.RegisterRequest;
+import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.service.UserService;
 import org.slf4j.Logger;
@@ -48,6 +49,9 @@ public class UserController {
             userService.register(registerForm);
         } catch (UserAlreadyExistsException e) {
             bindingResult.rejectValue("username", "error.registerForm", e.getMessage());
+            return "register_user";
+        } catch (EmailAlreadyExistsException e) {
+            bindingResult.rejectValue("email", "error.registerForm", e.getMessage());
             return "register_user";
         }
         return "redirect:/login";
