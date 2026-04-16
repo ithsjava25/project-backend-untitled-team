@@ -9,16 +9,17 @@
     <h1>My Tickets</h1>
 </header>
 <main>
-    <ul>
-        <li><a th:href="@{/upload}">Upload image</a></li>
-    </ul>
+<!--    <ul>-->
+<!--        <li><a th:href="@{/upload}">Upload image</a></li>-->
+<!--    </ul>-->
 
     <section>
         <h2>Create New Ticket</h2>
         <form id="createForm">
             <label>Title: <input type="text" id="createTitle" required></label><br>
             <label>Description: <textarea id="createDescription"></textarea></label><br>
-            <button type="submit">Create</button>
+            <input type="file" id="fileInput">
+            <button onclick="uploadNewFile()" type="submit">Create</button>
         </form>
     </section>
 
