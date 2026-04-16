@@ -51,7 +51,7 @@ class CaseServiceTest {
     }
 
     @Test
-    void assingTicket_shouldAssign_whenUserIsHandler() {
+    void assignTicket_shouldAssign_whenUserIsHandler() {
         User handler = makeUser(2L, "handler", Role.HANDLER);
         User owner = makeUser(1L, "owner", Role.USER);
         CaseEntity caseEntity = makeCaseEntity(1L, owner);
@@ -60,9 +60,10 @@ class CaseServiceTest {
         when(userRepository.findByUsername("handler")).thenReturn(Optional.of(handler));
         when(caseRepository.save(any())).thenReturn(caseEntity);
 
-        CaseEntityDto result = caseService.assignTicket(1L,"handler");
+        CaseEntityDto result = caseService.assignTicket(1L, "handler");
 
         assertNotNull(result);
+        assertEquals(handler, caseEntity.getAssignedTo(), "Ticket was not assigned to handler");
     }
 
     @Test
@@ -78,6 +79,7 @@ class CaseServiceTest {
         CaseEntityDto result = caseService.assignTicket(1L, "admin");
 
         assertNotNull(result);
+        assertEquals(admin, caseEntity.getAssignedTo(), "Ticket was not assigned to admin");
     }
 
     @Test
