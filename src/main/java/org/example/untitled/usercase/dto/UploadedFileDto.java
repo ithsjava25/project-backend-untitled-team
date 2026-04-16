@@ -1,6 +1,6 @@
 package org.example.untitled.usercase.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record UploadedFileDto(
         Long id,
@@ -8,5 +8,5 @@ public record UploadedFileDto(
         Long uploadedById,
         String uploadedByUsername,
         Long caseId,
-        LocalDateTime uploadedAt
+        Instant uploadedAt
     ){}

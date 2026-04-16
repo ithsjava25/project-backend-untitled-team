@@ -3,7 +3,7 @@ package org.example.untitled.usercase.dto;
 import org.example.untitled.usercase.CaseStatus;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record CaseEntityDto(
         Long id,
@@ -16,6 +16,6 @@ public record CaseEntityDto(
         Long assignedToId,
         @Value("")
         String assignedToUsername,
-        LocalDateTime createdAt
+        Instant createdAt
 ){
 }
