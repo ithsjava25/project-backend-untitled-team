@@ -6,6 +6,7 @@ import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.service.CaseService;
+import org.example.untitled.usercase.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,9 +23,11 @@ import java.util.List;
 public class CaseController {
 
     private final CaseService caseService;
+    private final CommentService commentService;
 
-    public CaseController(CaseService caseService) {
+    public CaseController(CaseService caseService, CommentService commentService) {
         this.caseService = caseService;
+        this.commentService = commentService;
     }
 
     @PostMapping
@@ -87,7 +90,7 @@ public class CaseController {
         }
         try {
             caseService.updateStatus(ticket.id(), CaseStatus.CLOSED);
-
+            commentService.createComment(comment, ticket);
         } catch (IllegalArgumentException e) {
             bindingResult.rejectValue("text", "error.createCommentRequest", e.getMessage());
             return "close_ticket";
