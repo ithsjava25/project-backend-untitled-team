@@ -75,8 +75,10 @@ public class CaseViewController {
             @PathVariable Long id,
             @Valid @ModelAttribute("ticketForm") CreateCaseRequest ticketForm,
             BindingResult bindingResult,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("ticketId", id);
             return "edit_ticket";
         }
         try {
@@ -84,6 +86,7 @@ public class CaseViewController {
         } catch (ResponseStatusException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 bindingResult.rejectValue("title", "error.ticketForm", e.getReason());
+                model.addAttribute("ticketId", id);
                 return "edit_ticket";
             }
             throw e;
