@@ -1,6 +1,5 @@
 package org.example.untitled.usercase.service;
 
-import jakarta.persistence.Entity;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
