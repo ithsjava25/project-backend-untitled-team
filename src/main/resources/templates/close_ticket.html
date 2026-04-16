@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Close Ticket</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
+</head>
+<body>
+<h1>Close Ticket</h1>
+<div>
+    <div th:object="${ticket}">
+        <div class="ticket-info">
+            <div class="ticket-title">
+                <p th:text="*{title}"></p>
+            </div>
+            <div class="ticket-body">
+                <p th:text="*{description}"></p>
+            </div>
+        </div>
+    </div>
+    <div>
+        <form th:action="@{/tickets/close}" th:object="${comment}" method="post">
+            <div>
+                <label for="text">Reason for closing</label>
+                <textarea th:field="*{text}" id="text"></textarea>
+                <input th:value="${ticket.id}" type="hidden" name="id">
+            </div>
+            <div class="ticket-footer">
+                <div class="ticket-button">
+                    <button type="submit">Close Ticket</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -1,12 +1,12 @@
 package org.example.untitled.usercase.service;
 
-import java.util.List;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
+import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.mapper.CaseMapper;
 import org.example.untitled.usercase.repository.CaseRepository;
 import org.springframework.http.HttpStatus;
@@ -14,17 +14,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 public class CaseService {
 
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
+    private final CommentService commentService;
 
     public CaseService(
             CaseRepository caseRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, CommentService commentService) {
         this.caseRepository = caseRepository;
         this.userRepository = userRepository;
+        this.commentService = commentService;
     }
 
     public CaseEntityDto createTicket(CreateCaseRequest request, String username) {
@@ -77,6 +81,16 @@ public class CaseService {
         caseRepository.save(entity);
     }
 
+    @Transactional
+    public void closeTicket(CaseEntityDto ticket, CreateCommentRequest comment) {
+        if (comment == null)
+            throw new IllegalArgumentException("Comment Cant be null");
+        if (ticket == null)
+            throw new IllegalArgumentException("Ticket Cant be null");
+        updateStatus(ticket.id(), CaseStatus.CLOSED);
+        commentService.createComment(comment, ticket);
+    }
+
     public List<CaseEntityDto> getAllTickets() {
         return caseRepository.findAll().stream()
                 .map(CaseMapper::toDto)
@@ -105,5 +119,15 @@ public class CaseService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         caseEntity.setAssignedTo(handler);
         return CaseMapper.toDto(caseRepository.save(caseEntity));
+    }
+
+    public CaseEntityDto getTicketByID(long id) {
+        CaseEntity caseEntity = caseRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
+        return CaseMapper.toDto(caseEntity);
+    }
+    public User findOwnerById(long id) {
+        return caseRepository.findOwnerById(id);
     }
 }
