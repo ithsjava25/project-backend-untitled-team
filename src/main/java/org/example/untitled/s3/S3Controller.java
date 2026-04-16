@@ -26,6 +26,7 @@ public class S3Controller {
     @GetMapping("/upload")
     public String home(Model model){
         log.info("welcome page");
+        model.addAttribute("files", s3Service.listFiles());
         return "upload";
     }
 
