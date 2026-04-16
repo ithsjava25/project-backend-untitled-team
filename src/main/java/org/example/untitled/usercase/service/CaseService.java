@@ -1,6 +1,5 @@
 package org.example.untitled.usercase.service;
 
-import java.util.List;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseEntity;
@@ -13,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 public class CaseService {
@@ -102,5 +103,12 @@ public class CaseService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         caseEntity.setAssignedTo(handler);
         return CaseMapper.toDto(caseRepository.save(caseEntity));
+    }
+
+    public CaseEntityDto getTicketByID(long id) {
+        CaseEntity caseEntity = caseRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
+        return CaseMapper.toDto(caseEntity);
     }
 }
