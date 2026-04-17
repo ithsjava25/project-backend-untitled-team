@@ -18,18 +18,14 @@ async function fetchAFile(){
 async function downloadFile(fileName) {
     const res = await apiReq(`/api/files/download-url?fileName=${encodeURIComponent(fileName)}`);
     if (!res) return;
-
     const {url} = await res.json();
     window.open(url, '_blank');
-
 }
 
 async function uploadNewFile(){
     const input = document.getElementById('fileInput');
     const status = document.getElementById('status');
-
     if (input.files.length === 0) return;
-
     const filesToUpload = Array.from(input.files);
     input.value = null;
 
@@ -39,8 +35,7 @@ async function uploadNewFile(){
         try {
             status.innerText = `Processing file ${i + 1} of ${filesToUpload.length}: ${file.name}`;
             const res = await apiReq(`/api/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
-            if (!res) continue; // Move to next file if request fails
-
+            if (!res) continue;
             const { url } = await res.json();
             status.innerText = `Uploading ${file.name}...`;
             const putRes = await fetch(url, {
@@ -54,7 +49,7 @@ async function uploadNewFile(){
                 });
 
                 status.innerText = `Successfully uploaded ${file.name}`;
-                fetchAFile(); // Refresh list/view
+                fetchAFile();
             } else {
                 status.innerText = `Failed to upload ${file.name}. Status: ${putRes.status}`;
             }
@@ -74,19 +69,12 @@ async function deleteFile(fileName){
         return;
     }
 }
-async function apiReq(url, options = {}){
-    // const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-    // const csrfHeader = document.querySelector('meta[name="_crsf_header"]').getAttribute('content');
-    options.credentials = options.credentials || "same-origin";
+async function apiReq(url, options = {}) {
+    options.credentials = options.credentials || 'same-origin';
     options.headers = options.headers || {};
     options.redirect = 'manual';
-    const method = options.method ? options.method.toUpperCase() : 'GET';
-    //  if (method !== 'GET' && method !== 'HEAD'){
-    //    options.headers[csrfHeader] = csrfToken;
-    //}
     const res = await fetch(url, options);
     if (res.status === 401 || res.status === 403) {
-        console.warn("auth issue, reloading....");
         window.location.reload();
         return null;
     }
