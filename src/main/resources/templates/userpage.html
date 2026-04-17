@@ -9,9 +9,10 @@
     <h1>My Tickets</h1>
 </header>
 <main>
-<!--    <ul>-->
-<!--        <li><a th:href="@{/upload}">Upload image</a></li>-->
-<!--    </ul>-->
+    <ul>
+        <li><a th:href="@{/upload}">Upload image</a></li>
+        <li><a th:href="@{/tickets/create}">Create new ticket</a></li>
+    </ul>
 
     <section>
         <h2>Create New Ticket</h2>
@@ -25,18 +26,18 @@
 
     <section>
         <h2>My Tickets</h2>
-        <div id="ticketList"></div>
-    </section>
-
-    <section id="editSection" style="display:none;">
-        <h2>Edit Ticket</h2>
-        <form id="editForm">
-            <input type="hidden" id="editId">
-            <label>Title: <input type="text" id="editTitle" required></label><br>
-            <label>Description: <textarea id="editDescription"></textarea></label><br>
-            <button type="submit">Save</button>
-            <button type="button" onclick="document.getElementById('editSection').style.display='none'">Cancel</button>
-        </form>
+        <div th:if="${#lists.isEmpty(tickets)}">
+            <p>You have no tickets yet.</p>
+        </div>
+        <div th:each="ticket : ${tickets}">
+            <strong th:text="${ticket.title}"></strong>
+            <span th:text="' — ' + ${ticket.status}"></span>
+            <br>
+            <em th:text="${ticket.description}"></em>
+            <br>
+            <a th:href="@{/tickets/{id}/edit(id=${ticket.id})}">Edit</a>
+            <hr>
+        </div>
     </section>
 </main>
 
