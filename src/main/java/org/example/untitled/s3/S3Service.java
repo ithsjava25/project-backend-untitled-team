@@ -25,11 +25,13 @@ public class S3Service {
     private final S3Presigner s3Presigner;
     private final String BUCKET_NAME = "chum-bucket";
 
-    private List<UploadedFile> uploadedFiles;
+    //used for the s3 files locally.
+    private final List<UploadedFile> uploadedFiles;
 
-    public S3Service(S3Client s3Client, S3Presigner s3Presigner){
+    public S3Service(S3Client s3Client, S3Presigner s3Presigner, List<UploadedFile> uploadedFiles){
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
+        this.uploadedFiles = uploadedFiles;
     }
 
     public record S3UploadResponse(String url, String fileName){}
