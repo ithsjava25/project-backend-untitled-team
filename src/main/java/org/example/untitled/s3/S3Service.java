@@ -1,10 +1,8 @@
 package org.example.untitled.s3;
 
 import jakarta.annotation.PostConstruct;
-import org.example.untitled.user.User;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.UploadedFile;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
