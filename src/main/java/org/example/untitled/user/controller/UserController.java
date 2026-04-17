@@ -1,30 +1,34 @@
 package org.example.untitled.user.controller;
 
+import jakarta.validation.Valid;
 import org.example.untitled.auth.dto.RegisterRequest;
 import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.example.untitled.usercase.service.CaseService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import jakarta.validation.Valid;
 
 @Controller
 public class UserController {
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
+    private final CaseService caseService;
     private final UserService userService;
 
-    public UserController(UserService service){
-        this.userService = service;
+    public UserController(CaseService caseService, UserService userService) {
+        this.caseService = caseService;
+        this.userService = userService;
     }
 
     @GetMapping("/user")
-    public String userLanding(){
+    public String userLanding(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        model.addAttribute("tickets", caseService.getMyTickets(userDetails.getUsername()));
         return "userpage";
     }
 
@@ -40,8 +44,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String processRegister(@Valid @ModelAttribute("registerForm") RegisterRequest registerForm,
-                                  BindingResult bindingResult) {
+    public String processRegister(
+            @Valid @ModelAttribute("registerForm") RegisterRequest registerForm,
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "register_user";
         }

@@ -2,13 +2,13 @@
 <html xmlns:th="https://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Ticket</title>
+    <title>Edit Ticket</title>
     <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<h1>Create Ticket</h1>
+<h1>Edit Ticket</h1>
 <div>
-    <form th:action="@{/tickets/create}" th:object="${ticketForm}" method="post">
+    <form th:action="@{/tickets/{id}/edit(id=${ticketId})}" th:object="${ticketForm}" method="post">
         <header class="ticket-header">
             <div class="ticket-title">
                 <label for="title">Issue:</label>
@@ -23,11 +23,11 @@
         </div>
         <footer class="ticket-footer">
             <div class="ticket-button">
-                <button type="submit">Create Ticket</button>
+                <button type="submit">Save Changes</button>
+                <a th:href="@{/user}">Cancel</a>
             </div>
         </footer>
     </form>
 </div>
-
 </body>
 </html>
