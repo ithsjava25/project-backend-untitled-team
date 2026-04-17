@@ -1,7 +1,6 @@
 package org.example.untitled.auth;
 
 import jakarta.validation.Valid;
-import org.example.untitled.auth.dto.LoginRequest;
 import org.example.untitled.auth.dto.RegisterRequest;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.service.UserService;
@@ -24,7 +23,7 @@ public class AuthController {
 
     @GetMapping("/login")
     public String showLoginForm(Model model) {
-        model.addAttribute("loginForm", new LoginRequest());
+        model.addAttribute("loginForm");
         return "login";
     }
 
