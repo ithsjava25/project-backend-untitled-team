@@ -22,9 +22,13 @@
             <textarea th:field="*{description}" id="description"></textarea>
             <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
         </div>
+        <div>
+            <input type="file" id="fileInput">
+            <p id="status"></p>
+        </div>
         <footer class="ticket-footer">
             <div class="ticket-button">
-                <button type="submit">Create Ticket</button>
+                <button onclick="uploadNewFile()" type="submit">Create Ticket</button>
             </div>
         </footer>
     </form>

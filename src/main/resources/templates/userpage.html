@@ -15,16 +15,6 @@
     </ul>
 
     <section>
-        <h2>Create New Ticket</h2>
-        <form id="createForm">
-            <label>Title: <input type="text" id="createTitle" required></label><br>
-            <label>Description: <textarea id="createDescription"></textarea></label><br>
-            <input type="file" id="fileInput">
-            <button onclick="uploadNewFile()" type="submit">Create</button>
-        </form>
-    </section>
-
-    <section>
         <h2>My Tickets</h2>
         <div th:if="${#lists.isEmpty(tickets)}">
             <p>You have no tickets yet.</p>
@@ -41,84 +31,5 @@
     </section>
 </main>
 
-<script>
-    const token = localStorage.getItem('jwt');
-
-    async function loadTickets() {
-        const res = await fetch('/tickets/my', {
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const tickets = await res.json();
-        const list = document.getElementById('ticketList');
-        list.innerHTML = '';
-        tickets.forEach(t => {
-            const div = document.createElement('div');
-
-            const title = document.createElement('strong');
-            title.textContent = t.title;
-            div.appendChild(title);
-            div.appendChild(document.createTextNode(' — ' + t.status));
-            div.appendChild(document.createElement('br'));
-
-            const desc = document.createElement('em');
-            desc.textContent = t.description || '';
-            div.appendChild(desc);
-            div.appendChild(document.createElement('br'));
-
-            const editBtn = document.createElement('button');
-            editBtn.textContent = 'Edit';
-            editBtn.addEventListener('click', () => startEdit(t.id, t.title, t.description || ''));
-            div.appendChild(editBtn);
-            div.appendChild(document.createElement('hr'));
-
-            list.appendChild(div);
-        });
-    }
-
-    document.getElementById('createForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await fetch('/tickets', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: document.getElementById('createTitle').value,
-                description: document.getElementById('createDescription').value
-            })
-        });
-        document.getElementById('createTitle').value = '';
-        document.getElementById('createDescription').value = '';
-        loadTickets();
-    });
-
-    function startEdit(id, title, description) {
-        document.getElementById('editId').value = id;
-        document.getElementById('editTitle').value = title;
-        document.getElementById('editDescription').value = description;
-        document.getElementById('editSection').style.display = 'block';
-    }
-
-    document.getElementById('editForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('editId').value;
-        await fetch('/tickets/' + id, {
-            method: 'PUT',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: document.getElementById('editTitle').value,
-                description: document.getElementById('editDescription').value
-            })
-        });
-        document.getElementById('editSection').style.display = 'none';
-        loadTickets();
-    });
-
-    loadTickets();
-</script>
 </body>
 </html>
