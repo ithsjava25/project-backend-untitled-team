@@ -1,30 +1,97 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="https://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>File Upload</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
 <header>
-    <h1>This is a test for file uploads</h1>
+    <h1>File Upload</h1>
 </header>
 <main>
-    <p>
-        create a form for uploads
-    </p>
-    <table>
-        <thead>
-        <tr>File Name</tr>
-        </thead>
-        <tbody id="fileTableBody">
-        <tr></tr>
-        </tbody>
-    </table>
-    <div>
-        <input type="file" id="fileInput">
-        <button onclick="uploadNewFile()" class="button">upload</button>
-        <p id="status"></p>
-    </div>
+    <section>
+        <h2>Upload File</h2>
+        <div>
+            <input type="file" id="fileInput">
+            <button onclick="uploadNewFile()" class="button">Upload</button>
+            <p id="status"></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Uploaded Files</h2>
+        <div th:if="${#lists.isEmpty(files)}">
+            <p>No files uploaded yet.</p>
+        </div>
+        <table th:if="${not #lists.isEmpty(files)}">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="file : ${files}">
+                    <td th:text="${file}"></td>
+                    <td>
+                        <button th:onclick="'downloadFile(\'' + ${file} + '\')'" class="button">Download</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 </main>
+
+<script>
+    async function downloadFile(fileName) {
+        const res = await apiReq(`/upload/api/files/download-url?fileName=${encodeURIComponent(fileName)}`);
+        if (!res) return;
+        const {url} = await res.json();
+        window.open(url, '_blank');
+    }
+
+    async function uploadNewFile() {
+        const input = document.getElementById('fileInput');
+        const file = input.files[0];
+        const status = document.getElementById('status');
+        status.innerText = 'Getting upload URL...';
+
+        try {
+            const res = await apiReq(`/upload/api/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
+            if (!res) return;
+            const {url} = await res.json();
+
+            status.innerText = 'Uploading...';
+            const putRes = await fetch(url, {
+                method: 'PUT',
+                body: file,
+                headers: {'Content-Type': file.type}
+            });
+
+            if (putRes.ok) {
+                await apiReq(`/upload/api/files/callback?fileName=${encodeURIComponent(file.name)}`, {method: 'POST'});
+                status.innerText = 'Upload successful';
+                window.location.reload();
+            } else {
+                status.innerText = 'Upload failed: ' + putRes.status;
+            }
+        } catch (error) {
+            status.innerText = 'Error: ' + error.message;
+        }
+    }
+
+    async function apiReq(url, options = {}) {
+        options.credentials = options.credentials || 'same-origin';
+        options.headers = options.headers || {};
+        options.redirect = 'manual';
+        const res = await fetch(url, options);
+        if (res.status === 401 || res.status === 403) {
+            window.location.reload();
+            return null;
+        }
+        return res;
+    }
+</script>
 </body>
 </html>
