@@ -42,7 +42,7 @@ public class CaseViewController {
             return "create_ticket";
         }
         try {
-            caseService.createTicket(ticketForm, userDetails.getUsername());
+            caseService.createTicket(ticketForm, userDetails.getUsername(), ticketForm.getFileName());
         } catch (ResponseStatusException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 bindingResult.rejectValue("title", "error.ticketForm", e.getReason());

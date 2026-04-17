@@ -2,6 +2,8 @@ package org.example.untitled.usercase.service;
 
 import java.util.List;
 
+import org.example.untitled.s3.S3Service;
+
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
@@ -21,15 +23,17 @@ public class CaseService {
 
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
     public CaseService(
             CaseRepository caseRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, S3Service s3Service) {
         this.caseRepository = caseRepository;
         this.userRepository = userRepository;
+        this.s3Service = s3Service;
     }
 
-    public CaseEntityDto createTicket(CreateCaseRequest request, String username) {
+    public CaseEntityDto createTicket(CreateCaseRequest request, String username, String fileName) {
         User owner = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (caseRepository.existsByTitleAndOwner(request.getTitle(), owner)) {
@@ -39,6 +43,7 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
+        caseEntity.setFiles(s3Service.createFile(caseEntity, fileName));
         return CaseMapper.toDto(caseRepository.save(caseEntity));
     }
 

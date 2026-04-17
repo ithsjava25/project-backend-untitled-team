@@ -1,6 +1,8 @@
 package org.example.untitled.usercase.controller;
 
 import java.util.List;
+
+import org.example.untitled.s3.S3Service;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
@@ -24,7 +26,8 @@ public class CaseController {
 
     private final CaseService caseService;
 
-    public CaseController(CaseService caseService) {
+
+    public CaseController(CaseService caseService, S3Service s3Service) {
         this.caseService = caseService;
     }
 
@@ -32,7 +35,7 @@ public class CaseController {
     public ResponseEntity<CaseEntityDto> createTicket(
             @Valid @RequestBody CreateCaseRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(caseService.createTicket(request, userDetails.getUsername()));
+        return ResponseEntity.ok(caseService.createTicket(request, userDetails.getUsername(), request.getFileName()));
     }
 
     @GetMapping("/my")
