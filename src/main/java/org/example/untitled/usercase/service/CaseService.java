@@ -27,7 +27,8 @@ public class CaseService {
 
     public CaseService(
             CaseRepository caseRepository,
-            UserRepository userRepository, S3Service s3Service) {
+            UserRepository userRepository,
+            S3Service s3Service) {
         this.caseRepository = caseRepository;
         this.userRepository = userRepository;
         this.s3Service = s3Service;

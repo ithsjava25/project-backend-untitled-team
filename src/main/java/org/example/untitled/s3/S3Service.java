@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,13 +24,9 @@ public class S3Service {
     private final S3Presigner s3Presigner;
     private final String BUCKET_NAME = "chum-bucket";
 
-    //used for the s3 files locally.
-    private final List<UploadedFile> uploadedFiles;
-
-    public S3Service(S3Client s3Client, S3Presigner s3Presigner, List<UploadedFile> uploadedFiles){
+    public S3Service(S3Client s3Client, S3Presigner s3Presigner){
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
-        this.uploadedFiles = uploadedFiles;
     }
 
     public record S3UploadResponse(String url, String fileName){}
@@ -97,18 +94,13 @@ public class S3Service {
     }
 
     public List<UploadedFile> createFile(CaseEntity caseEntity, String fileName) {
+        List<UploadedFile> uploadedFiles = new ArrayList<>();
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setUploadedBy(caseEntity.getOwner());
         uploadedFile.setAssociatedCase(caseEntity);
         uploadedFile.setFilename(fileName);
         uploadedFiles.add(uploadedFile);
 
-        return uploadedFiles.stream()
-                .filter(p ->
-                        p.getUploadedBy().getUsername()
-                                .equals(caseEntity.getOwner().getUsername()))
-                .filter(associated -> associated
-                        .getAssociatedCase().getId().equals(caseEntity.getId()))
-                .toList();
+        return uploadedFiles;
     }
 }

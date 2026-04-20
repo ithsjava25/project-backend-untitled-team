@@ -9,7 +9,7 @@ async function fetchAFile(){
         tr.innerHTML = `
                     <td>${file}</td>
                     <td><button onclick="downloadFile('${file}')" class="button">Download</button></td>
-                    <td><button onclick="deleteFile('${file}')" class="button">Delete</input></td>
+                    <td><button onclick="deleteFile('${file}')" class="button">Delete</button></td>
                 `;
         body.appendChild(tr);
     });

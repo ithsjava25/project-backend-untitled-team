@@ -51,8 +51,4 @@ public class S3Config {
                         .build()).build();
     }
 
-    @Bean
-    public List<UploadedFile> uploadedFiles(){
-        return new ArrayList<>();
-    }
 }
