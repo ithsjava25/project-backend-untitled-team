@@ -50,20 +50,20 @@ public class CaseController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<List<CaseEntityDto>> getAllTickets() {
         return ResponseEntity.ok(caseService.getAllTickets());
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> updateStatus(
             @PathVariable Long id, @RequestParam CaseStatus status) {
         return ResponseEntity.ok(caseService.updateStatus(id, status));
     }
 
     @PutMapping("/{id}/assign")
-    @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> assignToSelf(
             @PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(caseService.assignTicket(id, userDetails.getUsername()));
