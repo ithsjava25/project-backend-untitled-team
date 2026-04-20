@@ -16,7 +16,7 @@ async function fetchAFile(){
 }
 
 async function downloadFile(fileName) {
-    const res = await apiReq(`/api/files/download-url?fileName=${encodeURIComponent(fileName)}`);
+    const res = await apiReq(`/upload/files/download-url?fileName=${encodeURIComponent(fileName)}`);
     if (!res) return;
     const {url} = await res.json();
     window.open(url, '_blank');
@@ -34,7 +34,7 @@ async function uploadNewFile(){
 
         try {
             status.innerText = `Processing file ${i + 1} of ${filesToUpload.length}: ${file.name}`;
-            const res = await apiReq(`/api/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
+            const res = await apiReq(`/upload/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
             if (!res) continue;
             const { url } = await res.json();
             status.innerText = `Uploading ${file.name}...`;
@@ -44,7 +44,7 @@ async function uploadNewFile(){
                 headers: { 'Content-Type': file.type }
             });
             if (putRes.ok) {
-                await apiReq(`/api/files/callback?fileName=${encodeURIComponent(file.name)}`, {
+                await apiReq(`/upload/files/callback?fileName=${encodeURIComponent(file.name)}`, {
                     method: 'POST'
                 });
 
@@ -61,12 +61,14 @@ async function uploadNewFile(){
     status.innerText = "All uploads completed.";
 }
 async function deleteFile(fileName){
-    const confirmation = window.confirm(fileName + " will be deleted! Are you sure?")
-    if (confirmation) {
-        const res = await apiReq(`/upload/api/files/delete-url?fileName=${encodeURIComponent(fileName)}`);
-        window.location.reload();
-    } else {
-        return;
+    const status = document.getElementById('status');
+    if (!window.confirm(fileName + " will be deleted! Are you sure?")) {
+        const res = await apiReq(`/upload/api/files/delete-url?fileName=${encodeURIComponent(fileName)}`, {method: 'DELETE'});
+        if(res.ok){
+            await fetchAFile();
+        } else {
+            status.innerText= 'Error: ' + res.status;
+        }
     }
 }
 async function apiReq(url, options = {}) {

@@ -43,7 +43,8 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
-        caseEntity.setFiles(s3Service.createFile(caseEntity, fileName));
+        if(fileName != null && !fileName.isBlank())
+            caseEntity.setFiles(s3Service.createFile(caseEntity, fileName));
         return CaseMapper.toDto(caseRepository.save(caseEntity));
     }
 

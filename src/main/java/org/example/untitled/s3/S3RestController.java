@@ -27,8 +27,8 @@ public class S3RestController {
     @ResponseBody
     public Map<String, String> getUploadUrl(@RequestParam String fileName, @RequestParam String contentType){
         log.info("uploading file " + fileName);
-        String url = String.valueOf(s3Service.generateS3PreUploadUrl(fileName, contentType));
-        return Map.of("url",url);
+        S3Service.S3UploadResponse resp = s3Service.generateS3PreUploadUrl(fileName, contentType);
+        return Map.of("url", resp.url(), "fileName", resp.fileName());
     }
 
     @GetMapping("/upload/api/files/download-url")
@@ -39,8 +39,7 @@ public class S3RestController {
         return Map.of("url", url);
     }
 
-    @GetMapping("/upload/api/files/delete-url")
-    @ResponseBody
+    @DeleteMapping("/upload/api/files/delete-url")
     public void deleteFile(@RequestParam String fileName){
         log.info("Deleting file " + fileName);
         s3Service.deleteFile(fileName);
