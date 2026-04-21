@@ -5,6 +5,7 @@ import java.util.List;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
+import org.example.untitled.usercase.AuditAction;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
@@ -46,7 +47,9 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_CREATED, owner.getId(), saved.getId());
+        return CaseMapper.toDto(saved);
     }
 
     public List<CaseEntityDto> getMyTickets(String username) {
@@ -69,7 +72,9 @@ public class CaseService {
         }
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_UPDATED, null, saved.getId());
+        return CaseMapper.toDto(saved);
     }
 
     @Transactional
@@ -99,7 +104,9 @@ public class CaseService {
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         caseEntity.setStatus(newStatus);
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_STATUS_CHANGED, null, saved.getId());
+        return CaseMapper.toDto(saved);
     }
 
     public CaseEntityDto assignTicket(Long id, String username) {
@@ -112,6 +119,22 @@ public class CaseService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler or admin");
         }
         caseEntity.setAssignedTo(handler);
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_ASSIGNED, handler.getId(), saved.getId());
+        return CaseMapper.toDto(saved);
+    }
+
+    public CaseEntityDto getTicketByID(long id) {
+        CaseEntity caseEntity = caseRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
+        return CaseMapper.toDto(caseEntity);
+    }
+    public User findOwnerById(long id) {
+        return caseRepository.findOwnerById(id);
+    }
+
+    public boolean isNotOwner(CaseEntityDto ticket, String username) {
+        return !ticket.ownerUsername().equals(username);
     }
 }
