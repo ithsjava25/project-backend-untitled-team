@@ -135,7 +135,7 @@ public class CaseService {
         return caseRepository.findOwnerById(id);
     }
 
-    public boolean isOwner(CaseEntityDto ticket, String username) {
-        return ticket.ownerUsername().equals(username);
+    public boolean isNotOwner(CaseEntityDto ticket, String username) {
+        return !ticket.ownerUsername().equals(username);
     }
 }

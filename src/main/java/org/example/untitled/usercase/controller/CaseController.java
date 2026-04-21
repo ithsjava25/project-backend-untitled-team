@@ -81,7 +81,7 @@ public class CaseController {
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
-        if (!caseService.isOwner(ticket, userDetails.getUsername()))
+        if (caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
         model.addAttribute("ticket", caseService.getTicketByID(id));
         model.addAttribute("comment", new CreateCommentRequest());
@@ -97,7 +97,7 @@ public class CaseController {
             Model model
     ) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
-        if (!caseService.isOwner(ticket, userDetails.getUsername()))
+        if (caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
         if (bindingResult.hasErrors()) {
             model.addAttribute("ticket", ticket);
