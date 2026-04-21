@@ -41,14 +41,14 @@ public class UserService {
         return UserMapper.toDto(userRep.save(user));
     }
 
-    public User register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.USER);
         try {
-            return userRep.save(user);
+            userRep.save(user);
         } catch (DataIntegrityViolationException e) {
             String message = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
             if (message.contains("email")) {
