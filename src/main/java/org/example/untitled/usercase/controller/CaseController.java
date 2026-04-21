@@ -6,6 +6,7 @@ import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.service.CaseService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,10 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -76,26 +74,40 @@ public class CaseController {
     }
 
     @GetMapping("/{id}/close")
+    @PreAuthorize("isAuthenticated()")
     public String closeTicket(
-            Model model, @PathVariable long id) {
+            Model model,
+            @PathVariable long id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        CaseEntityDto ticket = caseService.getTicketByID(id);
+        if (!caseService.isOwner(ticket, userDetails.getUsername()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
         model.addAttribute("ticket", caseService.getTicketByID(id));
         model.addAttribute("comment", new CreateCommentRequest());
         return "close_ticket";
     }
 
-    @PostMapping("/close")
+    @PostMapping("/{id}/close")
     public String processCloseTicket(
-            @ModelAttribute("comment") @Valid CreateCommentRequest comment, BindingResult bindingResult,
-            @ModelAttribute("ticket") CaseEntityDto ticket
+            @PathVariable long id,
+            @ModelAttribute("comment") @Valid CreateCommentRequest comment,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model
     ) {
-
+        CaseEntityDto ticket = caseService.getTicketByID(id);
+        if (!caseService.isOwner(ticket, userDetails.getUsername()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
         if (bindingResult.hasErrors()) {
+            model.addAttribute("ticket", ticket);
             return "close_ticket";
         }
         try {
             caseService.closeTicket(ticket, comment);
         } catch (IllegalArgumentException e) {
             bindingResult.rejectValue("text", "error.createCommentRequest", e.getMessage());
+            model.addAttribute("ticket", ticket);
             return "close_ticket";
         }
 

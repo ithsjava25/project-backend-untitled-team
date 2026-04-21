@@ -1,7 +1,5 @@
 package org.example.untitled.usercase.service;
 
-import java.util.List;
-
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
@@ -135,5 +133,9 @@ public class CaseService {
     }
     public User findOwnerById(long id) {
         return caseRepository.findOwnerById(id);
+    }
+
+    public boolean isOwner(CaseEntityDto ticket, String username) {
+        return ticket.ownerUsername().equals(username);
     }
 }

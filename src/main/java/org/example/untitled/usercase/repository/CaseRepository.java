@@ -19,5 +19,4 @@ public interface CaseRepository extends ListCrudRepository<CaseEntity, Long> {
     User findOwnerById(long id);
 
     CaseEntity findCaseEntityById(long id);
-
 }

@@ -29,7 +29,7 @@ public class CommentService {
         var caseEntity = caseRepository.findById(ticket.id())
                 .orElseThrow(() -> new IllegalArgumentException("Ticket not found: " + ticket.id()));
         var entity = CommentMapper.toEntity(comment);
-        entity.setAuthor(caseRepository.findOwnerById(ticket.id()));
+        entity.setAuthor(caseEntity.getOwner());
         entity.setCaseEntity(caseEntity);
         commentRepository.save(entity);
     }
