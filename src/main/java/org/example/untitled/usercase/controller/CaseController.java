@@ -43,7 +43,7 @@ public class CaseController {
             @PathVariable Long id,
             @Valid @RequestBody CreateCaseRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(caseService.updateTicket(id, request, userDetails.getUsername()));
+        return ResponseEntity.ok(caseService.updateTicket(id, request, userDetails.getUsername(), request.getFileName()));
     }
 
     @GetMapping

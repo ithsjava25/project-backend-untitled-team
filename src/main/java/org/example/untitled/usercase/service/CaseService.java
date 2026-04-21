@@ -57,7 +57,7 @@ public class CaseService {
                 .toList();
     }
 
-    public CaseEntityDto updateTicket(Long id, CreateCaseRequest request, String username) {
+    public CaseEntityDto updateTicket(Long id, CreateCaseRequest request, String username, String fileName) {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
@@ -69,6 +69,8 @@ public class CaseService {
         }
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
+        if(fileName != null && !fileName.isBlank())
+            caseEntity.setFiles(s3Service.createFile(caseEntity, fileName));
         return CaseMapper.toDto(caseRepository.save(caseEntity));
     }
 
