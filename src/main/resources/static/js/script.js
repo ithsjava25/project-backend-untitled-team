@@ -36,7 +36,7 @@ async function uploadNewFile(){
             status.innerText = `Processing file ${i + 1} of ${filesToUpload.length}: ${file.name}`;
             const res = await apiReq(`/upload/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
             if (!res) continue;
-            const { url } = await res.json();
+            const { url, fileName: uploadedFileName } = await res.json();
             status.innerText = `Uploading ${file.name}...`;
             const putRes = await fetch(url, {
                 method: 'PUT',
@@ -44,7 +44,7 @@ async function uploadNewFile(){
                 headers: { 'Content-Type': file.type }
             });
             if (putRes.ok) {
-                await apiReq(`/upload/files/callback?fileName=${encodeURIComponent(file.name)}`, {
+                await apiReq(`/upload/files/callback?fileName=${encodeURIComponent(uploadedFileName)}`, {
                     method: 'POST'
                 });
 
