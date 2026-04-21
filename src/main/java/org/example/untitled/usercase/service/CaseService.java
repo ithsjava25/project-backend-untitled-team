@@ -18,6 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Service for managing support tickets (cases) in the system.
+ * Handles creation, updates, assignment, and status changes of tickets,
+ * and logs all significant actions via {@link AuditLogService}.
+ */
 @Service
 public class CaseService {
 
