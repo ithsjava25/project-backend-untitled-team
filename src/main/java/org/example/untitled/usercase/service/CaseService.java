@@ -37,6 +37,7 @@ public class CaseService {
         this.auditLogService = auditLogService;
     }
 
+    @Transactional
     public CaseEntityDto createTicket(CreateCaseRequest request, String username) {
         User owner = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -60,6 +61,7 @@ public class CaseService {
                 .toList();
     }
 
+    @Transactional
     public CaseEntityDto updateTicket(Long id, CreateCaseRequest request, String username) {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
@@ -73,7 +75,7 @@ public class CaseService {
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
         CaseEntity saved = caseRepository.save(caseEntity);
-        auditLogService.log(AuditAction.CASE_UPDATED, null, saved.getId());
+        auditLogService.log(AuditAction.CASE_UPDATED, caseEntity.getOwner().getId(), saved.getId());
         return CaseMapper.toDto(saved);
     }
 
@@ -99,6 +101,7 @@ public class CaseService {
                 .toList();
     }
 
+    @Transactional
     public CaseEntityDto updateStatus(Long id, CaseStatus newStatus) {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
@@ -109,6 +112,7 @@ public class CaseService {
         return CaseMapper.toDto(saved);
     }
 
+    @Transactional
     public CaseEntityDto assignTicket(Long id, String username) {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
