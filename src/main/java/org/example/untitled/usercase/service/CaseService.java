@@ -5,15 +5,16 @@ import java.util.List;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
-import org.example.untitled.usercase.AuditAction;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
+import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.mapper.CaseMapper;
 import org.example.untitled.usercase.repository.CaseRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -22,10 +23,16 @@ public class CaseService {
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
     private final AuditLogService auditLogService;
+    private final CommentService commentService;
 
-    public CaseService(CaseRepository caseRepository, UserRepository userRepository, AuditLogService auditLogService) {
+    public CaseService(
+            CaseRepository caseRepository,
+            UserRepository userRepository,
+            CommentService commentService,
+            AuditLogService auditLogService) {
         this.caseRepository = caseRepository;
         this.userRepository = userRepository;
+        this.commentService = commentService;
         this.auditLogService = auditLogService;
     }
 
@@ -39,9 +46,7 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
-        CaseEntity saved = caseRepository.save(caseEntity);
-        auditLogService.log(AuditAction.CASE_CREATED, owner.getId(), saved.getId());
-        return CaseMapper.toDto(saved);
+        return CaseMapper.toDto(caseRepository.save(caseEntity));
     }
 
     public List<CaseEntityDto> getMyTickets(String username) {
@@ -67,6 +72,16 @@ public class CaseService {
         return CaseMapper.toDto(caseRepository.save(caseEntity));
     }
 
+    @Transactional
+    public void closeTicket(CaseEntityDto ticket, CreateCommentRequest comment) {
+        if (comment == null)
+            throw new IllegalArgumentException("Comment Cant be null");
+        if (ticket == null)
+            throw new IllegalArgumentException("Ticket Cant be null");
+        updateStatus(ticket.id(), CaseStatus.CLOSED);
+        commentService.createComment(comment, ticket);
+    }
+
     public List<CaseEntityDto> getAllTickets() {
         return caseRepository.findAll().stream()
                 .map(CaseMapper::toDto)
@@ -84,9 +99,7 @@ public class CaseService {
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         caseEntity.setStatus(newStatus);
-        CaseEntity saved = caseRepository.save(caseEntity);
-        auditLogService.log(AuditAction.CASE_STATUS_CHANGED, null, saved.getId());
-        return CaseMapper.toDto(saved);
+        return CaseMapper.toDto(caseRepository.save(caseEntity));
     }
 
     public CaseEntityDto assignTicket(Long id, String username) {
@@ -99,8 +112,6 @@ public class CaseService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler or admin");
         }
         caseEntity.setAssignedTo(handler);
-        CaseEntity saved = caseRepository.save(caseEntity);
-        auditLogService.log(AuditAction.CASE_ASSIGNED, handler.getId(), saved.getId());
-        return CaseMapper.toDto(saved);
+        return CaseMapper.toDto(caseRepository.save(caseEntity));
     }
 }

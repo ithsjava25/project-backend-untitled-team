@@ -124,3 +124,57 @@ button:active {
         padding: 20px;
     }
 }
+
+/* Ticket info display (read-only content) */
+.ticket-info {
+    background: #1e293b;
+    padding: 20px 25px;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Title inside ticket info */
+.ticket-title p {
+    font-size: 18px;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin-bottom: 10px;
+}
+
+/* Description text */
+.ticket-body p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #cbd5f5;
+}
+
+/* Fix label styling (your HTML doesn't use .ticket-header) */
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #cbd5f5;
+}
+
+/* Add spacing between form sections */
+form > div {
+    margin-bottom: 15px;
+}
+
+/* Improve textarea spacing */
+textarea {
+    margin-top: 5px;
+}
+
+/* Button wrapper (optional but cleaner layout) */
+.ticket-button {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Make hidden input not affect layout */
+input[type="hidden"] {
+    display: none;
+}
