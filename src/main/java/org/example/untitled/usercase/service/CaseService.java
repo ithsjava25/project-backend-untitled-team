@@ -105,8 +105,8 @@ public class CaseService {
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         User handler = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        if (handler.getRole() != Role.HANDLER && handler.getRole() != Role.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler or admin");
+        if (handler.getRole() != Role.HANDLER && handler.getRole() != Role.SUPERVISOR && handler.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler, supervisor or admin");
         }
         caseEntity.setAssignedTo(handler);
         return CaseMapper.toDto(caseRepository.save(caseEntity));
