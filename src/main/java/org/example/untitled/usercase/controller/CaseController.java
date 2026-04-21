@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @Controller
 @RequestMapping("/tickets")
 public class CaseController {
@@ -49,12 +53,14 @@ public class CaseController {
     }
 
     @GetMapping
+    @ResponseBody
     @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
     public ResponseEntity<List<CaseEntityDto>> getAllTickets() {
         return ResponseEntity.ok(caseService.getAllTickets());
     }
 
     @PutMapping("/{id}/status")
+    @ResponseBody
     @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> updateStatus(
             @PathVariable Long id, @RequestParam CaseStatus status) {
@@ -62,6 +68,7 @@ public class CaseController {
     }
 
     @PutMapping("/{id}/assign")
+    @ResponseBody
     @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> assignToSelf(
             @PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {

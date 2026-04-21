@@ -3,7 +3,7 @@ package org.example.untitled.usercase;
 import jakarta.persistence.*;
 import org.example.untitled.user.User;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 public class UploadedFile {
@@ -19,7 +19,7 @@ public class UploadedFile {
     private String s3key;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime uploadedAt;
+    private Instant uploadedAt;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -35,7 +35,7 @@ public class UploadedFile {
 
     @PrePersist
     protected void onCreate() {
-        this.uploadedAt = LocalDateTime.now();
+        this.uploadedAt = Instant.now();
     }
 
     public Long getId() {
@@ -62,7 +62,7 @@ public class UploadedFile {
         this.s3key = s3key;
     }
 
-    public LocalDateTime getUploadedAt() {
+    public Instant getUploadedAt() {
         return uploadedAt;
     }
 

@@ -11,6 +11,7 @@ import java.util.List;
 public interface CaseRepository extends ListCrudRepository<CaseEntity, Long> {
 
     boolean existsByTitleAndOwner(String title, User user);
+    boolean existsByTitleAndOwnerAndIdNot(String title, User owner, Long id);
     List<CaseEntity> findByAssignedTo(User assignedTo);
 
     List<CaseEntity> findByOwner(User owner);

@@ -1,6 +1,6 @@
 package org.example.untitled.usercase.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record CommentDto(
         Long id,
@@ -8,5 +8,5 @@ public record CommentDto(
         Long authorId,
         String authorUsername,
         Long caseId,
-        LocalDateTime createdAt
+        Instant createdAt
 ){}

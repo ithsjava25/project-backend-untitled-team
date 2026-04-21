@@ -3,7 +3,7 @@ package org.example.untitled.usercase;
 import jakarta.persistence.*;
 import org.example.untitled.user.User;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 public class Comment {
@@ -16,7 +16,7 @@ public class Comment {
     private String text;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -32,7 +32,7 @@ public class Comment {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
     }
 
     public Long getId() {
@@ -51,7 +51,7 @@ public class Comment {
         this.text = text;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import org.example.untitled.exception.UserHasActiveCasesException;
 import org.example.untitled.usercase.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class User {
     private List<AuditLog> auditLogs = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     public User() {
         // Empty constructor for JPA
@@ -53,7 +53,7 @@ public class User {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
     }
 
     @PreRemove
@@ -146,7 +146,7 @@ public class User {
         this.auditLogs = auditLogs != null ? auditLogs : new ArrayList<>();
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 }

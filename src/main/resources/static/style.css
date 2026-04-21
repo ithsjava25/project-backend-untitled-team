@@ -40,12 +40,15 @@ form {
 
 /* Sections */
 .ticket-header,
-.ticket-body {
+.ticket-body,
+.register-header,
+.register-body,
+.login-header,
+.login-body {
     margin-bottom: 20px;
 }
 
-.ticket-title label,
-.ticket-body label {
+label {
     font-weight: 600;
     margin-bottom: 6px;
     color: #cbd5f5;
@@ -85,7 +88,9 @@ textarea:focus {
 }
 
 /* Footer */
-.ticket-footer {
+.ticket-footer,
+.register-footer,
+.login-footer {
     display: flex;
     justify-content: flex-end;
 }

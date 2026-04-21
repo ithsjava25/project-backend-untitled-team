@@ -16,8 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CaseMapperTest {
 
-    private CaseMapper caseMapper;
-
     private User makeUser(Long id, String username) {
         User user = new User();
         user.setId(id);
@@ -32,7 +30,7 @@ class CaseMapperTest {
         entity.setStatus(CaseStatus.OPEN);
         entity.setOwner(makeUser(1L, "alice"));
 
-        CaseEntityDto dto = caseMapper.toDto(entity);
+        CaseEntityDto dto = CaseMapper.toDto(entity);
 
         assertEquals(1L, dto.ownerId());
         assertEquals("alice", dto.ownerUsername());
@@ -45,7 +43,7 @@ class CaseMapperTest {
         entity.setStatus(CaseStatus.OPEN);
         entity.setOwner(makeUser(1L, "alice"));
 
-        CaseEntityDto dto = caseMapper.toDto(entity);
+        CaseEntityDto dto = CaseMapper.toDto(entity);
 
         assertNull(dto.assignedToId());
         assertNull(dto.assignedToUsername());
@@ -61,7 +59,7 @@ class CaseMapperTest {
         comment.setAuthor(makeUser(1L, "alice"));
         comment.setCaseEntity(caseEntity);
 
-        CommentDto dto = caseMapper.toDto(comment);
+        CommentDto dto = CaseMapper.toDto(comment);
 
         assertEquals("This is a comment", dto.text());
         assertEquals(1L, dto.authorId());
@@ -79,7 +77,7 @@ class CaseMapperTest {
         file.setUploadedBy(makeUser(1L, "alice"));
         file.setAssociatedCase(caseEntity);
 
-        UploadedFileDto dto = caseMapper.toDto(file);
+        UploadedFileDto dto = CaseMapper.toDto(file);
 
         assertEquals("report.pdf", dto.filename());
         assertEquals(1L, dto.uploadedById());
