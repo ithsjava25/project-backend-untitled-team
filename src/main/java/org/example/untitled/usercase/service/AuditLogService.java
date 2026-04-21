@@ -6,6 +6,9 @@ import org.example.untitled.usercase.repository.AuditLogRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+/**
+ * Service for logging audit events in the system.
+ */
 @Service
 public class AuditLogService {
 
