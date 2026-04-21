@@ -5,6 +5,7 @@ import java.util.List;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
+import org.example.untitled.usercase.AuditAction;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
@@ -21,12 +22,12 @@ public class CaseService {
 
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
-    public CaseService(
-            CaseRepository caseRepository,
-            UserRepository userRepository) {
+    public CaseService(CaseRepository caseRepository, UserRepository userRepository, AuditLogService auditLogService) {
         this.caseRepository = caseRepository;
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
     }
 
     public CaseEntityDto createTicket(CreateCaseRequest request, String username) {
@@ -39,7 +40,9 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_CREATED, owner.getId(), saved.getId());
+        return CaseMapper.toDto(saved);
     }
 
     public List<CaseEntityDto> getMyTickets(String username) {
@@ -96,7 +99,9 @@ public class CaseService {
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         caseEntity.setStatus(newStatus);
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_STATUS_CHANGED, null, saved.getId());
+        return CaseMapper.toDto(saved);
     }
 
     public CaseEntityDto assignTicket(Long id, String username) {
@@ -109,6 +114,8 @@ public class CaseService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler or admin");
         }
         caseEntity.setAssignedTo(handler);
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_ASSIGNED, handler.getId(), saved.getId());
+        return CaseMapper.toDto(saved);
     }
 }

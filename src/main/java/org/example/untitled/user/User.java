@@ -41,9 +41,6 @@ public class User {
     @OneToMany(mappedBy = "uploadedBy", fetch = FetchType.LAZY)
     private List<UploadedFile> uploadedFiles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<AuditLog> auditLogs = new ArrayList<>();
-
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -136,14 +133,6 @@ public class User {
 
     public void setUploadedFiles(List<UploadedFile> uploadedFiles) {
         this.uploadedFiles = uploadedFiles != null ? uploadedFiles : new ArrayList<>();
-    }
-
-    public List<AuditLog> getAuditLogs() {
-        return auditLogs;
-    }
-
-    public void setAuditLogs(List<AuditLog> auditLogs) {
-        this.auditLogs = auditLogs != null ? auditLogs : new ArrayList<>();
     }
 
     public Instant getCreatedAt() {
