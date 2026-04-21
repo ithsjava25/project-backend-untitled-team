@@ -1,6 +1,8 @@
 package org.example.untitled.usercase.controller;
 
 import jakarta.validation.Valid;
+import org.example.untitled.user.User;
+import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
@@ -24,9 +26,11 @@ import java.util.List;
 public class CaseController {
 
     private final CaseService caseService;
+    private final UserRepository userRepository;
 
-    public CaseController(CaseService caseService) {
+    public CaseController(CaseService caseService, UserRepository userRepository) {
         this.caseService = caseService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
@@ -61,8 +65,12 @@ public class CaseController {
     @ResponseBody
     @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> updateStatus(
-            @PathVariable Long id, @RequestParam CaseStatus status) {
-        return ResponseEntity.ok(caseService.updateStatus(id, status));
+            @PathVariable Long id,
+            @RequestParam CaseStatus status,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return ResponseEntity.ok(caseService.updateStatus(id, status, user.getId()));
     }
 
     @PutMapping("/{id}/assign")
