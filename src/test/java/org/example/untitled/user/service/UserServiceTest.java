@@ -10,6 +10,7 @@ import org.example.untitled.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,20 +54,18 @@ class UserServiceTest {
     // --- register ---
 
     @Test
-    void register_success_returnsUser() {
-        User saved = new User();
-        saved.setId(1L);
-        saved.setUsername("alice");
-        saved.setEmail("alice@example.com");
-        saved.setRole(Role.USER);
-
+    void register_success_savesEncodedPassword() {
         when(passwordEncoder.encode(anyString())).thenReturn("hashed");
-        when(userRepository.save(any(User.class))).thenReturn(saved);
 
-        User result = userService.register(registerRequest);
+        userService.register(registerRequest);
 
-        assertThat(result.getUsername()).isEqualTo("alice");
-        assertThat(result.getRole()).isEqualTo(Role.USER);
+        verify(passwordEncoder).encode("password123");
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(captor.capture());
+        assertThat(captor.getValue().getUsername()).isEqualTo("alice");
+        assertThat(captor.getValue().getPassword()).isEqualTo("hashed");
+        assertThat(captor.getValue().getRole()).isEqualTo(Role.USER);
     }
 
     @Test
@@ -103,6 +103,8 @@ class UserServiceTest {
         UserDto result = userService.updateRole(1L, Role.HANDLER);
 
         assertThat(result.username()).isEqualTo("alice");
+        assertThat(result.role()).isEqualTo(Role.HANDLER);
+        assertThat(user.getRole()).isEqualTo(Role.HANDLER);
     }
 
     @Test
