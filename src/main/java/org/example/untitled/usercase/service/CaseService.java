@@ -2,7 +2,6 @@ package org.example.untitled.usercase.service;
 
 import org.example.untitled.s3.S3Service;
 import java.util.List;
-import org.example.untitled.s3.S3Service;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
@@ -57,8 +56,9 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
-        if(fileName != null && !fileName.isBlank())
-            caseEntity.setFiles(s3Service.createFile(caseEntity, fileName));
+        if(fileName != null && !fileName.isBlank()){
+            caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fileName));
+        }
         CaseEntity saved = caseRepository.save(caseEntity);
         auditLogService.log(AuditAction.CASE_CREATED, owner.getId(), saved.getId());
         return CaseMapper.toDto(saved);
@@ -86,7 +86,7 @@ public class CaseService {
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
         if(fileName != null && !fileName.isBlank())
-            caseEntity.setFiles(s3Service.createFile(caseEntity, fileName));
+            caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fileName));
         CaseEntity saved = caseRepository.save(caseEntity);
         auditLogService.log(AuditAction.CASE_UPDATED, caseEntity.getOwner().getId(), saved.getId());
         return CaseMapper.toDto(saved);

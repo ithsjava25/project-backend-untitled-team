@@ -35,7 +35,7 @@ public class CaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User assignedTo;
 
-    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "associatedCaseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
