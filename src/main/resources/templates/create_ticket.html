@@ -21,7 +21,7 @@
             <label for="description">Description:</label>
             <textarea th:field="*{description}" id="description"></textarea>
             <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
-            <input type="file" id="fileInput">
+            <input type="file" id="fileInput" multiple>
             <p id="status"></p>
         </div>
         <footer class="ticket-footer">

@@ -20,28 +20,28 @@
         </div>
     </section>
 
-    <section>
-        <h2>Uploaded Files</h2>
-        <div th:unless="${#lists.isEmpty(files)}">
-            <p>No files uploaded yet.</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>File Name</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="file : ${files}">
-                    <td th:text="${file}"></td>
-                    <td>
-                        <button th:onclick="'downloadFile(\'' + ${file} + '\')'" class="button">Download</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        </div>
-    </section>
+<!--    <section>-->
+<!--        <h2>Uploaded Files</h2>-->
+<!--        <div th:unless="${#lists.isEmpty(files)}">-->
+<!--            <p>No files uploaded yet.</p>-->
+<!--        <table>-->
+<!--            <thead>-->
+<!--                <tr>-->
+<!--                    <th>File Name</th>-->
+<!--                    <th>Action</th>-->
+<!--                </tr>-->
+<!--            </thead>-->
+<!--            <tbody>-->
+<!--                <tr th:each="file : ${files}">-->
+<!--                    <td th:text="${file}"></td>-->
+<!--                    <td>-->
+<!--                        <button th:onclick="'downloadFile(\'' + ${file} + '\')'" class="button">Download</button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--            </tbody>-->
+<!--        </table>-->
+<!--        </div>-->
+<!--    </section>-->
 </main>
 </body>
 </html>

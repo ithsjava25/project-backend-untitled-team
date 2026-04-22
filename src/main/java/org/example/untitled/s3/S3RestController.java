@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/upload/api/files")
+@RequestMapping("/tickets/upload/api/files")
 public class S3RestController {
 
     private final Logger log = LoggerFactory.getLogger(S3RestController.class);
