@@ -1,13 +1,14 @@
 package org.example.untitled.usercase.controller;
 
-import java.util.List;
+import jakarta.validation.Valid;
+import org.example.untitled.user.User;
+import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.service.CaseService;
 import org.springframework.http.HttpStatus;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,9 +26,11 @@ import java.util.List;
 public class CaseController {
 
     private final CaseService caseService;
+    private final UserRepository userRepository;
 
-    public CaseController(CaseService caseService) {
+    public CaseController(CaseService caseService, UserRepository userRepository) {
         this.caseService = caseService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
@@ -53,22 +56,26 @@ public class CaseController {
 
     @GetMapping
     @ResponseBody
-    @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<List<CaseEntityDto>> getAllTickets() {
         return ResponseEntity.ok(caseService.getAllTickets());
     }
 
     @PutMapping("/{id}/status")
     @ResponseBody
-    @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> updateStatus(
-            @PathVariable Long id, @RequestParam CaseStatus status) {
-        return ResponseEntity.ok(caseService.updateStatus(id, status));
+            @PathVariable Long id,
+            @RequestParam CaseStatus status,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return ResponseEntity.ok(caseService.updateStatus(id, status, user.getId()));
     }
 
     @PutMapping("/{id}/assign")
     @ResponseBody
-    @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> assignToSelf(
             @PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(caseService.assignTicket(id, userDetails.getUsername()));
