@@ -2,12 +2,14 @@ package org.example.untitled.usercase.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
+
 public class CreateCaseRequest {
 
     @NotBlank private String title;
 
     @NotBlank private String description;
-    private String fileName;
+    private List<String> fileNames;
 
     public CreateCaseRequest() {}
 
@@ -17,11 +19,11 @@ public class CreateCaseRequest {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getFileName() {
-        return fileName;
+    public List<String> getFileNames() {
+        return fileNames;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setFileNames(List<String> fileNames) {
+        this.fileNames = fileNames;
     }
 }

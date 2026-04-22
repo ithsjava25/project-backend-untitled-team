@@ -46,7 +46,7 @@ public class CaseService {
     }
 
     @Transactional
-    public CaseEntityDto createTicket(CreateCaseRequest request, String username, String fileName) {
+    public CaseEntityDto createTicket(CreateCaseRequest request, String username) {
         User owner = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (caseRepository.existsByTitleAndOwner(request.getTitle(), owner)) {
@@ -56,8 +56,10 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
-        if(fileName != null && !fileName.isBlank()){
-            caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fileName));
+        if (request.getFileNames() != null){
+            for(String fName : request.getFileNames()){
+                caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fName));
+            }
         }
         CaseEntity saved = caseRepository.save(caseEntity);
         auditLogService.log(AuditAction.CASE_CREATED, owner.getId(), saved.getId());
@@ -73,7 +75,7 @@ public class CaseService {
     }
 
     @Transactional
-    public CaseEntityDto updateTicket(Long id, CreateCaseRequest request, String username, String fileName) {
+    public CaseEntityDto updateTicket(Long id, CreateCaseRequest request, String username) {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
@@ -85,8 +87,11 @@ public class CaseService {
         }
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
-        if(fileName != null && !fileName.isBlank())
-            caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fileName));
+        if (request.getFileNames() != null){
+            for(String fName : request.getFileNames()){
+                caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fName));
+            }
+        }
         CaseEntity saved = caseRepository.save(caseEntity);
         auditLogService.log(AuditAction.CASE_UPDATED, caseEntity.getOwner().getId(), saved.getId());
         return CaseMapper.toDto(saved);

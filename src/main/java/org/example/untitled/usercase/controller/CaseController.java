@@ -37,7 +37,7 @@ public class CaseController {
     public ResponseEntity<CaseEntityDto> createTicket(
             @Valid @RequestBody CreateCaseRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(caseService.createTicket(request, userDetails.getUsername(), request.getFileName()));
+        return ResponseEntity.ok(caseService.createTicket(request, userDetails.getUsername()));
     }
 
     @GetMapping("/my")
@@ -51,7 +51,7 @@ public class CaseController {
             @PathVariable Long id,
             @Valid @RequestBody CreateCaseRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(caseService.updateTicket(id, request, userDetails.getUsername(), request.getFileName()));
+        return ResponseEntity.ok(caseService.updateTicket(id, request, userDetails.getUsername()));
     }
 
     @GetMapping

@@ -23,12 +23,14 @@ async function downloadFile(fileName) {
 }
 
 async function uploadNewFile(){
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
     const input = document.getElementById('fileInput');
     const status = document.getElementById('status');
     if (input.files.length === 0) return;
     const filesToUpload = Array.from(input.files);
     input.value = null;
-
+    submitBtn.innerText = "Uploading...";
     for (let i = 0; i < filesToUpload.length; i++) {
         const file = filesToUpload[i];
 
@@ -49,17 +51,31 @@ async function uploadNewFile(){
                 });
 
                 status.innerText = `Successfully uploaded ${file.name}`;
-                fetchAFile();
+
+                const hiddenContainer = document.getElementById("hidden-file-inputs");
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'fileNames';
+                input.value = uploadedFileName;
+                hiddenContainer.appendChild(input);
             } else {
                 status.innerText = `Failed to upload ${file.name}. Status: ${putRes.status}`;
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Create Ticket";
             }
         } catch (error) {
             console.error(error);
             status.innerText = `Error uploading ${file.name}: ${error.message}`;
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Create Ticket";
         }
     }
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Create Ticket";
+    document.querySelector('form').submit();
     status.innerText = "All uploads completed.";
 }
+
 async function deleteFile(fileName){
     const status = document.getElementById('status');
     if (!window.confirm(fileName + " will be deleted! Are you sure?")) {

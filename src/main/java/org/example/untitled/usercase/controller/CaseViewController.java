@@ -42,7 +42,7 @@ public class CaseViewController {
             return "create_ticket";
         }
         try {
-            caseService.createTicket(ticketForm, userDetails.getUsername(), ticketForm.getFileName());
+            caseService.createTicket(ticketForm, userDetails.getUsername());
         } catch (ResponseStatusException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 bindingResult.rejectValue("title", "error.ticketForm", e.getReason());
@@ -82,7 +82,7 @@ public class CaseViewController {
             return "edit_ticket";
         }
         try {
-            caseService.updateTicket(id, ticketForm, userDetails.getUsername(), ticketForm.getFileName());
+            caseService.updateTicket(id, ticketForm, userDetails.getUsername());
         } catch (ResponseStatusException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 bindingResult.rejectValue("title", "error.ticketForm", e.getReason());

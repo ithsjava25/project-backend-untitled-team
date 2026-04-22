@@ -94,13 +94,14 @@ public class S3Service {
     }
 
     public List<UploadedFile> createFile(CaseEntity caseEntity, String fileName) {
-        List<UploadedFile> uploadedFiles = new ArrayList<>();
+        String s3Key = String.format("tickets/%d/uploads/%s", caseEntity.getId(), fileName);
+
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setUploadedBy(caseEntity.getOwner());
         uploadedFile.setAssociatedCase(caseEntity);
         uploadedFile.setFilename(fileName);
-        uploadedFiles.add(uploadedFile);
+        uploadedFile.setS3Key(s3Key);
 
-        return uploadedFiles;
+        return List.of(uploadedFile);
     }
 }

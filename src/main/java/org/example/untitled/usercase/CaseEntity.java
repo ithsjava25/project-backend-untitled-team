@@ -38,7 +38,7 @@ public class CaseEntity {
     @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "associatedCaseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "associatedCaseEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UploadedFile> files = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
