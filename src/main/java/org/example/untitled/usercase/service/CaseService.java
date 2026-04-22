@@ -56,6 +56,7 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
+        caseEntity = caseRepository.save(caseEntity);
         if (request.getFileNames() != null){
             for(String fName : request.getFileNames()){
                 caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fName));
