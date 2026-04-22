@@ -8,21 +8,24 @@
 <body>
 <h1>Register</h1>
 <div>
-    <form th:action="@{/auth/register}" th:object="${registerForm}" method="post">
+    <form th:action="@{/register}" th:object="${registerForm}" method="post">
         <header class="register-header">
             <div class="register-username">
                 <label for="username">Username:</label>
                 <input th:field="*{username}" id="username">
+                <p th:if="${#fields.hasErrors('username')}" th:errorclass="error" th:errors="*{username}"></p>
             </div>
         </header>
         <div class="register-body">
             <div class="register-email">
                 <label for="email">Email:</label>
                 <input th:field="*{email}" id="email">
+                <p th:if="${#fields.hasErrors('email')}" th:errorclass="error" th:errors="*{email}"></p>
             </div>
             <div>
                 <label for="password">Password:</label>
                 <input type="password" th:field="*{password}" id="password">
+                <p th:if="${#fields.hasErrors('password')}" th:errorclass="error" th:errors="*{password}"></p>
             </div>
         </div>
         <footer class="register-footer">
@@ -31,6 +34,9 @@
             </div>
         </footer>
     </form>
+</div>
+<div>
+    <p><a th:href="@{/}">go back to start</a></p>
 </div>
 </body>
 </html>

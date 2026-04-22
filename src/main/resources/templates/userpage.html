@@ -13,20 +13,21 @@
     <ul>
         <li><a th:href="@{/upload}">Upload image</a></li>
         <li><a th:href="@{/tickets/create}">Create new ticket</a></li>
+        <li><a th:href="@{/}">Home</a></li>
     </ul>
 
-    <section>
+    <section th:object="${myTicket}">
         <h2>My Tickets</h2>
-        <div th:if="${#lists.isEmpty(tickets)}">
+        <div th:if="${#lists.isEmpty(myTicket)}">
             <p>You have no tickets yet.</p>
         </div>
-        <div th:each="ticket : ${tickets}">
-            <strong th:text="${ticket.title}"></strong>
-            <span th:text="' — ' + ${ticket.status}"></span>
+        <div th:each="tickets : ${myTicket}">
+            <strong th:text="${tickets.title}"></strong>
+            <span th:text="' — ' + ${tickets.status}"></span>
             <br>
-            <em th:text="${ticket.description}"></em>
+            <em th:text="${tickets.description}"></em>
             <br>
-            <a th:href="@{/tickets/{id}/edit(id=${ticket.id})}">Edit</a>
+            <a th:href="@{/tickets/{id}/edit(id=${tickets.id})}">Edit</a>
             <hr>
         </div>
     </section>
