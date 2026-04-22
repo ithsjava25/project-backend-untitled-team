@@ -13,11 +13,12 @@
     <ul>
         <li><a th:href="@{/upload}">Upload image</a></li>
         <li><a th:href="@{/tickets/create}">Create new ticket</a></li>
+        <li><a th:href="@{/}">Home</a></li>
     </ul>
 
     <section>
         <h2>My Tickets</h2>
-        <div th:if="${#lists.isEmpty(tickets)}">
+        <div th:if="${#lists.isEmpty(myTicket)}">
             <p>You have no tickets yet.</p>
         </div>
         <div th:each="ticket : ${tickets}">
