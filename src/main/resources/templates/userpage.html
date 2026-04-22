@@ -18,7 +18,7 @@
 
     <section>
         <h2>My Tickets</h2>
-        <div th:if="${#lists.isEmpty(myTicket)}">
+        <div th:if="${#lists.isEmpty(tickets)}">
             <p>You have no tickets yet.</p>
         </div>
         <div th:each="ticket : ${tickets}">
