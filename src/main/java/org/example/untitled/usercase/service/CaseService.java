@@ -2,12 +2,16 @@ package org.example.untitled.usercase.service;
 
 import org.example.untitled.s3.S3Service;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.AuditAction;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.CaseStatus;
+import org.example.untitled.usercase.UploadedFile;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
@@ -59,6 +63,7 @@ public class CaseService {
         caseEntity = caseRepository.save(caseEntity);
         if (request.getFileNames() != null){
             for(String fName : request.getFileNames()){
+                if (fName == null || fName.isBlank()) continue;
                 caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fName));
             }
         }
@@ -88,8 +93,13 @@ public class CaseService {
         }
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
+        caseEntity = caseRepository.save(caseEntity);
         if (request.getFileNames() != null){
+            Set<String> existing = caseEntity.getFiles().stream()
+                    .map(UploadedFile::getFilename)
+                    .collect(Collectors.toSet());
             for(String fName : request.getFileNames()){
+                if (fName == null || fName.isBlank() || existing.contains(fName)) continue;
                 caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fName));
             }
         }

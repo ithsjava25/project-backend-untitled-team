@@ -27,7 +27,10 @@ async function uploadNewFile(){
     submitBtn.disabled = true;
     const input = document.getElementById('fileInput');
     const status = document.getElementById('status');
-    if (input.files.length === 0) return;
+    if (input.files.length === 0){
+        document.querySelector('form').submit();
+        return;
+    }
     const filesToUpload = Array.from(input.files);
     input.value = null;
     submitBtn.innerText = "Uploading...";
@@ -72,8 +75,8 @@ async function uploadNewFile(){
     }
     submitBtn.disabled = false;
     submitBtn.innerText = "Create Ticket";
-    document.querySelector('form').submit();
     status.innerText = "All uploads completed.";
+    document.querySelector('form').submit();
 }
 
 async function deleteFile(fileName){

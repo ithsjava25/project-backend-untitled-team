@@ -22,7 +22,6 @@
             <label for="description">Description:</label>
             <textarea th:field="*{description}" id="description"></textarea>
             <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
-            <input type="hidden" th:field="*{fileNames}" id="s3FileName">
             <input type="file" id="fileInput" multiple>
             <p id="status"></p>
         </div>
