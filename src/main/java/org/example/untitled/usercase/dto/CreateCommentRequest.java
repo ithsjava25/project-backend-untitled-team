@@ -8,7 +8,7 @@ public class CreateCommentRequest {
 
     @NotBlank private String text;
 
-    @NotNull @Positive private Long caseId;
+    @Positive private Long caseId;
 
     public CreateCommentRequest() {}
 

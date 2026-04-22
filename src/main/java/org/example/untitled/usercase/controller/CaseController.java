@@ -111,6 +111,7 @@ public class CaseController {
             model.addAttribute("ticket", ticket);
             return "close_ticket";
         }
+        comment.setCaseId(id);
         try {
             caseService.closeTicket(ticket, comment);
         } catch (IllegalArgumentException e) {
