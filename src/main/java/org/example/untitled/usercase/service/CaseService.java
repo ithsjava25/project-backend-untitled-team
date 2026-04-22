@@ -61,6 +61,9 @@ public class CaseService {
         }
         CaseEntity saved = caseRepository.save(caseEntity);
         auditLogService.log(AuditAction.CASE_CREATED, owner.getId(), saved.getId());
+        if (fileName != null && !fileName.isBlank()) {
+            auditLogService.log(AuditAction.FILE_UPLOADED, owner.getId(), saved.getId());
+        }
         return CaseMapper.toDto(saved);
     }
 
@@ -89,6 +92,9 @@ public class CaseService {
             caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fileName));
         CaseEntity saved = caseRepository.save(caseEntity);
         auditLogService.log(AuditAction.CASE_UPDATED, caseEntity.getOwner().getId(), saved.getId());
+        if (fileName != null && !fileName.isBlank()) {
+            auditLogService.log(AuditAction.FILE_UPLOADED, caseEntity.getOwner().getId(), saved.getId());
+        }
         return CaseMapper.toDto(saved);
     }
 
