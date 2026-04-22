@@ -1,5 +1,6 @@
 package org.example.untitled.usercase.service;
 
+import org.example.untitled.usercase.AuditAction;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.mapper.CommentMapper;
@@ -13,11 +14,13 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final CaseRepository caseRepository;
+    private final AuditLogService auditLogService;
 
 
-    public CommentService(CommentRepository commentRepository, CaseRepository caseRepository) {
+    public CommentService(CommentRepository commentRepository, CaseRepository caseRepository, AuditLogService auditLogService) {
         this.commentRepository = commentRepository;
         this.caseRepository = caseRepository;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
@@ -32,5 +35,6 @@ public class CommentService {
         entity.setAuthor(caseEntity.getOwner());
         entity.setCaseEntity(caseEntity);
         commentRepository.save(entity);
+        auditLogService.log(AuditAction.COMMENT_ADDED, entity.getAuthor().getId(), caseEntity.getId()); // lägg till
     }
 }
