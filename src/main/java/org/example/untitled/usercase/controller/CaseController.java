@@ -58,6 +58,8 @@ public class CaseController {
     }
 
     @PutMapping("/{id}/status")
+    @ResponseBody
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> updateStatus(
             @PathVariable Long id,
             @RequestParam CaseStatus status,
