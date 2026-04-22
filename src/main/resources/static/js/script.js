@@ -1,5 +1,5 @@
 async function fetchAFile(){
-    const response = await apiReq('/api/files');
+    const response = await apiReq('upload/api/files');
     if (!response) return;
     const files = await response.json();
     const body = document.getElementById('fileTableBody')
@@ -34,7 +34,7 @@ async function uploadNewFile(){
 
         try {
             status.innerText = `Processing file ${i + 1} of ${filesToUpload.length}: ${file.name}`;
-            const res = await apiReq(`/upload/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
+            const res = await apiReq(`/upload/api/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
             if (!res) continue;
             const { url, fileName: uploadedFileName } = await res.json();
             status.innerText = `Uploading ${file.name}...`;
@@ -44,7 +44,7 @@ async function uploadNewFile(){
                 headers: { 'Content-Type': file.type }
             });
             if (putRes.ok) {
-                await apiReq(`/upload/files/callback?fileName=${encodeURIComponent(uploadedFileName)}`, {
+                await apiReq(`/upload/api/files/callback?fileName=${encodeURIComponent(uploadedFileName)}`, {
                     method: 'POST'
                 });
 

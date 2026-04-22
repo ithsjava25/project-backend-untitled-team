@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>File Upload</title>
     <link rel="stylesheet" th:href="@{/style.css}">
+    <script src="/js/script.js" type="text/javascript"></script>
 </head>
 <body>
 <header>
@@ -13,7 +14,7 @@
     <section>
         <h2>Upload File</h2>
         <div>
-            <input type="file" id="fileInput">
+            <input type="file" id="fileInput" multiple>
             <button onclick="uploadNewFile()" class="button">Upload</button>
             <p id="status"></p>
         </div>
@@ -21,10 +22,9 @@
 
     <section>
         <h2>Uploaded Files</h2>
-        <div th:if="${#lists.isEmpty(files)}">
+        <div th:unless="${#lists.isEmpty(files)}">
             <p>No files uploaded yet.</p>
-        </div>
-        <table th:if="${not #lists.isEmpty(files)}">
+        <table>
             <thead>
                 <tr>
                     <th>File Name</th>
@@ -40,6 +40,7 @@
                 </tr>
             </tbody>
         </table>
+        </div>
     </section>
 </main>
 </body>
