@@ -26,11 +26,9 @@ import java.util.List;
 public class CaseController {
 
     private final CaseService caseService;
-    private final UserRepository userRepository;
 
-    public CaseController(CaseService caseService, UserRepository userRepository) {
+    public CaseController(CaseService caseService) {
         this.caseService = caseService;
-        this.userRepository = userRepository;
     }
 
     @PostMapping
@@ -62,15 +60,11 @@ public class CaseController {
     }
 
     @PutMapping("/{id}/status")
-    @ResponseBody
-    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> updateStatus(
             @PathVariable Long id,
             @RequestParam CaseStatus status,
             @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        return ResponseEntity.ok(caseService.updateStatus(id, status, user.getId()));
+        return ResponseEntity.ok(caseService.updateStatus(id, status, userDetails.getUsername()));
     }
 
     @PutMapping("/{id}/assign")
