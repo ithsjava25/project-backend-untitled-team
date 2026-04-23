@@ -6,31 +6,38 @@
     <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<header>
-    <h1>My Tickets</h1>
-</header>
-<main>
-    <ul>
-        <li><a th:href="@{/upload}">Upload image</a></li>
-        <li><a th:href="@{/tickets/create}">Create new ticket</a></li>
-    </ul>
+<h1>My Tickets</h1>
+<div>
+    <div class="ticket-actions">
+        <a th:href="@{/tickets/create}">Create new ticket</a>
+        <a th:href="@{/upload}">Upload file</a>
+    </div>
 
-    <section>
-        <h2>My Tickets</h2>
-        <div th:if="${#lists.isEmpty(tickets)}">
-            <p>You have no tickets yet.</p>
-        </div>
-        <div th:each="ticket : ${tickets}">
-            <strong th:text="${ticket.title}"></strong>
-            <span th:text="' — ' + ${ticket.status}"></span>
-            <br>
-            <em th:text="${ticket.description}"></em>
-            <br>
-            <a th:href="@{/tickets/{id}/edit(id=${ticket.id})}">Edit</a>
-            <hr>
-        </div>
-    </section>
-</main>
+    <div th:if="${#lists.isEmpty(tickets)}">
+        <p>You have no tickets yet. <a th:href="@{/tickets/create}">Create one?</a></p>
+    </div>
 
+    <div class="ticket-info" th:each="ticket : ${tickets}">
+        <div class="ticket-header">
+            <div class="ticket-title">
+                <p th:text="${ticket.title}"></p>
+            </div>
+            <span th:text="${ticket.status}"></span>
+        </div>
+        <div class="ticket-body">
+            <p th:text="${ticket.description}"></p>
+        </div>
+        <div class="ticket-footer">
+            <span th:if="${ticket.assignedToUsername != null}"
+                  th:text="'Assigned to: ' + ${ticket.assignedToUsername}"></span>
+            <span th:if="${ticket.assignedToUsername == null}">Not yet assigned</span>
+            <div class="ticket-button">
+                <a th:href="@{/tickets/{id}/edit(id=${ticket.id})}">Edit</a>
+                <a th:if="${ticket.status.name() != 'CLOSED' and ticket.status.name() != 'SOLVED'}"
+                   th:href="@{/tickets/{id}/close(id=${ticket.id})}">Close</a>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
