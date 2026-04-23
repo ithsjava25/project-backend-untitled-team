@@ -8,6 +8,8 @@ import org.example.untitled.user.User;
 import org.example.untitled.user.dto.UserDto;
 import org.example.untitled.user.mapper.UserMapper;
 import org.example.untitled.user.repository.UserRepository;
+import org.example.untitled.usercase.AuditAction;
+import org.example.untitled.usercase.service.AuditLogService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,11 +23,12 @@ public class UserService {
 
     private final UserRepository userRep;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
-    public UserService(
-            UserRepository userRep, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRep, PasswordEncoder passwordEncoder, AuditLogService auditLogService) {
         this.userRep = userRep;
         this.passwordEncoder = passwordEncoder;
+        this.auditLogService = auditLogService;
     }
 
     public List<UserDto> getAllUsers() {
@@ -38,7 +41,9 @@ public class UserService {
         User user = userRep.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + id));
         user.setRole(role);
-        return UserMapper.toDto(userRep.save(user));
+        UserDto saved = UserMapper.toDto(userRep.save(user));
+        auditLogService.log(AuditAction.USER_ROLE_CHANGED, id, null);
+        return saved;
     }
 
     public void register(RegisterRequest request) {

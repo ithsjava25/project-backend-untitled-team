@@ -1,6 +1,8 @@
 package org.example.untitled.usercase.controller;
 
 import jakarta.validation.Valid;
+import org.example.untitled.user.User;
+import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
@@ -27,17 +29,20 @@ public class CaseController {
 
     private final CaseService caseService;
     private final CommentService commentService;
+    private final UserRepository userRepository;
+  
 
-    public CaseController(CaseService caseService, CommentService commentService) {
+    public CaseController(CaseService caseService, CommentService commentService, UserRepository userRepository) {
         this.caseService = caseService;
         this.commentService = commentService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
     public ResponseEntity<CaseEntityDto> createTicket(
             @Valid @RequestBody CreateCaseRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(caseService.createTicket(request, userDetails.getUsername()));
+        return ResponseEntity.ok(caseService.createTicket(request, userDetails.getUsername(), request.getFileName()));
     }
 
     @GetMapping("/my")
@@ -68,27 +73,31 @@ public class CaseController {
             @PathVariable Long id,
             @Valid @RequestBody CreateCaseRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(caseService.updateTicket(id, request, userDetails.getUsername()));
+        return ResponseEntity.ok(caseService.updateTicket(id, request, userDetails.getUsername(), request.getFileName()));
     }
 
     @GetMapping
     @ResponseBody
-    @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<List<CaseEntityDto>> getAllTickets() {
         return ResponseEntity.ok(caseService.getAllTickets());
     }
 
     @PutMapping("/{id}/status")
     @ResponseBody
-    @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> updateStatus(
-            @PathVariable Long id, @RequestParam CaseStatus status) {
-        return ResponseEntity.ok(caseService.updateStatus(id, status));
+            @PathVariable Long id,
+            @RequestParam CaseStatus status,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return ResponseEntity.ok(caseService.updateStatus(id, status, user.getId()));
     }
 
     @PutMapping("/{id}/assign")
     @ResponseBody
-    @PreAuthorize("hasAnyRole('HANDLER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public ResponseEntity<CaseEntityDto> assignToSelf(
             @PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(caseService.assignTicket(id, userDetails.getUsername()));
@@ -124,6 +133,7 @@ public class CaseController {
             model.addAttribute("ticket", ticket);
             return "close_ticket";
         }
+        comment.setCaseId(id);
         try {
             caseService.closeTicket(ticket, comment);
         } catch (IllegalArgumentException e) {

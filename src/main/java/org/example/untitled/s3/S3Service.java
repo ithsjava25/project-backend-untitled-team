@@ -1,6 +1,8 @@
 package org.example.untitled.s3;
 
 import jakarta.annotation.PostConstruct;
+import org.example.untitled.usercase.CaseEntity;
+import org.example.untitled.usercase.UploadedFile;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -11,6 +13,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +28,8 @@ public class S3Service {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
     }
+
+    public record S3UploadResponse(String url, String fileName){}
 
     @PostConstruct
     public void init(){
@@ -49,7 +54,6 @@ public class S3Service {
         ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
                 .bucket(BUCKET_NAME)
                 .build();
-
         ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
 
         return listObjectsV2Response.contents().stream()
@@ -57,7 +61,7 @@ public class S3Service {
                 .toList();
     }
 
-    public String generateS3PreUploadUrl(String fileName, String contentType) {
+    public S3UploadResponse generateS3PreUploadUrl(String fileName, String contentType) {
         String fileIn = UUID.randomUUID().toString().substring(0, 8) + "-" +fileName;
         PutObjectPresignRequest preReq = PutObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(10))
@@ -68,7 +72,8 @@ public class S3Service {
                         .build())
                 .build();
         PresignedPutObjectRequest prePutObj = s3Presigner.presignPutObject(preReq);
-        return prePutObj.url().toString();
+        String url = prePutObj.url().toString();
+        return new S3UploadResponse(url, fileIn);
     }
 
     public String generateS3DownloadUrl(String fileName) {
@@ -78,7 +83,24 @@ public class S3Service {
                         .key(fileName)
                         .build())
                 .build();
-        PresignedGetObjectRequest presigneReq = s3Presigner.presignGetObject(presignRequest);
-        return presigneReq.url().toString();
+        PresignedGetObjectRequest presignReq = s3Presigner.presignGetObject(presignRequest);
+        return presignReq.url().toString();
+    }
+
+    public void deleteFile(String filename){
+        s3Client.deleteObject(req -> req
+                .bucket(BUCKET_NAME)
+                .key(filename));
+    }
+
+    public List<UploadedFile> createFile(CaseEntity caseEntity, String fileName) {
+        List<UploadedFile> uploadedFiles = new ArrayList<>();
+        UploadedFile uploadedFile = new UploadedFile();
+        uploadedFile.setUploadedBy(caseEntity.getOwner());
+        uploadedFile.setAssociatedCase(caseEntity);
+        uploadedFile.setFilename(fileName);
+        uploadedFiles.add(uploadedFile);
+
+        return uploadedFiles;
     }
 }

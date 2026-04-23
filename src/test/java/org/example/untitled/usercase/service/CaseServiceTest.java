@@ -30,6 +30,9 @@ class CaseServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     @InjectMocks
     private CaseService caseService;
 

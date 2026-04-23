@@ -35,14 +35,11 @@ public class CaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User assignedTo;
 
-    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "associatedCaseEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UploadedFile> files = new ArrayList<>();
-
-    @OneToMany(mappedBy = "caseEntity", fetch = FetchType.LAZY)
-    private List<AuditLog> auditLogs = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -120,14 +117,6 @@ public class CaseEntity {
 
     public void setFiles(List<UploadedFile> files) {
         this.files = files;
-    }
-
-    public List<AuditLog> getAuditLogs() {
-        return auditLogs;
-    }
-
-    public void setAuditLogs(List<AuditLog> auditLogs) {
-        this.auditLogs = auditLogs;
     }
 
     public Instant getCreatedAt() {
