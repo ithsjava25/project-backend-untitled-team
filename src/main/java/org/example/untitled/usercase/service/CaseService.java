@@ -115,13 +115,15 @@ public class CaseService {
     }
 
     @Transactional
-    public CaseEntityDto updateStatus(Long id, CaseStatus newStatus, Long actorId) {
+    public CaseEntityDto updateStatus(Long id, CaseStatus newStatus, String username) {
+        User actor = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         caseEntity.setStatus(newStatus);
         CaseEntity saved = caseRepository.save(caseEntity);
-        auditLogService.log(AuditAction.CASE_STATUS_CHANGED, actorId, saved.getId());
+        auditLogService.log(AuditAction.CASE_STATUS_CHANGED, actor.getId(), saved.getId());
         return CaseMapper.toDto(saved);
     }
 

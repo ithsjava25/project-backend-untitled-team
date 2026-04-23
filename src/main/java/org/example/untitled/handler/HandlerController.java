@@ -52,9 +52,7 @@ public class HandlerController {
     @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public String updateStatus(@PathVariable Long id, @RequestParam CaseStatus status,
                                @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        caseService.updateStatus(id, status, user.getId());
+        caseService.updateStatus(id, status, userDetails.getUsername());
         return "redirect:/handler";
     }
 }
