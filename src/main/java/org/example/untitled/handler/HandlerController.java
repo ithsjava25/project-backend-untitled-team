@@ -16,6 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+
+/**
+ * Controller for the handler dashboard, accessible to users with roles
+ * HANDLER, SUPERVISOR, or ADMIN. Provides functionality for viewing,
+ * assigning, and updating the status of support tickets.
+ */
 @Controller
 public class HandlerController {
 
