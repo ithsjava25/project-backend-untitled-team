@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Handler Dashboard</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<h1>Handler Dashboard</h1>
+<div>
+    <div th:if="${#lists.isEmpty(tickets)}">
+        <p>No tickets in the system yet.</p>
+    </div>
+
+    <div class="ticket-info" th:each="ticket : ${tickets}">
+        <div class="ticket-header">
+            <div class="ticket-title">
+                <p th:text="${ticket.title}"></p>
+            </div>
+            <span th:text="${ticket.status}"></span>
+        </div>
+        <div class="ticket-body">
+            <p th:text="${ticket.description}"></p>
+            <p>Owner: <span th:text="${ticket.ownerUsername}"></span></p>
+            <p th:if="${ticket.assignedToUsername != null}">
+                Assigned to: <span th:text="${ticket.assignedToUsername}"></span>
+            </p>
+            <p th:if="${ticket.assignedToUsername == null}">Not yet assigned</p>
+        </div>
+        <div class="ticket-footer">
+            <div class="ticket-button">
+                <form th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
+                    <input type="hidden" name="_method" value="PUT">
+                    <button type="submit"
+                            th:disabled="${ticket.assignedToUsername != null}">
+                        Assign to me
+                    </button>
+                </form>
+                <form th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post">
+                    <input type="hidden" name="_method" value="PUT">
+                    <select name="status">
+                        <option th:each="s : ${statuses}"
+                                th:value="${s}"
+                                th:text="${s}"
+                                th:selected="${s == ticket.status}">
+                        </option>
+                    </select>
+                    <button type="submit">Update Status</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

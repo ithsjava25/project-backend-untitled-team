@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -38,6 +39,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/user", true)
+                        .successHandler(customAuthenticationSuccessHandler())
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login")
@@ -60,6 +62,21 @@ public class SecurityConfig {
         } catch (Exception e) {
             throw new RuntimeException("Could not get AuthenticationManager", e);
         }
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return (request, response, authentication) -> {
+            boolean isHandler = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_HANDLER")
+                            || a.getAuthority().equals("ROLE_SUPERVISOR")
+                            || a.getAuthority().equals("ROLE_ADMIN"));
+            if (isHandler) {
+                response.sendRedirect("/handler");
+            } else {
+                response.sendRedirect("/user");
+            }
+        };
     }
 
     @Bean
