@@ -189,3 +189,150 @@ textarea {
 input[type="hidden"] {
     display: none;
 }
+
+/* Page wrapper */
+.page-wrapper {
+    padding: 40px 20px;
+}
+
+/* Page header row */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    margin: 0;
+    text-align: left;
+}
+
+/* Action buttons */
+.ticket-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Link buttons */
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    color: #0f172a;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #67e8f9, #818cf8);
+    color: #0f172a;
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: #1e293b;
+    color: #94a3b8;
+    border: 1px solid #334155;
+}
+
+.btn-secondary:hover {
+    background: #273548;
+    color: #e2e8f0;
+}
+
+.btn-danger {
+    background: #7f1d1d;
+    color: #fca5a5;
+    border: 1px solid #991b1b;
+}
+
+.btn-danger:hover {
+    background: #991b1b;
+    color: #fee2e2;
+}
+
+/* Ticket header row */
+.ticket-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.ticket-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f1f5f9;
+}
+
+/* Status badge */
+.status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #0f3460;
+    color: #38bdf8;
+    border: 1px solid #1d4ed8;
+}
+
+/* Footer row */
+.ticket-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #1e3a5f;
+}
+
+.assigned {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    color: #64748b;
+    margin-top: 60px;
+    font-size: 15px;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #1e3a5f;
+    padding-bottom: 0;
+}
+
+/* Filter tabs */
+
+.filter-tab {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s ease;
+}
+
+.filter-tab:hover {
+    color: #e2e8f0;
+    text-decoration: none;
+}
+
+.filter-tab.active {
+    color: #38bdf8;
+    border-bottom-color: #38bdf8;
+}

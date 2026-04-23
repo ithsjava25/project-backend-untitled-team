@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css"/>
+</head>
+<body>
+<div>
+    <h1>Ticket Details</h1>
+    <div th:object="${ticket}">
+        <div class="ticket-info">
+            <div class="ticket-title">
+                <p th:text="*{title}"></p>
+            </div>
+            <div class="ticket-body">
+                <p>Status: </p>
+                <p th:text="*{status}"></p><br>
+                <p>Handler: </p>
+                <p th:text="*{assignedToUsername}"></p><br>
+                <p>Description: </p>
+                <p th:text="*{description}"></p><br>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="ticket-comments">
+            <div th:each="comment : ${comments}" class="comment-box">
+                <p class="comment-title" th:text="${comment.title}"></p>
+                <p class="comment-text" th:text="${comment.text}"></p>
+                <p class="comment-author">
+                    Author: <span th:text="${comment.authorUsername}"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="ticket-footer">
+        <nav>
+            <a th:href="@{/tickets/{id}/close(id=${ticket.id})}">Close</a> |
+            <a th:href="@{/tickets}">Back</a>
+        </nav>
+    </div>
+</div>
+</body>
+</html>
