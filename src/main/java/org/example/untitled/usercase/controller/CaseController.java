@@ -83,8 +83,7 @@ public class CaseController {
     public String closeTicket(
             Model model,
             @PathVariable long id,
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
+            @AuthenticationPrincipal UserDetails userDetails) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
         if (caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
@@ -99,8 +98,7 @@ public class CaseController {
             @ModelAttribute("comment") @Valid CreateCommentRequest comment,
             BindingResult bindingResult,
             @AuthenticationPrincipal UserDetails userDetails,
-            Model model
-    ) {
+            Model model) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
         if (caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
@@ -116,7 +114,6 @@ public class CaseController {
             model.addAttribute("ticket", ticket);
             return "close_ticket";
         }
-
         return "redirect:/user";
     }
 }

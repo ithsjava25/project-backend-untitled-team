@@ -6,31 +6,49 @@
     <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<header>
-    <h1>My Tickets</h1>
-</header>
-<main>
-    <ul>
-        <li><a th:href="@{/upload}">Upload image</a></li>
-        <li><a th:href="@{/tickets/create}">Create new ticket</a></li>
-    </ul>
-
-    <section>
-        <h2>My Tickets</h2>
-        <div th:if="${#lists.isEmpty(tickets)}">
-            <p>You have no tickets yet.</p>
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>My Tickets</h1>
+        <div class="ticket-actions">
+            <a th:href="@{/tickets/create}" class="btn">+ New ticket</a>
+            <a th:href="@{/upload}" class="btn btn-secondary">Upload file</a>
         </div>
-        <div th:each="ticket : ${tickets}">
-            <strong th:text="${ticket.title}"></strong>
-            <span th:text="' — ' + ${ticket.status}"></span>
-            <br>
-            <em th:text="${ticket.description}"></em>
-            <br>
-            <a th:href="@{/tickets/{id}/edit(id=${ticket.id})}">Edit</a>
-            <hr>
-        </div>
-    </section>
-</main>
+    </div>
 
+    <div class="filter-tabs">
+        <a th:href="@{/user}"
+           th:classappend="${filter == null or filter == 'all'} ? ' active'"
+           class="filter-tab">All</a>
+        <a th:href="@{/user(filter='open')}"
+           th:classappend="${filter == 'open'} ? ' active'"
+           class="filter-tab">Open</a>
+        <a th:href="@{/user(filter='closed')}"
+           th:classappend="${filter == 'closed'} ? ' active'"
+           class="filter-tab">Closed</a>
+    </div>
+
+    <p class="empty-state" th:if="${#lists.isEmpty(tickets)}">
+        No tickets yet. <a th:href="@{/tickets/create}">Create one?</a>
+    </p>
+
+    <div class="ticket-info" th:each="ticket : ${tickets}">
+        <div class="ticket-header">
+            <span class="ticket-title" th:text="${ticket.title}"></span>
+            <span class="status-badge" th:text="${ticket.status}"></span>
+        </div>
+        <div class="ticket-body">
+            <p th:text="${ticket.description}"></p>
+        </div>
+        <div class="ticket-footer">
+            <span class="assigned"
+                  th:text="${ticket.assignedToUsername != null ? 'Assigned to: ' + ticket.assignedToUsername : 'Unassigned'}"></span>
+            <div class="ticket-button">
+                <a th:href="@{/tickets/{id}/edit(id=${ticket.id})}" class="btn btn-secondary">Edit</a>
+                <a th:if="${ticket.status.name() != 'CLOSED' and ticket.status.name() != 'SOLVED'}"
+                   th:href="@{/tickets/{id}/close(id=${ticket.id})}" class="btn btn-danger">Close</a>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
