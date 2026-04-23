@@ -118,6 +118,17 @@ button:active {
     transform: translateY(0);
 }
 
+/* Links */
+a {
+    color: #38bdf8;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #67e8f9;
+    text-decoration: none;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
     form {

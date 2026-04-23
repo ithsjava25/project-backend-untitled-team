@@ -1,8 +1,11 @@
 package org.example.untitled.usercase.service;
 
+import org.example.untitled.s3.S3Service;
+import java.util.List;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
+import org.example.untitled.usercase.AuditAction;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
@@ -15,24 +18,35 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-
+/**
+ * Service for managing support tickets (cases) in the system.
+ * Handles creation, updates, assignment, and status changes of tickets,
+ * and logs all significant actions via {@link AuditLogService}.
+ */
 @Service
 public class CaseService {
 
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
     private final CommentService commentService;
+    private final S3Service s3Service;
 
     public CaseService(
             CaseRepository caseRepository,
-            UserRepository userRepository, CommentService commentService) {
+            UserRepository userRepository,
+            CommentService commentService,
+            S3Service s3Service,
+            AuditLogService auditLogService) {
         this.caseRepository = caseRepository;
         this.userRepository = userRepository;
         this.commentService = commentService;
+        this.auditLogService = auditLogService;
+        this.s3Service = s3Service;
     }
 
-    public CaseEntityDto createTicket(CreateCaseRequest request, String username) {
+    @Transactional
+    public CaseEntityDto createTicket(CreateCaseRequest request, String username, String fileName) {
         User owner = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (caseRepository.existsByTitleAndOwner(request.getTitle(), owner)) {
@@ -42,7 +56,12 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        if(fileName != null && !fileName.isBlank()){
+            caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fileName));
+        }
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_CREATED, owner.getId(), saved.getId());
+        return CaseMapper.toDto(saved);
     }
 
     public List<CaseEntityDto> getMyTickets(String username) {
@@ -53,7 +72,8 @@ public class CaseService {
                 .toList();
     }
 
-    public CaseEntityDto updateTicket(Long id, CreateCaseRequest request, String username) {
+    @Transactional
+    public CaseEntityDto updateTicket(Long id, CreateCaseRequest request, String username, String fileName) {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
@@ -65,21 +85,11 @@ public class CaseService {
         }
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
-    }
-
-    @Transactional
-    public void saveTicket(CreateCaseRequest createForm, User user) {
-        if (createForm == null) {
-            throw new IllegalArgumentException("ticketForm can not be null");
-        }
-        if (user == null) throw new IllegalArgumentException("User can not be null");
-        if (caseRepository.existsByTitleAndOwner(createForm.getTitle(), user))
-            throw new IllegalArgumentException("A ticket for this issue is already in the system");
-        var entity = CaseMapper.toEntity(createForm);
-        entity.setOwner(user);
-        entity.setStatus(CaseStatus.OPEN);
-        caseRepository.save(entity);
+        if(fileName != null && !fileName.isBlank())
+            caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fileName));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_UPDATED, caseEntity.getOwner().getId(), saved.getId());
+        return CaseMapper.toDto(saved);
     }
 
     @Transactional
@@ -88,7 +98,7 @@ public class CaseService {
             throw new IllegalArgumentException("Comment Cant be null");
         if (ticket == null)
             throw new IllegalArgumentException("Ticket Cant be null");
-        updateStatus(ticket.id(), CaseStatus.CLOSED);
+        updateStatus(ticket.id(), CaseStatus.CLOSED, ticket.ownerId());
         commentService.createComment(comment, ticket);
     }
 
@@ -104,25 +114,31 @@ public class CaseService {
                 .toList();
     }
 
-    public CaseEntityDto updateStatus(Long id, CaseStatus newStatus) {
+    @Transactional
+    public CaseEntityDto updateStatus(Long id, CaseStatus newStatus, Long actorId) {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         caseEntity.setStatus(newStatus);
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_STATUS_CHANGED, actorId, saved.getId());
+        return CaseMapper.toDto(saved);
     }
 
+    @Transactional
     public CaseEntityDto assignTicket(Long id, String username) {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         User handler = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        if (handler.getRole() != Role.HANDLER && handler.getRole() != Role.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler or admin");
+        if (handler.getRole() != Role.HANDLER && handler.getRole() != Role.SUPERVISOR && handler.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler, supervisor or admin");
         }
         caseEntity.setAssignedTo(handler);
-        return CaseMapper.toDto(caseRepository.save(caseEntity));
+        CaseEntity saved = caseRepository.save(caseEntity);
+        auditLogService.log(AuditAction.CASE_ASSIGNED, handler.getId(), saved.getId());
+        return CaseMapper.toDto(saved);
     }
 
     public CaseEntityDto getTicketByID(long id) {

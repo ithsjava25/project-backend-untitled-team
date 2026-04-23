@@ -15,8 +15,6 @@ public class UploadedFile {
     @Column(nullable = false)
     private String filename;
 
-    @Column(nullable = false)
-    private String s3key;
 
     @Column(nullable = false, updatable = false)
     private Instant uploadedAt;
@@ -52,14 +50,6 @@ public class UploadedFile {
 
     public void setFilename(String filename) {
         this.filename = filename;
-    }
-
-    public String getS3key() {
-        return s3key;
-    }
-
-    public void setS3key(String s3key) {
-        this.s3key = s3key;
     }
 
     public Instant getUploadedAt() {

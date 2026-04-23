@@ -6,5 +6,6 @@ public enum AuditAction {
     CASE_STATUS_CHANGED,
     COMMENT_ADDED,
     FILE_UPLOADED,
-    USER_ROLE_CHANGED
+    USER_ROLE_CHANGED,
+    CASE_UPDATED
 }

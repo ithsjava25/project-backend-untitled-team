@@ -1,8 +1,6 @@
 package org.example.untitled.usercase;
 
 import jakarta.persistence.*;
-import org.example.untitled.user.User;
-
 import java.time.Instant;
 
 @Entity
@@ -19,21 +17,18 @@ public class AuditLog {
     @Column(nullable = false, updatable = false)
     private Instant timestamp;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    @Column
+    private Long userId;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private CaseEntity caseEntity;
+    @Column
+    private Long caseId;
 
-    public AuditLog() {
-        // Empty constructor for JPA
-    }
+    public AuditLog() {}
 
-    public AuditLog(AuditAction action, User user, CaseEntity caseEntity) {
+    public AuditLog(AuditAction action, Long userId, Long caseId) {
         this.action = action;
-        this.user = user;
-        this.caseEntity = caseEntity;
+        this.userId = userId;
+        this.caseId = caseId;
     }
 
     @PrePersist
@@ -41,23 +36,9 @@ public class AuditLog {
         this.timestamp = Instant.now();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public AuditAction getAction() {
-        return action;
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public CaseEntity getCaseEntity() {
-        return caseEntity;
-    }
+    public Long getId() { return id; }
+    public AuditAction getAction() { return action; }
+    public Instant getTimestamp() { return timestamp; }
+    public Long getUserId() { return userId; }
+    public Long getCaseId() { return caseId; }
 }
