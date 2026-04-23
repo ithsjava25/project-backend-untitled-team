@@ -93,7 +93,6 @@ public class CaseService {
         }
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
-        caseEntity = caseRepository.save(caseEntity);
         if (request.getFileNames() != null){
             Set<String> existing = caseEntity.getFiles().stream()
                     .map(UploadedFile::getFilename)
