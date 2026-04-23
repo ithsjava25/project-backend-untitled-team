@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class UserController {
@@ -27,8 +28,25 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public String userLanding(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        model.addAttribute("tickets", caseService.getMyTickets(userDetails.getUsername()));
+    public String userLanding(Model model,
+                              @AuthenticationPrincipal UserDetails userDetails,
+                              @RequestParam(required = false) String filter) {
+        var tickets = caseService.getMyTickets(userDetails.getUsername());
+
+        if ("open".equals(filter)) {
+            tickets = tickets.stream()
+                    .filter(t -> !t.status().name().equals("CLOSED")
+                            && !t.status().name().equals("SOLVED"))
+                    .toList();
+        } else if ("closed".equals(filter)) {
+            tickets = tickets.stream()
+                    .filter(t -> t.status().name().equals("CLOSED")
+                            || t.status().name().equals("SOLVED"))
+                    .toList();
+        }
+
+        model.addAttribute("tickets", tickets);
+        model.addAttribute("filter", filter);
         return "userpage";
     }
 
