@@ -310,19 +310,22 @@ class CaseServiceTest {
         User owner = makeUser(1L, "alice", Role.USER);
         CaseEntity ticket = makeCaseEntity(10L, owner);
 
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(owner));
         when(caseRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(caseRepository.save(ticket)).thenReturn(ticket);
 
-        CaseEntityDto result = caseService.updateStatus(10L, CaseStatus.IN_PROGRESS, 1l);
+        CaseEntityDto result = caseService.updateStatus(10L, CaseStatus.IN_PROGRESS, "alice");
 
         assertThat(result.status()).isEqualTo(CaseStatus.IN_PROGRESS);
     }
 
     @Test
     void updateStatus_throwsNotFound_whenTicketNotFound() {
+        User actor = makeUser(1L, "alice", Role.USER);
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(actor));
         when(caseRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> caseService.updateStatus(99L, CaseStatus.IN_PROGRESS, 1l))
+        assertThatThrownBy(() -> caseService.updateStatus(99L, CaseStatus.IN_PROGRESS, "alice"))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(e -> ((ResponseStatusException) e).getStatusCode())
                 .isEqualTo(HttpStatus.NOT_FOUND);

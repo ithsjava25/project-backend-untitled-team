@@ -98,7 +98,7 @@ public class CaseService {
             throw new IllegalArgumentException("Comment Cant be null");
         if (ticket == null)
             throw new IllegalArgumentException("Ticket Cant be null");
-        updateStatus(ticket.id(), CaseStatus.CLOSED, ticket.ownerId());
+        updateStatus(ticket.id(), CaseStatus.CLOSED, ticket.ownerUsername());
         commentService.createComment(comment, ticket);
     }
 
