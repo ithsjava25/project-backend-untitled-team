@@ -75,6 +75,11 @@ async function apiReq(url, options = {}) {
     options.credentials = options.credentials || 'same-origin';
     options.headers = options.headers || {};
     options.redirect = 'manual';
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+    if (csrfToken && csrfHeader && options.method && options.method.toUpperCase() !== 'GET') {
+        options.headers[csrfHeader] = csrfToken;
+    }
     const res = await fetch(url, options);
     if (res.status === 401 || res.status === 403) {
         window.location.reload();

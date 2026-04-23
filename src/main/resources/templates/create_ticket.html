@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Create Ticket</title>
     <link rel="stylesheet" th:href="@{/style.css}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <script th:src="@{/js/script.js}" defer></script>
 <body>
