@@ -8,6 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class HandlerController {
@@ -24,5 +27,20 @@ public class HandlerController {
         model.addAttribute("tickets", caseService.getAllTickets());
         model.addAttribute("statuses", CaseStatus.values());
         return "handlerpage";
+    }
+
+    @PostMapping("/handler/tickets/{id}/assign")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
+    public String assignTicket(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        caseService.assignTicket(id, userDetails.getUsername());
+        return "redirect:/handler";
+    }
+
+    @PostMapping("/handler/tickets/{id}/status")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
+    public String updateStatus(@PathVariable Long id, @RequestParam CaseStatus status,
+                               @AuthenticationPrincipal UserDetails userDetails) {
+        caseService.updateStatus(id, status, userDetails.getUsername());
+        return "redirect:/handler";
     }
 }
