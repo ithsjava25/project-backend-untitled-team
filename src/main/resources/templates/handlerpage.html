@@ -36,7 +36,8 @@
                     </button>
                 </form>
                 <form th:action="@{/handler/tickets/{id}/status(id=${ticket.id})}" method="post">
-                    <select name="status">
+                    <label th:for="'status-' + ${ticket.id}" th:text="'Status for ' + ${ticket.title}"></label>
+                    <select th:id="'status-' + ${ticket.id}" name="status">
                         <option th:each="s : ${statuses}"
                                 th:value="${s}"
                                 th:text="${s}"
