@@ -1,7 +1,7 @@
 package org.example.untitled.usercase.service;
 
-import org.example.untitled.usercase.Comment;
 import org.example.untitled.usercase.dto.CaseEntityDto;
+import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.mapper.CommentMapper;
 import org.example.untitled.usercase.repository.CaseRepository;
@@ -37,7 +37,7 @@ public class CommentService {
         commentRepository.save(entity);
     }
 
-    public List<Comment> getCommentsByTicketId(Long id) {
+    public List<CommentDto> getCommentsByTicketId(Long id) {
         return commentRepository.findCommentsByCaseEntity(
                 caseRepository.findCaseEntityById(id));
     }

@@ -19,7 +19,7 @@
         </div>
     </div>
     <div>
-        <form th:action="@{/tickets/close}" th:object="${comment}" method="post">
+        <form th:action="@{/tickets/{id}/close(id=${ticket.id})}" th:object="${comment}" method="post">
             <div>
                 <label for="text">Reason for closing</label>
                 <textarea th:field="*{text}" id="text"></textarea>
