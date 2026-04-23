@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<html xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/style.css}">
@@ -11,11 +13,21 @@
     <ul>
         <li><a th:href="@{/login}">Login</a></li>
         <li><a th:href="@{/register}">Register</a></li>
-        <li><a th:href="@{/user}">My tickets</a></li>
+        <li sec:authorize="hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')">
+            <a th:href="@{/handler}">Handler Dashboard</a>
+        </li>
+        <li sec:authorize="hasRole('USER')">
+            <a th:href="@{/user}">My tickets</a>
+        </li>
     </ul>
 </header>
 <main>
-    <h2>Welcome to [insert name here]</h2>
+    <h2 sec:authorize="isAuthenticated()">
+        Welcome, <span sec:authentication="name"></span>!
+    </h2>
+    <h2 sec:authorize="!isAuthenticated()">
+        Welcome!
+    </h2>
 </main>
 </body>
 </html>
