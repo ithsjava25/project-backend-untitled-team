@@ -6,6 +6,7 @@ import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
+import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.repository.CaseRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CaseServiceTest {
@@ -98,5 +102,275 @@ class CaseServiceTest {
                 () -> caseService.assignTicket(1L, "user"));
 
         assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+    }
+
+    @Test
+    void assignTicket_throwsNotFound_whenTicketNotFound() {
+        when(caseRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> caseService.assignTicket(99L, "handler"))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void assignTicket_throwsNotFound_whenHandlerNotFound() {
+        User owner = makeUser(1L, "owner", Role.USER);
+        CaseEntity caseEntity = makeCaseEntity(10L, owner);
+
+        when(caseRepository.findById(10L)).thenReturn(Optional.of(caseEntity));
+        when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> caseService.assignTicket(10L, "unknown"))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    // --- createTicket ---
+
+    @Test
+    void createTicket_success_returnsDto() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CaseEntity ticket = makeCaseEntity(10L, owner);
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("Test ticket");
+        req.setDescription("Description");
+
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(owner));
+        when(caseRepository.existsByTitleAndOwner(req.getTitle(), owner)).thenReturn(false);
+        when(caseRepository.save(any(CaseEntity.class))).thenReturn(ticket);
+
+        CaseEntityDto result = caseService.createTicket(req, "alice");
+
+        assertThat(result.title()).isEqualTo("Test ticket");
+        assertThat(result.ownerUsername()).isEqualTo("alice");
+    }
+
+    @Test
+    void createTicket_throwsNotFound_whenUserNotFound() {
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("Test ticket");
+        req.setDescription("Description");
+
+        when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> caseService.createTicket(req, "unknown"))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void createTicket_throwsConflict_whenDuplicateTitle() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("Duplicate");
+        req.setDescription("Description");
+
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(owner));
+        when(caseRepository.existsByTitleAndOwner(req.getTitle(), owner)).thenReturn(true);
+
+        assertThatThrownBy(() -> caseService.createTicket(req, "alice"))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    // --- getMyTickets ---
+
+    @Test
+    void getMyTickets_returnsTicketsForUser() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CaseEntity ticket = makeCaseEntity(10L, owner);
+
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(owner));
+        when(caseRepository.findByOwner(owner)).thenReturn(List.of(ticket));
+
+        List<CaseEntityDto> result = caseService.getMyTickets("alice");
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().ownerUsername()).isEqualTo("alice");
+    }
+
+    @Test
+    void getMyTickets_throwsNotFound_whenUserNotFound() {
+        when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> caseService.getMyTickets("unknown"))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    // --- updateTicket ---
+
+    @Test
+    void updateTicket_success_returnsUpdatedDto() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CaseEntity ticket = makeCaseEntity(10L, owner);
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("New title");
+        req.setDescription("New desc");
+
+        when(caseRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(caseRepository.existsByTitleAndOwnerAndIdNot("New title", owner, 10L)).thenReturn(false);
+        when(caseRepository.save(ticket)).thenReturn(ticket);
+
+        CaseEntityDto result = caseService.updateTicket(10L, req, "alice");
+
+        assertThat(result).isNotNull();
+        verify(caseRepository).save(ticket);
+    }
+
+    @Test
+    void updateTicket_throwsNotFound_whenTicketNotFound() {
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("Title");
+        req.setDescription("Desc");
+
+        when(caseRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> caseService.updateTicket(99L, req, "alice"))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void updateTicket_throwsForbidden_whenNotOwner() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CaseEntity ticket = makeCaseEntity(10L, owner);
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("Title");
+        req.setDescription("Desc");
+
+        when(caseRepository.findById(10L)).thenReturn(Optional.of(ticket));
+
+        assertThatThrownBy(() -> caseService.updateTicket(10L, req, "bob"))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void updateTicket_throwsConflict_whenDuplicateTitle() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CaseEntity ticket = makeCaseEntity(10L, owner);
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("Duplicate title");
+        req.setDescription("Desc");
+
+        when(caseRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(caseRepository.existsByTitleAndOwnerAndIdNot("Duplicate title", owner, 10L)).thenReturn(true);
+
+        assertThatThrownBy(() -> caseService.updateTicket(10L, req, "alice"))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    // --- saveTicket ---
+
+    @Test
+    void saveTicket_success_savesEntity() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("Test ticket");
+        req.setDescription("Description");
+
+        when(caseRepository.existsByTitleAndOwner(req.getTitle(), owner)).thenReturn(false);
+
+        caseService.saveTicket(req, owner);
+
+        verify(caseRepository).save(any(CaseEntity.class));
+    }
+
+    @Test
+    void saveTicket_throwsIllegalArgument_whenFormIsNull() {
+        User owner = makeUser(1L, "alice", Role.USER);
+
+        assertThatThrownBy(() -> caseService.saveTicket(null, owner))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void saveTicket_throwsIllegalArgument_whenUserIsNull() {
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("Test ticket");
+        req.setDescription("Description");
+
+        assertThatThrownBy(() -> caseService.saveTicket(req, null))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void saveTicket_throwsIllegalArgument_whenDuplicateTitle() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CreateCaseRequest req = new CreateCaseRequest();
+        req.setTitle("Duplicate");
+        req.setDescription("Description");
+
+        when(caseRepository.existsByTitleAndOwner(req.getTitle(), owner)).thenReturn(true);
+
+        assertThatThrownBy(() -> caseService.saveTicket(req, owner))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    // --- getAllTickets ---
+
+    @Test
+    void getAllTickets_returnsAllTickets() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CaseEntity ticket = makeCaseEntity(10L, owner);
+
+        when(caseRepository.findAll()).thenReturn(List.of(ticket));
+
+        List<CaseEntityDto> result = caseService.getAllTickets();
+
+        assertThat(result).hasSize(1);
+    }
+
+    // --- getTicketsAssignedTo ---
+
+    @Test
+    void getTicketsAssignedTo_returnsAssignedTickets() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        User handler = makeUser(2L, "bob", Role.HANDLER);
+        CaseEntity ticket = makeCaseEntity(10L, owner);
+        ticket.setAssignedTo(handler);
+
+        when(caseRepository.findByAssignedTo(handler)).thenReturn(List.of(ticket));
+
+        List<CaseEntityDto> result = caseService.getTicketsAssignedTo(handler);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().assignedToUsername()).isEqualTo("bob");
+    }
+
+    // --- updateStatus ---
+
+    @Test
+    void updateStatus_success_updatesStatus() {
+        User owner = makeUser(1L, "alice", Role.USER);
+        CaseEntity ticket = makeCaseEntity(10L, owner);
+
+        when(caseRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(caseRepository.save(ticket)).thenReturn(ticket);
+
+        CaseEntityDto result = caseService.updateStatus(10L, CaseStatus.IN_PROGRESS);
+
+        assertThat(result.status()).isEqualTo(CaseStatus.IN_PROGRESS);
+    }
+
+    @Test
+    void updateStatus_throwsNotFound_whenTicketNotFound() {
+        when(caseRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> caseService.updateStatus(99L, CaseStatus.IN_PROGRESS))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

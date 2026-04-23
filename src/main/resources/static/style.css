@@ -189,3 +189,64 @@ textarea {
 input[type="hidden"] {
     display: none;
 }
+
+/* COMMENTS SECTION */
+.ticket-comments {
+    margin-top: 25px;
+}
+
+/* Individual comment */
+.comment-box {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Slight hover effect */
+.comment-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Comment title */
+.comment-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #f1f5f9;
+    margin-bottom: 6px;
+}
+
+/* Comment text */
+.comment-text {
+    font-size: 14px;
+    color: #cbd5f5;
+    margin-bottom: 8px;
+}
+
+/* Comment author */
+.comment-author {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* Footer links */
+.ticket-footer {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.ticket-footer a {
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.ticket-footer a:hover {
+    color: #67e8f9;
+    text-decoration: underline;
+}

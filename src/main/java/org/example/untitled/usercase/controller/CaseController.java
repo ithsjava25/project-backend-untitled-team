@@ -5,9 +5,11 @@ import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
+import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.service.CaseService;
+import org.example.untitled.usercase.service.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,10 +28,13 @@ import java.util.List;
 public class CaseController {
 
     private final CaseService caseService;
+    private final CommentService commentService;
     private final UserRepository userRepository;
+  
 
-    public CaseController(CaseService caseService, UserRepository userRepository) {
+    public CaseController(CaseService caseService, CommentService commentService, UserRepository userRepository) {
         this.caseService = caseService;
+        this.commentService = commentService;
         this.userRepository = userRepository;
     }
 
@@ -44,6 +49,23 @@ public class CaseController {
     public ResponseEntity<List<CaseEntityDto>> getMyTickets(
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(caseService.getMyTickets(userDetails.getUsername()));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public String showTicketDetails(
+            @PathVariable long id,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model
+    ) {
+
+        CaseEntityDto ticket = caseService.getTicketByID(id);
+        if (caseService.isNotOwner(ticket, userDetails.getUsername()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
+        List<CommentDto> comments = commentService.getCommentsByTicketId(id);
+        model.addAttribute("ticket", ticket);
+        model.addAttribute("comments", comments);
+        return "ticket";
     }
 
     @PutMapping("/{id}")
