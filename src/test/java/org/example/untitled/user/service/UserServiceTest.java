@@ -7,6 +7,7 @@ import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.dto.UserDto;
 import org.example.untitled.user.repository.UserRepository;
+import org.example.untitled.usercase.service.AuditLogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,9 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private AuditLogService auditLogService;
 
     private RegisterRequest registerRequest;
 
