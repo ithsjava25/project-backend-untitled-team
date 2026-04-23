@@ -41,9 +41,7 @@
         </div>
         <div class="ticket-footer">
             <span class="assigned"
-                  th:text="${ticket.assignedToUsername != null}
-                  ? 'Assigned to: ' + ${ticket.assignedToUsername}
-                  : 'Unassigned'"></span>
+                  th:text="${ticket.assignedToUsername != null ? 'Assigned to: ' + ticket.assignedToUsername : 'Unassigned'}"></span>
             <div class="ticket-button">
                 <a th:href="@{/tickets/{id}/edit(id=${ticket.id})}" class="btn btn-secondary">Edit</a>
                 <a th:if="${ticket.status.name() != 'CLOSED' and ticket.status.name() != 'SOLVED'}"

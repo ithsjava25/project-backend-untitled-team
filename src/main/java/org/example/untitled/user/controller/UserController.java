@@ -31,6 +31,9 @@ public class UserController {
     public String userLanding(Model model,
                               @AuthenticationPrincipal UserDetails userDetails,
                               @RequestParam(required = false) String filter) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
         var tickets = caseService.getMyTickets(userDetails.getUsername());
 
         if ("open".equals(filter)) {
