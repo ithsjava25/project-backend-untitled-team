@@ -1,8 +1,6 @@
 package org.example.untitled.usercase.controller;
 
 import jakarta.validation.Valid;
-import org.example.untitled.user.User;
-import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
