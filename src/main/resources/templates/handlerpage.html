@@ -29,15 +29,13 @@
         </div>
         <div class="ticket-footer">
             <div class="ticket-button">
-                <form th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
-                    <input type="hidden" name="_method" value="PUT">
+                <form th:action="@{/handler/tickets/{id}/assign(id=${ticket.id})}" method="post">
                     <button type="submit"
                             th:disabled="${ticket.assignedToUsername != null}">
                         Assign to me
                     </button>
                 </form>
-                <form th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post">
-                    <input type="hidden" name="_method" value="PUT">
+                <form th:action="@{/handler/tickets/{id}/status(id=${ticket.id})}" method="post">
                     <select name="status">
                         <option th:each="s : ${statuses}"
                                 th:value="${s}"

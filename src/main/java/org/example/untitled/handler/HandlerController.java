@@ -1,7 +1,10 @@
 package org.example.untitled.handler;
 
+import org.example.untitled.user.User;
+import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.service.CaseService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,14 +14,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class HandlerController {
 
     private final CaseService caseService;
+    private final UserRepository userRepository;
 
-    public HandlerController(CaseService caseService) {
+    public HandlerController(CaseService caseService, UserRepository userRepository) {
         this.caseService = caseService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/handler")
@@ -40,7 +46,9 @@ public class HandlerController {
     @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public String updateStatus(@PathVariable Long id, @RequestParam CaseStatus status,
                                @AuthenticationPrincipal UserDetails userDetails) {
-        caseService.updateStatus(id, status, userDetails.getUsername());
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        caseService.updateStatus(id, status, user.getId());
         return "redirect:/handler";
     }
 }
