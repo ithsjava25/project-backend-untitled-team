@@ -142,7 +142,7 @@ class CaseServiceTest {
         when(caseRepository.existsByTitleAndOwner(req.getTitle(), owner)).thenReturn(false);
         when(caseRepository.save(any(CaseEntity.class))).thenReturn(ticket);
 
-        CaseEntityDto result = caseService.createTicket(req, "alice");
+        CaseEntityDto result = caseService.createTicket(req, "alice", req.getFileName());
 
         assertThat(result.title()).isEqualTo("Test ticket");
         assertThat(result.ownerUsername()).isEqualTo("alice");
@@ -156,7 +156,7 @@ class CaseServiceTest {
 
         when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> caseService.createTicket(req, "unknown"))
+        assertThatThrownBy(() -> caseService.createTicket(req, "unknown", req.getFileName()))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(e -> ((ResponseStatusException) e).getStatusCode())
                 .isEqualTo(HttpStatus.NOT_FOUND);
@@ -172,7 +172,7 @@ class CaseServiceTest {
         when(userRepository.findByUsername("alice")).thenReturn(Optional.of(owner));
         when(caseRepository.existsByTitleAndOwner(req.getTitle(), owner)).thenReturn(true);
 
-        assertThatThrownBy(() -> caseService.createTicket(req, "alice"))
+        assertThatThrownBy(() -> caseService.createTicket(req, "alice", req.getFileName()))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(e -> ((ResponseStatusException) e).getStatusCode())
                 .isEqualTo(HttpStatus.CONFLICT);
@@ -218,7 +218,7 @@ class CaseServiceTest {
         when(caseRepository.existsByTitleAndOwnerAndIdNot("New title", owner, 10L)).thenReturn(false);
         when(caseRepository.save(ticket)).thenReturn(ticket);
 
-        CaseEntityDto result = caseService.updateTicket(10L, req, "alice");
+        CaseEntityDto result = caseService.updateTicket(10L, req, "alice", req.getFileName());
 
         assertThat(result).isNotNull();
         verify(caseRepository).save(ticket);
@@ -232,7 +232,7 @@ class CaseServiceTest {
 
         when(caseRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> caseService.updateTicket(99L, req, "alice"))
+        assertThatThrownBy(() -> caseService.updateTicket(99L, req, "alice", req.getFileName()))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(e -> ((ResponseStatusException) e).getStatusCode())
                 .isEqualTo(HttpStatus.NOT_FOUND);
@@ -248,7 +248,7 @@ class CaseServiceTest {
 
         when(caseRepository.findById(10L)).thenReturn(Optional.of(ticket));
 
-        assertThatThrownBy(() -> caseService.updateTicket(10L, req, "bob"))
+        assertThatThrownBy(() -> caseService.updateTicket(10L, req, "bob", req.getFileName()))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(e -> ((ResponseStatusException) e).getStatusCode())
                 .isEqualTo(HttpStatus.FORBIDDEN);
@@ -265,58 +265,12 @@ class CaseServiceTest {
         when(caseRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(caseRepository.existsByTitleAndOwnerAndIdNot("Duplicate title", owner, 10L)).thenReturn(true);
 
-        assertThatThrownBy(() -> caseService.updateTicket(10L, req, "alice"))
+        assertThatThrownBy(() -> caseService.updateTicket(10L, req, "alice", req.getFileName()))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(e -> ((ResponseStatusException) e).getStatusCode())
                 .isEqualTo(HttpStatus.CONFLICT);
     }
 
-    // --- saveTicket ---
-
-    @Test
-    void saveTicket_success_savesEntity() {
-        User owner = makeUser(1L, "alice", Role.USER);
-        CreateCaseRequest req = new CreateCaseRequest();
-        req.setTitle("Test ticket");
-        req.setDescription("Description");
-
-        when(caseRepository.existsByTitleAndOwner(req.getTitle(), owner)).thenReturn(false);
-
-        caseService.saveTicket(req, owner);
-
-        verify(caseRepository).save(any(CaseEntity.class));
-    }
-
-    @Test
-    void saveTicket_throwsIllegalArgument_whenFormIsNull() {
-        User owner = makeUser(1L, "alice", Role.USER);
-
-        assertThatThrownBy(() -> caseService.saveTicket(null, owner))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void saveTicket_throwsIllegalArgument_whenUserIsNull() {
-        CreateCaseRequest req = new CreateCaseRequest();
-        req.setTitle("Test ticket");
-        req.setDescription("Description");
-
-        assertThatThrownBy(() -> caseService.saveTicket(req, null))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void saveTicket_throwsIllegalArgument_whenDuplicateTitle() {
-        User owner = makeUser(1L, "alice", Role.USER);
-        CreateCaseRequest req = new CreateCaseRequest();
-        req.setTitle("Duplicate");
-        req.setDescription("Description");
-
-        when(caseRepository.existsByTitleAndOwner(req.getTitle(), owner)).thenReturn(true);
-
-        assertThatThrownBy(() -> caseService.saveTicket(req, owner))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
 
     // --- getAllTickets ---
 
@@ -359,7 +313,7 @@ class CaseServiceTest {
         when(caseRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(caseRepository.save(ticket)).thenReturn(ticket);
 
-        CaseEntityDto result = caseService.updateStatus(10L, CaseStatus.IN_PROGRESS);
+        CaseEntityDto result = caseService.updateStatus(10L, CaseStatus.IN_PROGRESS, 1l);
 
         assertThat(result.status()).isEqualTo(CaseStatus.IN_PROGRESS);
     }
@@ -368,7 +322,7 @@ class CaseServiceTest {
     void updateStatus_throwsNotFound_whenTicketNotFound() {
         when(caseRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> caseService.updateStatus(99L, CaseStatus.IN_PROGRESS))
+        assertThatThrownBy(() -> caseService.updateStatus(99L, CaseStatus.IN_PROGRESS, 1l))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(e -> ((ResponseStatusException) e).getStatusCode())
                 .isEqualTo(HttpStatus.NOT_FOUND);
