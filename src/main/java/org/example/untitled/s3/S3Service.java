@@ -60,8 +60,15 @@ public class S3Service {
                 .toList();
     }
 
-    public S3UploadResponse generateS3PreUploadUrl(String fileName, String contentType) {
-        String fileIn = UUID.randomUUID().toString().substring(0, 8) + "-" +fileName;
+    public S3UploadResponse generateS3PreUploadUrl(Long caseId, String fileName, String contentType) {
+        if (fileName == null || fileName.contains("/") || fileName.contains("..")) {
+            throw new IllegalArgumentException("Invalid file name provided.");
+        }
+
+        String caseDir = (caseId == null) ? "new" : String.valueOf(caseId);
+        String shortUuid = UUID.randomUUID().toString().substring(0, 8);
+        String fileIn = String.format("tickets/%s/uploads/%s-%s", caseDir, shortUuid, fileName);
+
         PutObjectPresignRequest preReq = PutObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(10))
                 .putObjectRequest(objReq -> objReq
@@ -92,14 +99,14 @@ public class S3Service {
                 .key(filename));
     }
 
-    public List<UploadedFile> createFile(CaseEntity caseEntity, String fileName) {
-        String s3Key = String.format("tickets/%d/uploads/%s", caseEntity.getId(), fileName);
-
+    public List<UploadedFile> createFile(CaseEntity caseEntity, String s3Key) {
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setUploadedBy(caseEntity.getOwner());
         uploadedFile.setAssociatedCase(caseEntity);
-        uploadedFile.setFilename(fileName);
         uploadedFile.setS3Key(s3Key);
+        int indexOfSlash = s3Key.lastIndexOf('/');
+        String fileName = s3Key.substring(indexOfSlash + 1);
+        uploadedFile.setFilename(fileName);
 
         return List.of(uploadedFile);
     }

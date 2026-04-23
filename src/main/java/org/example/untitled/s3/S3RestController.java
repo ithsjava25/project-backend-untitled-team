@@ -26,9 +26,9 @@ public class S3RestController {
 
     @GetMapping("/upload-url")
     @ResponseBody
-    public Map<String, String> getUploadUrl(@RequestParam String fileName, @RequestParam String contentType){
+    public Map<String, String> getUploadUrl(@RequestParam(required = false) Long caseId, @RequestParam String fileName, @RequestParam String contentType){
         log.info("uploading file " + fileName);
-        S3Service.S3UploadResponse resp = s3Service.generateS3PreUploadUrl(fileName, contentType);
+        S3Service.S3UploadResponse resp = s3Service.generateS3PreUploadUrl(caseId, fileName, contentType);
         return Map.of("url", resp.url(), "fileName", resp.fileName());
     }
 
