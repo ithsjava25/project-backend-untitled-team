@@ -3,6 +3,7 @@ package org.example.untitled.usercase.controller;
 import jakarta.validation.Valid;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
+import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.service.CaseService;
@@ -28,8 +29,8 @@ public class CaseController {
     private final CommentService commentService;
 
     public CaseController(CaseService caseService, CommentService commentService) {
-        this.caseService = caseService;
-        this.commentService = commentService;
+      this.caseService = caseService;
+      this.commentService = commentService;
     }
 
     @PostMapping
@@ -43,6 +44,23 @@ public class CaseController {
     public ResponseEntity<List<CaseEntityDto>> getMyTickets(
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(caseService.getMyTickets(userDetails.getUsername()));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public String showTicketDetails(
+            @PathVariable long id,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model
+    ) {
+
+        CaseEntityDto ticket = caseService.getTicketByID(id);
+        if (caseService.isNotOwner(ticket, userDetails.getUsername()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
+        List<CommentDto> comments = commentService.getCommentsByTicketId(id);
+        model.addAttribute("ticket", ticket);
+        model.addAttribute("comments", comments);
+        return "ticket";
     }
 
     @PutMapping("/{id}")
