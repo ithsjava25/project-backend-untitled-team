@@ -1,5 +1,6 @@
 package org.example.untitled.usercase.service;
 
+import org.example.untitled.usercase.Comment;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.mapper.CommentMapper;
@@ -7,6 +8,8 @@ import org.example.untitled.usercase.repository.CaseRepository;
 import org.example.untitled.usercase.repository.CommentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class CommentService {
@@ -32,5 +35,10 @@ public class CommentService {
         entity.setAuthor(caseEntity.getOwner());
         entity.setCaseEntity(caseEntity);
         commentRepository.save(entity);
+    }
+
+    public List<Comment> getCommentsByTicketId(Long id) {
+        return commentRepository.findCommentsByCaseEntity(
+                caseRepository.findCaseEntityById(id));
     }
 }
