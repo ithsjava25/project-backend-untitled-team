@@ -16,7 +16,7 @@ async function fetchAFile(){
 }
 
 async function downloadFile(fileName) {
-    const res = await apiReq(`/tickets/upload/files/download-url?fileName=${encodeURIComponent(fileName)}`);
+    const res = await apiReq(`/tickets/upload/api/files/download-url?fileName=${encodeURIComponent(fileName)}`);
     if (!res) return;
     const {url} = await res.json();
     window.open(url, '_blank');
