@@ -128,6 +128,21 @@ class CaseServiceTest {
                 .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    @Test
+    void assignTicket_throwsConflict_whenAlreadyAssigned() {
+        User owner = makeUser(1L, "owner", Role.USER);
+        User handler = makeUser(2L, "handler", Role.HANDLER);
+        CaseEntity caseEntity = makeCaseEntity(1L, owner);
+        caseEntity.setAssignedTo(handler);
+
+        when(caseRepository.findById(1L)).thenReturn(Optional.of(caseEntity));
+
+        assertThatThrownBy(() -> caseService.assignTicket(1L, "handler"))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(e -> ((ResponseStatusException) e).getStatusCode())
+                .isEqualTo(HttpStatus.CONFLICT);
+    }
+
     // --- createTicket ---
 
     @Test

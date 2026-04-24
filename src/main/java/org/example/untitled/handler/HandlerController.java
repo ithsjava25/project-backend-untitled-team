@@ -23,11 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class HandlerController {
 
     private final CaseService caseService;
-    private final UserRepository userRepository;
 
-    public HandlerController(CaseService caseService, UserRepository userRepository) {
+    public HandlerController(CaseService caseService) {
         this.caseService = caseService;
-        this.userRepository = userRepository;
     }
 
     @GetMapping("/handler")
@@ -36,20 +34,5 @@ public class HandlerController {
         model.addAttribute("tickets", caseService.getAllTickets());
         model.addAttribute("statuses", CaseStatus.values());
         return "handlerpage";
-    }
-
-    @PostMapping("/handler/tickets/{id}/assign")
-    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
-    public String assignTicket(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        caseService.assignTicket(id, userDetails.getUsername());
-        return "redirect:/handler";
-    }
-
-    @PostMapping("/handler/tickets/{id}/status")
-    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
-    public String updateStatus(@PathVariable Long id, @RequestParam CaseStatus status,
-                               @AuthenticationPrincipal UserDetails userDetails) {
-        caseService.updateStatus(id, status, userDetails.getUsername());
-        return "redirect:/handler";
     }
 }

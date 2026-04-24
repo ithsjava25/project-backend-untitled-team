@@ -138,4 +138,23 @@ public class CaseController {
 
         return "redirect:/user";
     }
+
+    @PostMapping("/{id}/assign")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
+    public String assignTicketForm(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        caseService.assignTicket(id, userDetails.getUsername());
+        return "redirect:/handler";
+    }
+
+    @PostMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
+    public String updateStatusForm(
+            @PathVariable Long id,
+            @RequestParam CaseStatus status,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        caseService.updateStatus(id, status, userDetails.getUsername());
+        return "redirect:/handler";
+    }
 }
