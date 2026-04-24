@@ -42,9 +42,13 @@
                 <div style="display: flex; gap: 6px; align-items: center;">
                     <form class="inline-form" th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
                         <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                        <button type="submit" class="btn btn-sm"
-                                th:disabled="${ticket.assignedToUsername != null}">
-                            Assign to me
+                        <button type="submit"
+                                th:classappend="${ticket.assignedToUsername == currentUser} ? ' btn-assigned'
+                           : (${ticket.assignedToUsername != null} ? ' btn-taken' : '')"
+                                th:text="${ticket.assignedToUsername == currentUser} ? 'Assigned to you'
+                    : (${ticket.assignedToUsername != null} ? 'Taken' : 'Assign to me')"
+                                th:disabled="${ticket.assignedToUsername != null}"
+                                class="btn btn-sm">
                         </button>
                     </form>
                     <form class="inline-form" th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post"

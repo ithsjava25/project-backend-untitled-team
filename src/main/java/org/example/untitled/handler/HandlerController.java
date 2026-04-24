@@ -33,6 +33,9 @@ public class HandlerController {
     public String handlerDashboard(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         model.addAttribute("tickets", caseService.getAllTickets());
         model.addAttribute("statuses", CaseStatus.values());
+        model.addAttribute("currentUser", userDetails.getUsername());
         return "handlerpage";
     }
+
+
 }
