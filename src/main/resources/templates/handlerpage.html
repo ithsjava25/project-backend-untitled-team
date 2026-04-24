@@ -6,53 +6,70 @@
     <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<h1>Handler Dashboard</h1>
-<div>
-    <div th:if="${#lists.isEmpty(tickets)}">
-        <p>No tickets in the system yet.</p>
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>Handler Dashboard</h1>
     </div>
 
-    <div class="ticket-info" th:each="ticket : ${tickets}">
-        <div class="ticket-header">
-            <div class="ticket-title">
-                <p th:text="${ticket.title}"></p>
-            </div>
-            <span th:text="${ticket.status}"></span>
-        </div>
-        <div class="ticket-body">
-            <p th:text="${ticket.description}"></p>
-            <p>Owner: <span th:text="${ticket.ownerUsername}"></span></p>
-            <p th:if="${ticket.assignedToUsername != null}">
-                Assigned to: <span th:text="${ticket.assignedToUsername}"></span>
-            </p>
-            <p th:if="${ticket.assignedToUsername == null}">Not yet assigned</p>
-        </div>
-        <div class="ticket-footer">
-            <div class="ticket-button">
-                <form th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
-                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                    <button type="submit"
-                            th:disabled="${ticket.assignedToUsername != null}">
-                        Assign to me
-                    </button>
-                </form>
+    <p th:if="${#lists.isEmpty(tickets)}" class="empty-state">
+        No tickets in the system yet.
+    </p>
 
-                <form th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post">
-                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                    <label th:for="'status-' + ${ticket.id}"
-                           th:text="'Status for ' + ${ticket.title}"></label>
-                    <select th:id="'status-' + ${ticket.id}" name="status">
-                        <option th:each="s : ${statuses}"
-                                th:value="${s}"
-                                th:text="${s}"
-                                th:selected="${s == ticket.status}">
-                        </option>
-                    </select>
-                    <button type="submit">Update Status</button>
-                </form>
+    <div class="ticket-grid">
+        <div class="ticket-info" th:each="ticket : ${tickets}">
+            <div class="ticket-header">
+                <span class="ticket-title" th:text="${ticket.title}"></span>
+                <span class="status-badge"
+                      th:text="${ticket.status}"
+                      th:classappend="${ticket.status.name() == 'OPEN'} ? ' status-open'
+                                    : (${ticket.status.name() == 'IN_PROGRESS'} ? ' status-progress'
+                                    : (${ticket.status.name() == 'SOLVED'} ? ' status-solved'
+                                    : ' status-closed'))">
+                </span>
+            </div>
+            <div class="ticket-body">
+                <p th:text="${ticket.description}"></p>
+                <p>Owner: <span th:text="${ticket.ownerUsername}"></span></p>
+                <p th:if="${ticket.assignedToUsername != null}">
+                    Assigned to: <span th:text="${ticket.assignedToUsername}"></span>
+                </p>
+                <p th:if="${ticket.assignedToUsername == null}" class="unassigned">
+                    Not yet assigned
+                </p>
+            </div>
+            <div class="ticket-footer">
+                <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-secondary btn-sm">View</a>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <form class="inline-form" th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                        <button type="submit" class="btn btn-sm"
+                                th:disabled="${ticket.assignedToUsername != null}">
+                            Assign to me
+                        </button>
+                    </form>
+                    <form class="inline-form" th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post"
+                          style="display: flex; gap: 6px; align-items: center;">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                        <select name="status" class="ticket-select">
+                            <option th:each="s : ${statuses}"
+                                    th:value="${s}"
+                                    th:text="${s}"
+                                    th:selected="${s == ticket.status}">
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-sm">Update</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
+    <footer style="margin-top: 40px;">
+        <nav style="display: flex; gap: 10px;">
+            <a th:href="@{/}" class="btn btn-secondary">Home</a>
+            <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+        </nav>
+    </footer>
 </div>
 </body>
 </html>

@@ -52,12 +52,18 @@ public class CaseController {
     public String showTicketDetails(
             @PathVariable long id,
             @AuthenticationPrincipal UserDetails userDetails,
-            Model model
-    ) {
+            Model model) {
 
         CaseEntityDto ticket = caseService.getTicketByID(id);
-        if (caseService.isNotOwner(ticket, userDetails.getUsername()))
+
+        boolean isHandler = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_HANDLER")
+                        || a.getAuthority().equals("ROLE_SUPERVISOR")
+                        || a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isHandler && caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
+
         List<CommentDto> comments = commentService.getCommentsByTicketId(id);
         model.addAttribute("ticket", ticket);
         model.addAttribute("comments", comments);
