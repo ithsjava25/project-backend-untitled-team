@@ -98,7 +98,7 @@ public class CaseService {
         caseEntity.setDescription(request.getDescription());
         if (request.getFileNames() != null){
             Set<String> existing = caseEntity.getFiles().stream()
-                    .map(UploadedFile::getFilename)
+                    .map(UploadedFile::getS3Key)
                     .collect(Collectors.toSet());
             for(String fName : request.getFileNames()){
                 if (fName == null || fName.isBlank() || existing.contains(fName)) continue;
