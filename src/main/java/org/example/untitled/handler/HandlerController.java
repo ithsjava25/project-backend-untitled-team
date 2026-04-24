@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 /**
@@ -26,10 +27,27 @@ public class HandlerController {
 
     @GetMapping("/handler")
     @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
-    public String handlerDashboard(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        model.addAttribute("tickets", caseService.getAllTickets());
+    public String handlerDashboard(Model model,
+                                   @AuthenticationPrincipal UserDetails userDetails,
+                                   @RequestParam(required = false) String filter) {
+        var tickets = caseService.getAllTickets();
+
+        if ("active".equals(filter)) {
+            tickets = tickets.stream()
+                    .filter(t -> !t.status().name().equals("CLOSED")
+                            && !t.status().name().equals("SOLVED"))
+                    .toList();
+        } else if ("closed".equals(filter)) {
+            tickets = tickets.stream()
+                    .filter(t -> t.status().name().equals("CLOSED")
+                            || t.status().name().equals("SOLVED"))
+                    .toList();
+        }
+
+        model.addAttribute("tickets", tickets);
         model.addAttribute("statuses", CaseStatus.values());
         model.addAttribute("currentUser", userDetails.getUsername());
+        model.addAttribute("filter", filter);
         return "handlerpage";
     }
 

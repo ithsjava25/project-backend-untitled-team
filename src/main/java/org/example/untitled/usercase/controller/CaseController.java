@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -149,8 +150,13 @@ public class CaseController {
     @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public String assignTicketForm(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        caseService.assignTicket(id, userDetails.getUsername());
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+        try {
+            caseService.assignTicket(id, userDetails.getUsername());
+        } catch (ResponseStatusException e) {
+            redirectAttributes.addFlashAttribute("error", e.getReason());
+        }
         return "redirect:/handler";
     }
 
@@ -159,8 +165,13 @@ public class CaseController {
     public String updateStatusForm(
             @PathVariable Long id,
             @RequestParam CaseStatus status,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        caseService.updateStatus(id, status, userDetails.getUsername());
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+        try {
+            caseService.updateStatus(id, status, userDetails.getUsername());
+        } catch (ResponseStatusException e) {
+            redirectAttributes.addFlashAttribute("error", e.getReason());
+        }
         return "redirect:/handler";
     }
 }

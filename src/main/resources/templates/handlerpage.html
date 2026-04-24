@@ -11,6 +11,18 @@
         <h1>Handler Dashboard</h1>
     </div>
 
+    <div class="filter-tabs">
+        <a th:href="@{/handler}"
+           th:classappend="${filter == null or filter == 'all'} ? ' active'"
+           class="filter-tab">All</a>
+        <a th:href="@{/handler(filter='active')}"
+           th:classappend="${filter == 'active'} ? ' active'"
+           class="filter-tab">Active</a>
+        <a th:href="@{/handler(filter='closed')}"
+           th:classappend="${filter == 'closed'} ? ' active'"
+           class="filter-tab">Closed</a>
+    </div>
+
     <p th:if="${#lists.isEmpty(tickets)}" class="empty-state">
         No tickets in the system yet.
     </p>
