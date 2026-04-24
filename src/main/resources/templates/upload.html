@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <title>File Upload</title>
     <link rel="stylesheet" th:href="@{/style.css}">
-    <script src="/js/script.js" type="text/javascript"></script>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <script th:src="@{/js/script.js}" defer></script>
 </head>
 <body>
 <header>
@@ -20,28 +22,28 @@
         </div>
     </section>
 
-<!--    <section>-->
-<!--        <h2>Uploaded Files</h2>-->
-<!--        <div th:unless="${#lists.isEmpty(files)}">-->
-<!--            <p>No files uploaded yet.</p>-->
-<!--        <table>-->
-<!--            <thead>-->
-<!--                <tr>-->
-<!--                    <th>File Name</th>-->
-<!--                    <th>Action</th>-->
-<!--                </tr>-->
-<!--            </thead>-->
-<!--            <tbody>-->
-<!--                <tr th:each="file : ${files}">-->
-<!--                    <td th:text="${file}"></td>-->
-<!--                    <td>-->
-<!--                        <button th:onclick="'downloadFile(\'' + ${file} + '\')'" class="button">Download</button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--            </tbody>-->
-<!--        </table>-->
-<!--        </div>-->
-<!--    </section>-->
+    <section>
+        <h2>Uploaded Files</h2>
+        <div th:if="${#lists.isEmpty(files)}">
+            <p>No files uploaded yet.</p>
+        </div>
+        <table th:if="${not #lists.isEmpty(files)}">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="file : ${files}">
+                    <td th:text="${file}"></td>
+                    <td>
+                        <button th:onclick="'downloadFile(\'' + ${file} + '\')'" class="button">Download</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 </main>
 </body>
 </html>
