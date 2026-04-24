@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>File Upload</title>
     <link rel="stylesheet" th:href="@{/style.css}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <script th:src="@{/js/script.js}" defer></script>
 </head>
 <body>
 <header>
