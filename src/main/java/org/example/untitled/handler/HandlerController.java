@@ -1,5 +1,7 @@
 package org.example.untitled.handler;
 
+import org.example.untitled.user.Role;
+import org.example.untitled.user.service.UserService;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.service.CaseService;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Comparator;
+import java.util.List;
 
 
 /**
@@ -23,9 +26,11 @@ import java.util.Comparator;
 public class HandlerController {
 
     private final CaseService caseService;
+    private final UserService userService;
 
-    public HandlerController(CaseService caseService) {
+    public HandlerController(CaseService caseService, UserService userService) {
         this.caseService = caseService;
+        this.userService = userService;
     }
 
     @GetMapping("/handler")
@@ -61,9 +66,25 @@ public class HandlerController {
                         }))
                 .toList();
 
+        boolean isSupervisorOrAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_SUPERVISOR")
+                        || a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isSupervisorOrAdmin) {
+            model.addAttribute("handlers", userService.getUsersByRoles(List.of(Role.HANDLER, Role.SUPERVISOR, Role.ADMIN)));
+        }
+
+        String currentUserRole = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(a -> a.getAuthority().replace("ROLE_", ""))
+                .orElse("HANDLER");
+
+        model.addAttribute("currentUserRole", currentUserRole);
+
         model.addAttribute("tickets", tickets);
         model.addAttribute("statuses", CaseStatus.values());
         model.addAttribute("currentUser", currentUser);
+        model.addAttribute("isSupervisorOrAdmin", isSupervisorOrAdmin);
         model.addAttribute("filter", filter);
         return "handlerpage";
     }

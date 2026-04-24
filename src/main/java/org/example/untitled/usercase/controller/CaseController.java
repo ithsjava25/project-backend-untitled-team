@@ -150,10 +150,14 @@ public class CaseController {
     @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public String assignTicketForm(
             @PathVariable Long id,
+            @RequestParam(required = false) String username,
             @AuthenticationPrincipal UserDetails userDetails,
             RedirectAttributes redirectAttributes) {
         try {
-            caseService.assignTicket(id, userDetails.getUsername());
+            String assignTo = (username != null && !username.isBlank())
+                    ? username
+                    : userDetails.getUsername();
+            caseService.assignTicket(id, assignTo);
         } catch (ResponseStatusException e) {
             redirectAttributes.addFlashAttribute("error", e.getReason());
         }

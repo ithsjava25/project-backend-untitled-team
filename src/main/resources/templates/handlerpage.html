@@ -2,13 +2,13 @@
 <html xmlns:th="https://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Handler Dashboard</title>
+    <title th:text="${currentUserRole + ' Dashboard'}"></title>
     <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
 <div class="page-wrapper">
     <div class="page-header">
-        <h1>Handler Dashboard</h1>
+        <h1 th:text="${currentUserRole + ' Dashboard'}"></h1>
     </div>
 
     <div class="filter-tabs">
@@ -52,18 +52,43 @@
             <div class="ticket-footer">
                 <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-secondary btn-sm">View</a>
                 <div style="display: flex; gap: 6px; align-items: center;">
-                    <form class="inline-form" th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
-                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                        <button type="submit"
-                                th:classappend="${ticket.assignedToUsername == currentUser} ? ' btn-assigned'
-                           : (${ticket.assignedToUsername != null} ? ' btn-taken' : '')"
-                                th:text="${ticket.assignedToUsername == currentUser} ? 'Assigned to you'
-                    : (${ticket.assignedToUsername != null} ? 'Taken' : 'Assign to me')"
-                                th:disabled="${ticket.assignedToUsername != null}"
-                                class="btn btn-sm">
-                        </button>
-                    </form>
-                    <form class="inline-form" th:if="${ticket.assignedToUsername == currentUser}"
+                    <!-- Assign-knappen -->
+                    <th:block th:if="${isSupervisorOrAdmin}">
+                        <form class="inline-form" th:if="${ticket.assignedToUsername == null}"
+                              th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post"
+                              style="display: flex; gap: 6px; align-items: center;">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <select name="username" class="ticket-select">
+                                <option th:each="h : ${handlers}"
+                                        th:value="${h.username()}"
+                                        th:text="${h.username()}">
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-sm">Assign</button>
+                        </form>
+                        <span th:if="${ticket.assignedToUsername != null}"
+                              class="btn btn-sm btn-assigned">
+        Assigned to: <span th:text="${ticket.assignedToUsername}"></span>
+    </span>
+                    </th:block>
+
+                    <th:block th:if="${!isSupervisorOrAdmin}">
+                        <form class="inline-form" th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <button type="submit"
+                                    th:classappend="${ticket.assignedToUsername == currentUser} ? ' btn-assigned'
+                               : (${ticket.assignedToUsername != null} ? ' btn-taken' : '')"
+                                    th:text="${ticket.assignedToUsername == currentUser} ? 'Assigned to you'
+                        : (${ticket.assignedToUsername != null} ? 'Taken' : 'Assign to me')"
+                                    th:disabled="${ticket.assignedToUsername != null}"
+                                    class="btn btn-sm">
+                            </button>
+                        </form>
+                    </th:block>
+
+                    <!-- Update-knappen, supervisor ser den på alla tickets -->
+                    <form class="inline-form"
+                          th:if="${isSupervisorOrAdmin or ticket.assignedToUsername == currentUser}"
                           th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post"
                           style="display: flex; gap: 6px; align-items: center;">
                         <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>

@@ -65,4 +65,11 @@ public class UserService {
             }
         }
     }
+
+    public List<UserDto> getUsersByRoles(List<Role> roles) {
+        return userRep.findAll().stream()
+                .filter(u -> roles.contains(u.getRole()))
+                .map(UserMapper::toDto)
+                .toList();
+    }
 }
