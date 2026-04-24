@@ -394,3 +394,32 @@ form.inline-form {
     border: 1px solid #334155;
     cursor: not-allowed;
 }
+
+.flash-error {
+    background: #7f1d1d;
+    color: #fca5a5;
+    border: 1px solid #991b1b;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.flash-success {
+    background: #052e16;
+    color: #4ade80;
+    border: 1px solid #166534;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}

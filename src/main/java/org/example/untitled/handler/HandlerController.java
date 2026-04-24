@@ -16,12 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Comparator;
 import java.util.List;
 
-
-/**
- * Controller for the handler dashboard, accessible to users with roles
- * HANDLER, SUPERVISOR, or ADMIN. Provides functionality for viewing,
- * assigning, and updating the status of support tickets.
- */
 @Controller
 public class HandlerController {
 
@@ -42,13 +36,13 @@ public class HandlerController {
 
         if ("active".equals(filter)) {
             tickets = tickets.stream()
-                    .filter(t -> !t.status().name().equals("CLOSED")
-                            && !t.status().name().equals("SOLVED"))
+                    .filter(t -> t.status() != CaseStatus.CLOSED
+                            && t.status() != CaseStatus.SOLVED)
                     .toList();
         } else if ("closed".equals(filter)) {
             tickets = tickets.stream()
-                    .filter(t -> t.status().name().equals("CLOSED")
-                            || t.status().name().equals("SOLVED"))
+                    .filter(t -> t.status() == CaseStatus.CLOSED
+                            || t.status() == CaseStatus.SOLVED)
                     .toList();
         }
 
@@ -66,28 +60,24 @@ public class HandlerController {
                         }))
                 .toList();
 
-        boolean isSupervisorOrAdmin = userDetails.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_SUPERVISOR")
-                        || a.getAuthority().equals("ROLE_ADMIN"));
+        Role currentRole = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(a -> Role.fromAuthority(a.getAuthority()))
+                .orElse(Role.HANDLER);
+
+        boolean isSupervisorOrAdmin = currentRole == Role.SUPERVISOR || currentRole == Role.ADMIN;
 
         if (isSupervisorOrAdmin) {
-            model.addAttribute("handlers", userService.getUsersByRoles(List.of(Role.HANDLER, Role.SUPERVISOR, Role.ADMIN)));
+            model.addAttribute("handlers", userService.getUsersByRoles(
+                    List.of(Role.HANDLER, Role.SUPERVISOR, Role.ADMIN)));
         }
-
-        String currentUserRole = userDetails.getAuthorities().stream()
-                .findFirst()
-                .map(a -> a.getAuthority().replace("ROLE_", ""))
-                .orElse("HANDLER");
-
-        model.addAttribute("currentUserRole", currentUserRole);
 
         model.addAttribute("tickets", tickets);
         model.addAttribute("statuses", CaseStatus.values());
         model.addAttribute("currentUser", currentUser);
+        model.addAttribute("currentUserRole", currentRole.name());
         model.addAttribute("isSupervisorOrAdmin", isSupervisorOrAdmin);
         model.addAttribute("filter", filter);
         return "handlerpage";
     }
-
-
 }

@@ -158,8 +158,11 @@ public class CaseController {
                     ? username
                     : userDetails.getUsername();
             caseService.assignTicket(id, assignTo);
+            redirectAttributes.addFlashAttribute("success", "Ticket assigned successfully");
         } catch (ResponseStatusException e) {
             redirectAttributes.addFlashAttribute("error", e.getReason());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "An unexpected error occurred");
         }
         return "redirect:/handler";
     }
@@ -173,8 +176,11 @@ public class CaseController {
             RedirectAttributes redirectAttributes) {
         try {
             caseService.updateStatus(id, status, userDetails.getUsername());
+            redirectAttributes.addFlashAttribute("success", "Status updated successfully");
         } catch (ResponseStatusException e) {
             redirectAttributes.addFlashAttribute("error", e.getReason());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "An unexpected error occurred");
         }
         return "redirect:/handler";
     }
