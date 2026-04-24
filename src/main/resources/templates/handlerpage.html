@@ -63,7 +63,8 @@
                                 class="btn btn-sm">
                         </button>
                     </form>
-                    <form class="inline-form" th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post"
+                    <form class="inline-form" th:if="${ticket.assignedToUsername == currentUser}"
+                          th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post"
                           style="display: flex; gap: 6px; align-items: center;">
                         <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                         <select name="status" class="ticket-select">

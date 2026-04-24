@@ -1,6 +1,7 @@
 package org.example.untitled.handler;
 
 import org.example.untitled.usercase.CaseStatus;
+import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.service.CaseService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Comparator;
 
 
 /**
@@ -44,9 +47,23 @@ public class HandlerController {
                     .toList();
         }
 
+        String currentUser = userDetails.getUsername();
+
+        tickets = tickets.stream()
+                .sorted(Comparator
+                        .<CaseEntityDto>comparingInt(t -> {
+                            if (t.assignedToUsername() != null && t.assignedToUsername().equals(currentUser)
+                                    && t.status() == CaseStatus.IN_PROGRESS) return 0;
+                            if (t.assignedToUsername() != null && t.assignedToUsername().equals(currentUser)) return 1;
+                            if (t.assignedToUsername() != null) return 2;
+                            if (t.status() == CaseStatus.OPEN) return 3;
+                            return 4;
+                        }))
+                .toList();
+
         model.addAttribute("tickets", tickets);
         model.addAttribute("statuses", CaseStatus.values());
-        model.addAttribute("currentUser", userDetails.getUsername());
+        model.addAttribute("currentUser", currentUser);
         model.addAttribute("filter", filter);
         return "handlerpage";
     }
