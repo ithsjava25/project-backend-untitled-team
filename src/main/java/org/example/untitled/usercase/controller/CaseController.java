@@ -1,6 +1,7 @@
 package org.example.untitled.usercase.controller;
 
 import jakarta.validation.Valid;
+import org.example.untitled.user.Role;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
@@ -23,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/tickets")
@@ -61,9 +63,9 @@ public class CaseController {
         CaseEntityDto ticket = caseService.getTicketByID(id);
 
         boolean isHandler = userDetails.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_HANDLER")
-                        || a.getAuthority().equals("ROLE_SUPERVISOR")
-                        || a.getAuthority().equals("ROLE_ADMIN"));
+                .map(a -> Role.fromAuthority(a.getAuthority()))
+                .flatMap(Optional::stream)
+                .anyMatch(r -> r == Role.HANDLER || r == Role.SUPERVISOR || r == Role.ADMIN);
 
         if (!isHandler && caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
@@ -161,11 +163,12 @@ public class CaseController {
                     ? username
                     : userDetails.getUsername();
             caseService.assignTicket(id, assignTo);
-            redirectAttributes.addFlashAttribute("success", "Ticket assigned successfully");
+            redirectAttributes.addFlashAttribute("success", "Ticket assigned to " + assignTo);
         } catch (ResponseStatusException e) {
             log.warn("Assign failed for ticket {}.", id, e);
-            redirectAttributes.addFlashAttribute("error", e.getReason());
-        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error",
+                    e.getReason() != null ? e.getReason() : "Could not assign ticket");
+        } catch (RuntimeException e) {
             log.error("Unexpected error assigning ticket {}.", id, e);
             redirectAttributes.addFlashAttribute("error", "An unexpected error occurred");
         }
@@ -176,16 +179,18 @@ public class CaseController {
     @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
     public String updateStatusForm(
             @PathVariable Long id,
-            @RequestParam CaseStatus status,
+            @RequestParam String statusParam,
             @AuthenticationPrincipal UserDetails userDetails,
             RedirectAttributes redirectAttributes) {
         try {
+            CaseStatus status = CaseStatus.valueOf(statusParam);
             caseService.updateStatus(id, status, userDetails.getUsername());
             redirectAttributes.addFlashAttribute("success", "Status updated successfully");
         } catch (ResponseStatusException e) {
             log.warn("Status update failed for ticket {}.", id, e);
-            redirectAttributes.addFlashAttribute("error", e.getReason());
-        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error",
+                    e.getReason() != null ? e.getReason() : "Could not update status");
+        } catch (RuntimeException e) {
             log.error("Unexpected error updating status for ticket {}.", id, e);
             redirectAttributes.addFlashAttribute("error", "An unexpected error occurred");
         }

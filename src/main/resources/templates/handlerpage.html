@@ -100,7 +100,7 @@
                         <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                         <label th:for="'status-' + ${ticket.id}" class="sr-only"
                                th:text="'Status for ' + ${ticket.title}"></label>
-                        <select name="status" class="ticket-select"
+                        <select name="statusParam" class="ticket-select"
                                 th:id="'status-' + ${ticket.id}">
                             <option th:each="s : ${statuses}"
                                     th:value="${s}"

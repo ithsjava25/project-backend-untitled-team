@@ -1,5 +1,6 @@
 package org.example.untitled.config;
 
+import org.example.untitled.user.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
@@ -65,11 +68,11 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return (request, response, authentication) -> {
-            boolean isHandler = authentication.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_HANDLER")
-                            || a.getAuthority().equals("ROLE_SUPERVISOR")
-                            || a.getAuthority().equals("ROLE_ADMIN"));
-            if (isHandler) {
+            boolean isHandlerLevel = authentication.getAuthorities().stream()
+                    .map(a -> Role.fromAuthority(a.getAuthority()))
+                    .flatMap(Optional::stream)
+                    .anyMatch(r -> r == Role.HANDLER || r == Role.SUPERVISOR || r == Role.ADMIN);
+            if (isHandlerLevel) {
                 response.sendRedirect("/handler");
             } else {
                 response.sendRedirect("/user");
