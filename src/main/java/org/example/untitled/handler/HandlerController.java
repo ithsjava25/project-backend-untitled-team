@@ -54,15 +54,15 @@ public class HandlerController {
                             if (t.assignedToUsername() != null && t.assignedToUsername().equals(currentUser)
                                     && t.status() == CaseStatus.IN_PROGRESS) return 0;
                             if (t.assignedToUsername() != null && t.assignedToUsername().equals(currentUser)) return 1;
-                            if (t.assignedToUsername() != null) return 2;
-                            if (t.status() == CaseStatus.OPEN) return 3;
+                            if (t.assignedToUsername() == null && t.status() == CaseStatus.OPEN) return 2;
+                            if (t.assignedToUsername() != null) return 3;
                             return 4;
                         }))
                 .toList();
 
         Role currentRole = userDetails.getAuthorities().stream()
                 .findFirst()
-                .map(a -> Role.fromAuthority(a.getAuthority()))
+                .flatMap(a -> Role.fromAuthority(a.getAuthority()))
                 .orElse(Role.HANDLER);
 
         boolean isSupervisorOrAdmin = currentRole == Role.SUPERVISOR || currentRole == Role.ADMIN;

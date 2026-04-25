@@ -1,16 +1,19 @@
 package org.example.untitled.user;
 
+import java.util.Optional;
+
 public enum Role {
     USER,
     HANDLER,
     SUPERVISOR,
     ADMIN;
 
-    public static Role fromAuthority(String authority) {
+    public static Optional<Role> fromAuthority(String authority) {
+        if (authority == null) return Optional.empty();
         try {
-            return Role.valueOf(authority.replace("ROLE_", ""));
+            return Optional.of(Role.valueOf(authority.replace("ROLE_", "")));
         } catch (IllegalArgumentException e) {
-            return Role.USER;
+            return Optional.empty();
         }
     }
 }

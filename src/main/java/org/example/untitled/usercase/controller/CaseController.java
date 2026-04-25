@@ -8,6 +8,8 @@ import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.service.CaseService;
 import org.example.untitled.usercase.service.CommentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +30,7 @@ public class CaseController {
 
     private final CaseService caseService;
     private final CommentService commentService;
+    private static final Logger log = LoggerFactory.getLogger(CaseController.class);
 
 
     public CaseController(CaseService caseService, CommentService commentService) {
@@ -160,8 +163,10 @@ public class CaseController {
             caseService.assignTicket(id, assignTo);
             redirectAttributes.addFlashAttribute("success", "Ticket assigned successfully");
         } catch (ResponseStatusException e) {
+            log.warn("Assign failed for ticket {}.", id, e);
             redirectAttributes.addFlashAttribute("error", e.getReason());
         } catch (Exception e) {
+            log.error("Unexpected error assigning ticket {}.", id, e);
             redirectAttributes.addFlashAttribute("error", "An unexpected error occurred");
         }
         return "redirect:/handler";
@@ -178,8 +183,10 @@ public class CaseController {
             caseService.updateStatus(id, status, userDetails.getUsername());
             redirectAttributes.addFlashAttribute("success", "Status updated successfully");
         } catch (ResponseStatusException e) {
+            log.warn("Status update failed for ticket {}.", id, e);
             redirectAttributes.addFlashAttribute("error", e.getReason());
         } catch (Exception e) {
+            log.error("Unexpected error updating status for ticket {}.", id, e);
             redirectAttributes.addFlashAttribute("error", "An unexpected error occurred");
         }
         return "redirect:/handler";
