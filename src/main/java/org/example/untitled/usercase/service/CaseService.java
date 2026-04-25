@@ -138,13 +138,10 @@ public class CaseService {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
-        if (caseEntity.getAssignedTo() != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ticket is already assigned");
-        }
         User handler = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        if (handler.getRole() != Role.HANDLER && handler.getRole() != Role.SUPERVISOR && handler.getRole() != Role.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler, supervisor or admin");
+        if (handler.getRole() != Role.HANDLER && handler.getRole() != Role.SUPERVISOR) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a handler or supervisor");
         }
         caseEntity.setAssignedTo(handler);
         CaseEntity saved = caseRepository.save(caseEntity);

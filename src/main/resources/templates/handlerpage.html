@@ -57,7 +57,7 @@
                 <div style="display: flex; gap: 6px; align-items: center;">
 
                     <th:block th:if="${isSupervisorOrAdmin}">
-                        <form class="inline-form" th:if="${ticket.assignedToUsername == null}"
+                        <form class="inline-form"
                               th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post"
                               style="display: flex; gap: 6px; align-items: center;">
                             <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
@@ -71,12 +71,10 @@
                                         th:text="${h.username()}">
                                 </option>
                             </select>
-                            <button type="submit" class="btn btn-sm">Assign</button>
+                            <button type="submit" class="btn btn-sm"
+                                    th:text="${ticket.assignedToUsername != null} ? 'Reassign' : 'Assign'">
+                            </button>
                         </form>
-                        <span th:if="${ticket.assignedToUsername != null}"
-                              class="btn btn-sm btn-assigned">
-                            Assigned to: <span th:text="${ticket.assignedToUsername}"></span>
-                        </span>
                     </th:block>
 
                     <th:block th:if="${!isSupervisorOrAdmin}">

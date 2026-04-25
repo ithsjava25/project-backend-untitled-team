@@ -69,7 +69,7 @@ public class HandlerController {
 
         if (isSupervisorOrAdmin) {
             model.addAttribute("handlers", userService.getUsersByRoles(
-                    List.of(Role.HANDLER, Role.SUPERVISOR, Role.ADMIN)));
+                    List.of(Role.HANDLER, Role.SUPERVISOR)));
         }
 
         model.addAttribute("tickets", tickets);
