@@ -186,6 +186,9 @@ public class CaseController {
             CaseStatus status = CaseStatus.valueOf(statusParam);
             caseService.updateStatus(id, status, userDetails.getUsername());
             redirectAttributes.addFlashAttribute("success", "Status updated successfully");
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid status value '{}' for ticket {}.", statusParam, id, e);
+            redirectAttributes.addFlashAttribute("error", "Invalid status value");
         } catch (ResponseStatusException e) {
             log.warn("Status update failed for ticket {}.", id, e);
             redirectAttributes.addFlashAttribute("error",

@@ -65,6 +65,7 @@ public class HandlerController {
                 .flatMap(a -> Role.fromAuthority(a.getAuthority()))
                 .orElse(Role.HANDLER);
 
+        boolean isSupervisor = currentRole == Role.SUPERVISOR;
         boolean isSupervisorOrAdmin = currentRole == Role.SUPERVISOR || currentRole == Role.ADMIN;
 
         if (isSupervisorOrAdmin) {
@@ -76,6 +77,7 @@ public class HandlerController {
         model.addAttribute("statuses", CaseStatus.values());
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("currentUserRole", currentRole.name());
+        model.addAttribute("isSupervisor", isSupervisor);
         model.addAttribute("isSupervisorOrAdmin", isSupervisorOrAdmin);
         model.addAttribute("filter", filter);
         return "handlerpage";

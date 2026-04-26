@@ -10,7 +10,7 @@
 <script th:src="@{/js/script.js}" defer></script>
 <body>
 <h1>Create Ticket</h1>
-<div>
+<div class="form-container">
     <form th:action="@{/tickets/create}" th:object="${ticketForm}" method="post">
         <header class="ticket-header">
             <div class="ticket-title">

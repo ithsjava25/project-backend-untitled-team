@@ -7,7 +7,7 @@
 </head>
 <body>
 <h1>Edit Ticket</h1>
-<div>
+<div class="form-container">
 
     <form th:action="@{/tickets/{id}/edit(id=${ticketId})}" th:object="${ticketForm}" method="post">
         <header class="ticket-header">

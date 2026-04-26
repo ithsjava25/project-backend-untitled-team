@@ -68,11 +68,15 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return (request, response, authentication) -> {
-            boolean isHandlerLevel = authentication.getAuthorities().stream()
+            Role role = authentication.getAuthorities().stream()
                     .map(a -> Role.fromAuthority(a.getAuthority()))
                     .flatMap(Optional::stream)
-                    .anyMatch(r -> r == Role.HANDLER || r == Role.SUPERVISOR || r == Role.ADMIN);
-            if (isHandlerLevel) {
+                    .findFirst()
+                    .orElse(Role.USER);
+
+            if (role == Role.ADMIN) {
+                response.sendRedirect("/admin");
+            } else if (role == Role.HANDLER || role == Role.SUPERVISOR) {
                 response.sendRedirect("/handler");
             } else {
                 response.sendRedirect("/user");

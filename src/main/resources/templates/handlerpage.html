@@ -36,10 +36,7 @@
                 <span class="ticket-title" th:text="${ticket.title}"></span>
                 <span class="status-badge"
                       th:text="${ticket.status}"
-                      th:classappend="${ticket.status.name() == 'OPEN'} ? ' status-open'
-                                    : (${ticket.status.name() == 'IN_PROGRESS'} ? ' status-progress'
-                                    : (${ticket.status.name() == 'SOLVED'} ? ' status-solved'
-                                    : ' status-closed'))">
+                      th:classappend="'status-' + ${ticket.status.name().toLowerCase().replace('_', '-')}">
                 </span>
             </div>
             <div class="ticket-body">
@@ -56,7 +53,8 @@
                 <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-secondary btn-sm">View</a>
                 <div style="display: flex; gap: 6px; align-items: center;">
 
-                    <th:block th:if="${isSupervisorOrAdmin}">
+                    <!-- Supervisor: dropdown för att assigna/reassigna -->
+                    <th:block th:if="${isSupervisor}">
                         <form class="inline-form"
                               th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post"
                               style="display: flex; gap: 6px; align-items: center;">
@@ -77,8 +75,10 @@
                         </form>
                     </th:block>
 
-                    <th:block th:if="${!isSupervisorOrAdmin}">
-                        <form class="inline-form" th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
+                    <!-- Handler: assign to me-knapp -->
+                    <th:block th:if="${!isSupervisor and !isSupervisorOrAdmin}">
+                        <form class="inline-form"
+                              th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
                             <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                             <button type="submit"
                                     th:classappend="${ticket.assignedToUsername == currentUser} ? ' btn-assigned'
@@ -91,6 +91,7 @@
                         </form>
                     </th:block>
 
+                    <!-- Update status -->
                     <form class="inline-form"
                           th:if="${isSupervisorOrAdmin or ticket.assignedToUsername == currentUser}"
                           th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post"
