@@ -53,7 +53,6 @@
         <nav style="display: flex; gap: 10px;">
             <a th:href="@{/}" class="btn btn-secondary">Home</a>
             <form th:action="@{/logout}" method="post" class="inline-form">
-                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                 <button type="submit" class="btn btn-danger">Logout</button>
             </form>
         </nav>

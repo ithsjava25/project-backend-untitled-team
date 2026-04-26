@@ -58,7 +58,6 @@
                         <form class="inline-form"
                               th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post"
                               style="display: flex; gap: 6px; align-items: center;">
-                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                             <label th:for="'username-' + ${ticket.id}" class="sr-only"
                                    th:text="'Assign handler for ' + ${ticket.title}"></label>
                             <select name="username" class="ticket-select" required
@@ -79,7 +78,6 @@
                     <th:block th:if="${!isSupervisor and !isSupervisorOrAdmin}">
                         <form class="inline-form"
                               th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
-                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                             <button type="submit"
                                     th:classappend="${ticket.assignedToUsername == currentUser} ? ' btn-assigned'
                                                    : (${ticket.assignedToUsername != null} ? ' btn-taken' : '')"
@@ -96,7 +94,6 @@
                           th:if="${isSupervisorOrAdmin or ticket.assignedToUsername == currentUser}"
                           th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post"
                           style="display: flex; gap: 6px; align-items: center;">
-                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                         <label th:for="'status-' + ${ticket.id}" class="sr-only"
                                th:text="'Status for ' + ${ticket.title}"></label>
                         <select name="statusParam" class="ticket-select"
@@ -119,7 +116,6 @@
         <nav style="display: flex; gap: 10px;">
             <a th:href="@{/}" class="btn btn-secondary">Home</a>
             <form th:action="@{/logout}" method="post" class="inline-form">
-                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                 <button type="submit" class="btn btn-danger">Logout</button>
             </form>
         </nav>

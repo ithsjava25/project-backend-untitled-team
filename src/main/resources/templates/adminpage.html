@@ -33,7 +33,6 @@
                       th:action="@{/admin/users/{id}/role(id=${user.id()})}"
                       method="post"
                       style="display: flex; gap: 6px; align-items: center;">
-                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                     <input type="hidden" name="_method" value="PUT"/>
                     <label th:for="'role-' + ${user.id()}" class="sr-only"
                            th:text="'Role for ' + ${user.username()}"></label>
@@ -56,7 +55,6 @@
         <nav style="display: flex; gap: 10px;">
             <a th:href="@{/}" class="btn btn-secondary">Home</a>
             <form th:action="@{/logout}" method="post" class="inline-form">
-                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                 <button type="submit" class="btn btn-danger">Logout</button>
             </form>
         </nav>
