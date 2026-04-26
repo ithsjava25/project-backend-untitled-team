@@ -34,7 +34,10 @@
     <div class="ticket-info" th:each="ticket : ${tickets}">
         <div class="ticket-header">
             <span class="ticket-title" th:text="${ticket.title}"></span>
-            <span class="status-badge" th:text="${ticket.status}"></span>
+            <span class="status-badge"
+                  th:text="${ticket.status.displayName}"
+                  th:classappend="'status-' + ${ticket.status.name().toLowerCase().replace('_', '-')}">
+            </span>
         </div>
         <div class="ticket-body">
             <p th:text="${ticket.description}"></p>

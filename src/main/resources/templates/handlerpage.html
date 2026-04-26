@@ -35,7 +35,7 @@
             <div class="ticket-header">
                 <span class="ticket-title" th:text="${ticket.title}"></span>
                 <span class="status-badge"
-                      th:text="${ticket.status}"
+                      th:text="${ticket.status.displayName}"
                       th:classappend="'status-' + ${ticket.status.name().toLowerCase().replace('_', '-')}">
                 </span>
             </div>
