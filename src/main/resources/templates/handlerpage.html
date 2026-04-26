@@ -63,7 +63,7 @@
                             <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                             <label th:for="'username-' + ${ticket.id}" class="sr-only"
                                    th:text="'Assign handler for ' + ${ticket.title}"></label>
-                            <select name="username" class="ticket-select"
+                            <select name="username" class="ticket-select" required
                                     th:id="'username-' + ${ticket.id}">
                                 <option disabled selected value="">Select a handler</option>
                                 <option th:each="h : ${handlers}"

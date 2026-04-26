@@ -2,6 +2,8 @@ package org.example.untitled.admin;
 
 import org.example.untitled.user.Role;
 import org.example.untitled.user.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -17,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminController.class);
     private final UserService userService;
 
     public AdminController(UserService userService) {
@@ -37,8 +41,13 @@ public class AdminController {
         try {
             userService.updateRole(id, role);
             redirectAttributes.addFlashAttribute("success", "Role updated successfully");
+        } catch (ResponseStatusException e) {
+            log.warn("Role update failed for user {}.", id, e);
+            redirectAttributes.addFlashAttribute("error",
+                    e.getReason() != null ? e.getReason() : "Could not update role");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Failed to update role");
+            log.error("Unexpected error updating role for user {}.", id, e);
+            redirectAttributes.addFlashAttribute("error", "An unexpected error occurred");
         }
         return "redirect:/admin";
     }

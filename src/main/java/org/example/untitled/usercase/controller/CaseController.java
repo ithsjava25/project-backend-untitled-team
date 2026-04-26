@@ -152,7 +152,7 @@ public class CaseController {
     }
 
     @PostMapping("/{id}/assign")
-    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HANDLER', 'SUPERVISOR')")
     public String assignTicketForm(
             @PathVariable Long id,
             @RequestParam(required = false) String username,
