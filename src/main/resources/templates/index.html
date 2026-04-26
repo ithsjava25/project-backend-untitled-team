@@ -27,8 +27,11 @@
 
             <a sec:authorize="hasRole('USER')" th:href="@{/user}" class="btn">My tickets</a>
 
-            <a sec:authorize="hasAnyRole('HANDLER','SUPERVISOR','ADMIN')"
+            <a sec:authorize="hasAnyRole('HANDLER','SUPERVISOR')"
                th:href="@{/handler}" class="btn">My Dashboard</a>
+
+            <a sec:authorize="hasRole('ADMIN')"
+               th:href="@{/admin}" class="btn">My Dashboard</a>
 
             <form sec:authorize="isAuthenticated()"
                   th:action="@{/logout}" method="post" class="inline-form">
