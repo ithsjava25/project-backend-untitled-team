@@ -1,10 +1,13 @@
 package org.example.untitled.admin;
 
 import org.example.untitled.user.Role;
+import org.example.untitled.user.User;
 import org.example.untitled.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,8 +44,24 @@ public class AdminController {
     @PutMapping("/users/{id}/role")
     public String updateRole(@PathVariable Long id,
                              @RequestParam Role role,
+                             @AuthenticationPrincipal UserDetails userDetails,
                              RedirectAttributes redirectAttributes) {
         try {
+            User currentUser = userService.findByUsername(userDetails.getUsername());
+
+            if (currentUser.getId().equals(id)) {
+                redirectAttributes.addFlashAttribute("error", "You cannot change your own role");
+                return "redirect:/admin";
+            }
+
+            if (role != Role.ADMIN && userService.countAdmins() <= 1) {
+                User target = userService.findById(id);
+                if (target.getRole() == Role.ADMIN) {
+                    redirectAttributes.addFlashAttribute("error", "Cannot demote the last admin");
+                    return "redirect:/admin";
+                }
+            }
+
             userService.updateRole(id, role);
             redirectAttributes.addFlashAttribute("success", "Role updated successfully");
         } catch (ResponseStatusException e) {

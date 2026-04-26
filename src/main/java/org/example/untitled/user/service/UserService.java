@@ -3,6 +3,7 @@ package org.example.untitled.user.service;
 import org.example.untitled.auth.dto.RegisterRequest;
 import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
+import org.example.untitled.exception.UserNotFoundException;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.dto.UserDto;
@@ -70,5 +71,19 @@ public class UserService {
         return userRep.findByRoleIn(roles).stream()
                 .map(UserMapper::toDto)
                 .toList();
+    }
+
+    public long countAdmins() {
+        return userRep.countByRole(Role.ADMIN);
+    }
+
+    public User findByUsername(String username) {
+        return userRep.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+    }
+
+    public User findById(Long id) {
+        return userRep.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 }

@@ -372,10 +372,11 @@ form.inline-form {
     margin-bottom: 0;
 }
 
-.status-open        { background: #052e16; color: #4ade80; border-color: #166534; }
-.status-in-progress { background: #1c1917; color: #fb923c; border-color: #9a3412; }
-.status-closed      { background: #1e293b; color: #cbd5e1; border-color: #334155; }
-.status-solved      { background: #0f172a; color: #a78bfa; border-color: #4c1d95; }
+.status-badge.status-open        { background: #052e16; color: #4ade80; border-color: #166534; }
+.status-badge.status-in-progress { background: #1c1917; color: #fb923c; border-color: #9a3412; }
+.status-badge.status-closed      { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+.status-badge.status-solved      { background: #0f172a; color: #a78bfa; border-color: #4c1d95; }
+
 .unassigned {
     color: #94a3b8;
     font-style: italic;

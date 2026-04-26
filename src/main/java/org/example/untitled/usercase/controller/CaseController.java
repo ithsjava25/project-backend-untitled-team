@@ -159,9 +159,22 @@ public class CaseController {
             @AuthenticationPrincipal UserDetails userDetails,
             RedirectAttributes redirectAttributes) {
         try {
-            String assignTo = (username != null && !username.isBlank())
-                    ? username
-                    : userDetails.getUsername();
+            String assignTo;
+
+            boolean isSupervisor = userDetails.getAuthorities().stream()
+                    .map(a -> Role.fromAuthority(a.getAuthority()))
+                    .flatMap(Optional::stream)
+                    .anyMatch(r -> r == Role.SUPERVISOR);
+
+            if (username != null && !username.isBlank() && !username.equals(userDetails.getUsername())) {
+                if (!isSupervisor) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to assign to another user");
+                }
+                assignTo = username;
+            } else {
+                assignTo = userDetails.getUsername();
+            }
+
             caseService.assignTicket(id, assignTo);
             redirectAttributes.addFlashAttribute("success", "Ticket assigned to " + assignTo);
         } catch (ResponseStatusException e) {
