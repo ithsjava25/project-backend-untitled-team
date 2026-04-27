@@ -1,6 +1,5 @@
 package org.example.untitled.s3;
 
-import org.example.untitled.usercase.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;

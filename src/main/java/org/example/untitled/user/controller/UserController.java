@@ -5,7 +5,6 @@ import org.example.untitled.auth.dto.RegisterRequest;
 import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.service.UserService;
-import org.example.untitled.usercase.UploadedFile;
 import org.example.untitled.usercase.service.CaseService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 
 @Controller
 public class UserController {
