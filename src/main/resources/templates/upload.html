@@ -24,10 +24,7 @@
 
     <section>
         <h2>Uploaded Files</h2>
-        <div th:if="${#lists.isEmpty(files)}">
-            <p>No files uploaded yet.</p>
-        </div>
-        <table th:if="${not #lists.isEmpty(files)}">
+        <table>
             <thead>
                 <tr>
                     <th>File Name</th>
@@ -38,7 +35,7 @@
                 <tr th:each="file : ${files}">
                     <td th:text="${file}"></td>
                     <td>
-                        <button th:onclick="'downloadFile(\'' + ${file} + '\')'" class="button">Download</button>
+                        <button th:data-file="${file}" th:onclick="'downloadFile(\'data-file\')'" class="button">Download</button>
                     </td>
                 </tr>
             </tbody>

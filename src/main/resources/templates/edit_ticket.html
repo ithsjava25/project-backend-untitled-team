@@ -10,7 +10,7 @@
 <h1>Edit Ticket</h1>
 <div class="form-container">
 
-    <form th:action="@{/tickets/{id}/edit(id=${ticketId})}" th:object="${ticketForm}" method="post">
+    <form th:action="@{/tickets/{id}/edit(id=${ticketId})}" th:object="${ticketForm}" method="POST">
         <header class="ticket-header">
             <div class="ticket-title">
                 <label for="title">Issue:</label>
@@ -26,9 +26,10 @@
             <input type="file" id="fileInput">
             <p id="status"></p>
         </div>
+        <div id="hidden-file-inputs"></div>
         <footer class="ticket-footer">
             <div class="ticket-button">
-                <button onclick="uploadNewFile()" type="button">Save Changes</button>
+                <button onclick="uploadNewFile()" type="button" id="submitBtn">Save Changes</button>
                 <a th:href="@{/user}">Cancel</a>
             </div>
         </footer>
