@@ -32,7 +32,7 @@
 
     <!-- Kommentarer -->
     <div th:if="${not #lists.isEmpty(comments)}" style="margin-top: 24px;">
-        <h2>Comments</h2>
+        <h2 class="section-title">Comments</h2>
         <div th:each="comment : ${comments}" class="ticket-info" style="margin-top: 12px;">
             <div class="ticket-header">
                 <span class="ticket-title" th:text="${comment.authorUsername}"></span>
@@ -46,8 +46,8 @@
     </div>
 
     <!-- Kommentarsformulär -->
-    <div style="margin-top: 24px;">
-        <h2>Add Comment</h2>
+    <div th:if="${canClose}" style="margin-top: 24px;">
+        <h2 class="section-title">Add Comment</h2>
         <form th:action="@{/tickets/{id}/comments(id=${ticket.id})}" method="post">
             <div>
                 <label for="text">Comment:</label>
@@ -61,12 +61,14 @@
 
     <!-- Aktivitetslogg -->
     <div th:if="${not #lists.isEmpty(auditLogs)}" style="margin-top: 24px;">
-        <h2>Activity Log</h2>
+        <h2 class="section-title">Activity Log</h2>
         <div th:each="entry : ${auditLogs}" class="ticket-info" style="margin-top: 12px;">
-            <div class="ticket-header">
-                <span class="ticket-title" th:text="${entry.action.displayName}"></span>
-                <span class="assigned"
-                      th:text="${#temporals.format(entry.timestamp, 'yyyy-MM-dd HH:mm')}"></span>
+            <div class="ticket-body">
+                <p><strong th:text="${entry.action.displayName}"></strong></p>
+                <p th:if="${entry.userId != null}"
+                   th:text="'By: ' + ${auditUserMap[entry.userId]}"></p>
+                <p class="assigned"
+                   th:text="${#temporals.format(entry.timestamp, 'yyyy-MM-dd HH:mm')}"></p>
             </div>
         </div>
     </div>

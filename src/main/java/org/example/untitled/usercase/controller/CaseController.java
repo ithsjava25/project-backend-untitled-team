@@ -2,6 +2,7 @@ package org.example.untitled.usercase.controller;
 
 import jakarta.validation.Valid;
 import org.example.untitled.user.Role;
+import org.example.untitled.user.service.UserService;
 import org.example.untitled.usercase.AuditLog;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
@@ -26,7 +27,9 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/tickets")
@@ -35,12 +38,15 @@ public class CaseController {
     private final CaseService caseService;
     private final CommentService commentService;
     private final AuditLogService auditLogService;
+    private final UserService userService;
     private static final Logger log = LoggerFactory.getLogger(CaseController.class);
 
-    public CaseController(CaseService caseService, CommentService commentService, AuditLogService auditLogService) {
+    public CaseController(CaseService caseService, CommentService commentService,
+                          AuditLogService auditLogService, UserService userService) {
         this.caseService = caseService;
         this.commentService = commentService;
         this.auditLogService = auditLogService;
+        this.userService = userService;
     }
 
     @PostMapping
@@ -82,11 +88,20 @@ public class CaseController {
         List<CommentDto> comments = commentService.getCommentsByTicketId(id);
         List<AuditLog> auditLogs = auditLogService.getLogsForCase(id);
 
+        Map<Long, String> auditUserMap = auditLogs.stream()
+                .filter(a -> a.getUserId() != null)
+                .map(a -> userService.findById(a.getUserId()))
+                .collect(Collectors.toMap(
+                        u -> u.getId(),
+                        u -> u.getUsername(),
+                        (a, b) -> a));
+
         model.addAttribute("ticket", ticket);
         model.addAttribute("comments", comments);
         model.addAttribute("comment", new CreateCommentRequest());
         model.addAttribute("canClose", canClose);
         model.addAttribute("auditLogs", auditLogs);
+        model.addAttribute("auditUserMap", auditUserMap);
         return "ticket";
     }
 
@@ -257,9 +272,18 @@ public class CaseController {
             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             CaseEntityDto ticket = caseService.getTicketByID(id);
+            List<AuditLog> auditLogs = auditLogService.getLogsForCase(id);
+            Map<Long, String> auditUserMap = auditLogs.stream()
+                    .filter(a -> a.getUserId() != null)
+                    .map(a -> userService.findById(a.getUserId()))
+                    .collect(Collectors.toMap(
+                            u -> u.getId(),
+                            u -> u.getUsername(),
+                            (a, b) -> a));
             model.addAttribute("ticket", ticket);
             model.addAttribute("comments", commentService.getCommentsByTicketId(id));
-            model.addAttribute("auditLogs", auditLogService.getLogsForCase(id));
+            model.addAttribute("auditLogs", auditLogs);
+            model.addAttribute("auditUserMap", auditUserMap);
             return "ticket";
         }
         try {
