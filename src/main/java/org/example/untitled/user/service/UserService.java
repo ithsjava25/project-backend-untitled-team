@@ -17,7 +17,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -85,5 +88,10 @@ public class UserService {
     public User findById(Long id) {
         return userRep.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    public Map<Long, String> findAllByIds(Collection<Long> ids) {
+        return userRep.findAllById(ids).stream()
+                .collect(Collectors.toMap(User::getId, User::getUsername));
     }
 }

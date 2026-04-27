@@ -61,8 +61,8 @@ public class CaseService {
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
         caseEntity = caseRepository.save(caseEntity);
-        if (request.getFileNames() != null){
-            for(String fName : request.getFileNames()){
+        if (request.getFileNames() != null) {
+            for (String fName : request.getFileNames()) {
                 if (fName == null || fName.isBlank()) continue;
                 caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fName));
             }
@@ -96,11 +96,11 @@ public class CaseService {
         }
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
-        if (request.getFileNames() != null){
+        if (request.getFileNames() != null) {
             Set<String> existing = caseEntity.getFiles().stream()
                     .map(UploadedFile::getS3Key)
                     .collect(Collectors.toSet());
-            for(String fName : request.getFileNames()){
+            for (String fName : request.getFileNames()) {
                 if (fName == null || fName.isBlank() || existing.contains(fName)) continue;
                 caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fName));
             }
@@ -114,13 +114,13 @@ public class CaseService {
     }
 
     @Transactional
-    public void closeTicket(CaseEntityDto ticket, CreateCommentRequest comment) {
+    public void closeTicket(CaseEntityDto ticket, CreateCommentRequest comment, String username) {
         if (comment == null)
-            throw new IllegalArgumentException("Comment Cant be null");
+            throw new IllegalArgumentException("Comment can't be null");
         if (ticket == null)
-            throw new IllegalArgumentException("Ticket Cant be null");
-        updateStatus(ticket.id(), CaseStatus.CLOSED, ticket.ownerUsername());
-        commentService.createComment(comment, ticket);
+            throw new IllegalArgumentException("Ticket can't be null");
+        updateStatus(ticket.id(), CaseStatus.CLOSED, username);
+        commentService.createComment(comment, ticket, username);
     }
 
     public List<CaseEntityDto> getAllTickets() {
@@ -170,6 +170,7 @@ public class CaseService {
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
         return CaseMapper.toDto(caseEntity);
     }
+
     public User findOwnerById(long id) {
         return caseRepository.findOwnerById(id);
     }

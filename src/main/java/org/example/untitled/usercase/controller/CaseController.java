@@ -14,6 +14,7 @@ import org.example.untitled.usercase.service.CaseService;
 import org.example.untitled.usercase.service.CommentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -71,10 +73,7 @@ public class CaseController {
 
         CaseEntityDto ticket = caseService.getTicketByID(id);
 
-        boolean isHandler = userDetails.getAuthorities().stream()
-                .map(a -> Role.fromAuthority(a.getAuthority()))
-                .flatMap(Optional::stream)
-                .anyMatch(r -> r == Role.HANDLER || r == Role.SUPERVISOR || r == Role.ADMIN);
+        boolean isHandler = isHandlerOrAbove(userDetails);
 
         if (!isHandler && caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
@@ -84,22 +83,17 @@ public class CaseController {
         boolean isOwner = ticket.ownerUsername().equals(userDetails.getUsername());
         boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
         boolean canClose = isTicketOpen && (isOwner || isAssigned || isHandler);
+        boolean canComment = isOwner || isAssigned || isHandler;
 
         List<CommentDto> comments = commentService.getCommentsByTicketId(id);
         List<AuditLog> auditLogs = auditLogService.getLogsForCase(id);
-
-        Map<Long, String> auditUserMap = auditLogs.stream()
-                .filter(a -> a.getUserId() != null)
-                .map(a -> userService.findById(a.getUserId()))
-                .collect(Collectors.toMap(
-                        u -> u.getId(),
-                        u -> u.getUsername(),
-                        (a, b) -> a));
+        Map<Long, String> auditUserMap = buildAuditUserMap(auditLogs);
 
         model.addAttribute("ticket", ticket);
         model.addAttribute("comments", comments);
         model.addAttribute("comment", new CreateCommentRequest());
         model.addAttribute("canClose", canClose);
+        model.addAttribute("canComment", canComment);
         model.addAttribute("auditLogs", auditLogs);
         model.addAttribute("auditUserMap", auditUserMap);
         return "ticket";
@@ -146,17 +140,13 @@ public class CaseController {
             @AuthenticationPrincipal UserDetails userDetails) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
 
-        boolean isHandler = userDetails.getAuthorities().stream()
-                .map(a -> Role.fromAuthority(a.getAuthority()))
-                .flatMap(Optional::stream)
-                .anyMatch(r -> r == Role.HANDLER || r == Role.SUPERVISOR || r == Role.ADMIN);
-
+        boolean isHandler = isHandlerOrAbove(userDetails);
         boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
 
         if (!isHandler && !isAssigned && caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
 
-        model.addAttribute("ticket", caseService.getTicketByID(id));
+        model.addAttribute("ticket", ticket);
         model.addAttribute("comment", new CreateCommentRequest());
         return "close_ticket";
     }
@@ -170,11 +160,7 @@ public class CaseController {
             Model model) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
 
-        boolean isHandler = userDetails.getAuthorities().stream()
-                .map(a -> Role.fromAuthority(a.getAuthority()))
-                .flatMap(Optional::stream)
-                .anyMatch(r -> r == Role.HANDLER || r == Role.SUPERVISOR || r == Role.ADMIN);
-
+        boolean isHandler = isHandlerOrAbove(userDetails);
         boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
 
         if (!isHandler && !isAssigned && caseService.isNotOwner(ticket, userDetails.getUsername()))
@@ -186,7 +172,7 @@ public class CaseController {
         }
         comment.setCaseId(id);
         try {
-            caseService.closeTicket(ticket, comment);
+            caseService.closeTicket(ticket, comment, userDetails.getUsername());
         } catch (IllegalArgumentException e) {
             bindingResult.rejectValue("text", "error.createCommentRequest", e.getMessage());
             model.addAttribute("ticket", ticket);
@@ -270,30 +256,72 @@ public class CaseController {
             @AuthenticationPrincipal UserDetails userDetails,
             Model model,
             RedirectAttributes redirectAttributes) {
+
+        CaseEntityDto ticket = caseService.getTicketByID(id);
+
+        boolean isHandler = isHandlerOrAbove(userDetails);
+        boolean isOwner = ticket.ownerUsername().equals(userDetails.getUsername());
+        boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
+        boolean canComment = isOwner || isAssigned || isHandler;
+
+        if (!canComment) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to comment on this ticket");
+        }
+
+        boolean isTicketOpen = ticket.status() != CaseStatus.CLOSED
+                && ticket.status() != CaseStatus.SOLVED;
+        boolean canClose = isTicketOpen && (isOwner || isAssigned || isHandler);
+
         if (bindingResult.hasErrors()) {
-            CaseEntityDto ticket = caseService.getTicketByID(id);
             List<AuditLog> auditLogs = auditLogService.getLogsForCase(id);
-            Map<Long, String> auditUserMap = auditLogs.stream()
-                    .filter(a -> a.getUserId() != null)
-                    .map(a -> userService.findById(a.getUserId()))
-                    .collect(Collectors.toMap(
-                            u -> u.getId(),
-                            u -> u.getUsername(),
-                            (a, b) -> a));
+            Map<Long, String> auditUserMap = buildAuditUserMap(auditLogs);
             model.addAttribute("ticket", ticket);
             model.addAttribute("comments", commentService.getCommentsByTicketId(id));
+            model.addAttribute("canClose", canClose);
+            model.addAttribute("canComment", canComment);
             model.addAttribute("auditLogs", auditLogs);
             model.addAttribute("auditUserMap", auditUserMap);
             return "ticket";
         }
+
         try {
             comment.setCaseId(id);
-            CaseEntityDto ticket = caseService.getTicketByID(id);
-            commentService.createComment(comment, ticket);
+            commentService.createComment(comment, ticket, userDetails.getUsername());
             redirectAttributes.addFlashAttribute("success", "Comment added successfully");
+        } catch (IllegalArgumentException e) {
+            log.warn("Comment creation failed for ticket {} by user {}: {}", id, userDetails.getUsername(), e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (DataAccessException e) {
+            log.error("Data access error adding comment to ticket {} by user {}.", id, userDetails.getUsername(), e);
+            redirectAttributes.addFlashAttribute("error", "Could not save comment, please try again");
+        } catch (ResponseStatusException e) {
+            log.warn("Comment creation rejected for ticket {} by user {}: {}", id, userDetails.getUsername(), e.getReason(), e);
+            redirectAttributes.addFlashAttribute("error",
+                    e.getReason() != null ? e.getReason() : "Could not add comment");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Could not add comment");
+            log.error("Unexpected error adding comment to ticket {} by user {}.", id, userDetails.getUsername(), e);
+            redirectAttributes.addFlashAttribute("error", "An unexpected error occurred");
         }
         return "redirect:/tickets/" + id;
+    }
+
+    // --- Private helpers ---
+
+    private boolean isHandlerOrAbove(UserDetails userDetails) {
+        return userDetails.getAuthorities().stream()
+                .map(a -> Role.fromAuthority(a.getAuthority()))
+                .flatMap(Optional::stream)
+                .anyMatch(r -> r == Role.HANDLER || r == Role.SUPERVISOR || r == Role.ADMIN);
+    }
+
+    private Map<Long, String> buildAuditUserMap(List<AuditLog> auditLogs) {
+        Set<Long> userIds = auditLogs.stream()
+                .map(AuditLog::getUserId)
+                .filter(uid -> uid != null)
+                .collect(Collectors.toSet());
+        if (userIds.isEmpty()) {
+            return Map.of();
+        }
+        return userService.findAllByIds(userIds);
     }
 }

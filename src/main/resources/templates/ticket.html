@@ -46,12 +46,17 @@
     </div>
 
     <!-- Kommentarsformulär -->
-    <div th:if="${canClose}" style="margin-top: 24px;">
+    <div th:if="${canComment}" style="margin-top: 24px;">
         <h2 class="section-title">Add Comment</h2>
-        <form th:action="@{/tickets/{id}/comments(id=${ticket.id})}" method="post">
+        <form th:action="@{/tickets/{id}/comments(id=${ticket.id})}"
+              th:object="${comment}"
+              method="post">
             <div>
                 <label for="text">Comment:</label>
-                <textarea id="text" name="text" placeholder="Write your comment here..."></textarea>
+                <textarea id="text" th:field="*{text}" placeholder="Write your comment here..."></textarea>
+                <span th:if="${#fields.hasErrors('text')}"
+                      th:errors="*{text}"
+                      class="field-error"></span>
             </div>
             <div style="margin-top: 12px;">
                 <button type="submit" class="btn">Add Comment</button>
@@ -66,7 +71,7 @@
             <div class="ticket-body">
                 <p><strong th:text="${entry.action.displayName}"></strong></p>
                 <p th:if="${entry.userId != null}"
-                   th:text="'By: ' + ${auditUserMap[entry.userId]}"></p>
+                   th:text="'By: ' + ${auditUserMap[entry.userId] ?: 'Unknown user'}"></p>
                 <p class="assigned"
                    th:text="${#temporals.format(entry.timestamp, 'yyyy-MM-dd HH:mm')}"></p>
             </div>
