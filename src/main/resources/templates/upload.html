@@ -9,41 +9,36 @@
     <script th:src="@{/js/script.js}" defer></script>
 </head>
 <body>
-<header>
-    <h1>File Upload</h1>
-</header>
-<main>
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>Uploaded Files</h1>
+        <div class="ticket-actions">
+            <a th:href="@{/user}" class="btn btn-secondary">user page</a>
+        </div>
+    </div>
     <section>
-        <h2>Upload File</h2>
-        <form>
-            <input type="file" id="fileInput" multiple>
-            <button onclick="uploadNewFile()" class="submit" id="submitBtn">Upload</button>
-            <p id="status"></p>
-        </form>
-        <div id="hidden-file-inputs"></div>
-    </section>
-
-    <section>
-        <h2>Uploaded Files</h2>
         <table>
             <thead>
-                <tr>
-                    <th>File Name</th>
-                    <th>Action</th>
-                </tr>
+            <tr>
+                <th>File Name</th>
+                <th>Action</th>
+            </tr>
             </thead>
             <tbody>
-                <tr th:each="file : ${files}">
-                    <td th:text="${file}"></td>
-                    <td>
-                        <button th:data-file="${file}"
-                                onclick="downloadFile(this.getAttribute('data-file'))"
-                                class="button">Download</button>
-                    </td>
-                </tr>
+            <tr th:each="file : ${files}">
+                <td th:text="${file.getFilename()}"></td>
+                <td>
+                    <button th:data-file="${file.getS3Key()}"
+                            onclick="downloadFile(this.getAttribute('data-file'))"
+                            class="button">Download</button>
+                </td>
+            </tr>
             </tbody>
         </table>
     </section>
+    <p><a th:href="@{/user}"></a></p>
+</div>
+
 </main>
 </body>
 </html>

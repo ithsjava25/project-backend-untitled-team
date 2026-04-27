@@ -80,14 +80,13 @@ async function uploadNewFile(){
 }
 
 async function deleteFile(fileName){
-    const status = document.getElementById('status');
     if (window.confirm(fileName + " will be deleted! Are you sure?")) {
         const res = await apiReq(`/tickets/upload/api/files/delete-url?fileName=${encodeURIComponent(fileName)}`, {method: 'DELETE'});
         if (!res) return;
         if (res.ok) {
             await fetchAFile();
         } else {
-            status.innerText= 'Error: ' + res.status;
+            console.error('Error: ' + res.status);
         }
     }
 }

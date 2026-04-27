@@ -24,7 +24,7 @@ public class S3Service {
     private final S3Presigner s3Presigner;
     private static final String BUCKET_NAME = "chum-bucket";
 
-    public S3Service(S3Client s3Client, S3Presigner s3Presigner){
+    public S3Service(S3Client s3Client, S3Presigner s3Presigner, UploadedFileRepository uploadedFileRepository){
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
     }

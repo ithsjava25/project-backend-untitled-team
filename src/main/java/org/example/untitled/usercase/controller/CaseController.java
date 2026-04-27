@@ -35,13 +35,10 @@ public class CaseController {
     private final CaseService caseService;
     private final CommentService commentService;
     private static final Logger log = LoggerFactory.getLogger(CaseController.class);
-    private final S3Service s3Service;
-
 
     public CaseController(CaseService caseService, CommentService commentService, S3Service s3Service) {
         this.caseService = caseService;
         this.commentService = commentService;
-        this.s3Service = s3Service;
     }
 
     @PostMapping

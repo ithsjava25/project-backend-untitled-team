@@ -194,4 +194,11 @@ public class CaseService {
     public boolean isNotOwner(CaseEntityDto ticket, String username) {
         return !ticket.ownerUsername().equals(username);
     }
+
+    public List<UploadedFile> getUserFiles(String username) {
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return uploadedFileRepository.getUploadedFilesByUploadedBy(owner).stream().toList();
+    }
 }

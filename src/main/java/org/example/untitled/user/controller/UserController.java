@@ -5,6 +5,7 @@ import org.example.untitled.auth.dto.RegisterRequest;
 import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.service.UserService;
+import org.example.untitled.usercase.UploadedFile;
 import org.example.untitled.usercase.service.CaseService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -83,5 +86,11 @@ public class UserController {
             return "register_user";
         }
         return "redirect:/login";
+    }
+
+    @GetMapping("/tickets/upload")
+    public String getUserTickets(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        model.addAttribute("files", caseService.getUserFiles(userDetails.getUsername()));
+        return "upload";
     }
 }
