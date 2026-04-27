@@ -2,12 +2,12 @@ package org.example.untitled.usercase.controller;
 
 import jakarta.validation.Valid;
 import org.example.untitled.user.Role;
+import org.example.untitled.usercase.AuditLog;
 import org.example.untitled.usercase.CaseStatus;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
-import org.example.untitled.usercase.AuditLog;
 import org.example.untitled.usercase.service.AuditLogService;
 import org.example.untitled.usercase.service.CaseService;
 import org.example.untitled.usercase.service.CommentService;
@@ -36,7 +36,6 @@ public class CaseController {
     private final CommentService commentService;
     private final AuditLogService auditLogService;
     private static final Logger log = LoggerFactory.getLogger(CaseController.class);
-
 
     public CaseController(CaseService caseService, CommentService commentService, AuditLogService auditLogService) {
         this.caseService = caseService;
@@ -74,10 +73,19 @@ public class CaseController {
         if (!isHandler && caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
 
+        boolean isTicketOpen = ticket.status() != CaseStatus.CLOSED
+                && ticket.status() != CaseStatus.SOLVED;
+        boolean isOwner = ticket.ownerUsername().equals(userDetails.getUsername());
+        boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
+        boolean canClose = isTicketOpen && (isOwner || isAssigned || isHandler);
+
         List<CommentDto> comments = commentService.getCommentsByTicketId(id);
         List<AuditLog> auditLogs = auditLogService.getLogsForCase(id);
+
         model.addAttribute("ticket", ticket);
         model.addAttribute("comments", comments);
+        model.addAttribute("comment", new CreateCommentRequest());
+        model.addAttribute("canClose", canClose);
         model.addAttribute("auditLogs", auditLogs);
         return "ticket";
     }
@@ -120,11 +128,19 @@ public class CaseController {
     public String closeTicket(
             Model model,
             @PathVariable long id,
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
+            @AuthenticationPrincipal UserDetails userDetails) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
-        if (caseService.isNotOwner(ticket, userDetails.getUsername()))
+
+        boolean isHandler = userDetails.getAuthorities().stream()
+                .map(a -> Role.fromAuthority(a.getAuthority()))
+                .flatMap(Optional::stream)
+                .anyMatch(r -> r == Role.HANDLER || r == Role.SUPERVISOR || r == Role.ADMIN);
+
+        boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
+
+        if (!isHandler && !isAssigned && caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
+
         model.addAttribute("ticket", caseService.getTicketByID(id));
         model.addAttribute("comment", new CreateCommentRequest());
         return "close_ticket";
@@ -136,11 +152,19 @@ public class CaseController {
             @ModelAttribute("comment") @Valid CreateCommentRequest comment,
             BindingResult bindingResult,
             @AuthenticationPrincipal UserDetails userDetails,
-            Model model
-    ) {
+            Model model) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
-        if (caseService.isNotOwner(ticket, userDetails.getUsername()))
+
+        boolean isHandler = userDetails.getAuthorities().stream()
+                .map(a -> Role.fromAuthority(a.getAuthority()))
+                .flatMap(Optional::stream)
+                .anyMatch(r -> r == Role.HANDLER || r == Role.SUPERVISOR || r == Role.ADMIN);
+
+        boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
+
+        if (!isHandler && !isAssigned && caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("ticket", ticket);
             return "close_ticket";
@@ -154,6 +178,9 @@ public class CaseController {
             return "close_ticket";
         }
 
+        if (isHandler) {
+            return "redirect:/handler";
+        }
         return "redirect:/user";
     }
 
@@ -217,5 +244,32 @@ public class CaseController {
             redirectAttributes.addFlashAttribute("error", "An unexpected error occurred");
         }
         return "redirect:/handler";
+    }
+
+    @PostMapping("/{id}/comments")
+    @PreAuthorize("isAuthenticated()")
+    public String addComment(
+            @PathVariable long id,
+            @Valid @ModelAttribute("comment") CreateCommentRequest comment,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            CaseEntityDto ticket = caseService.getTicketByID(id);
+            model.addAttribute("ticket", ticket);
+            model.addAttribute("comments", commentService.getCommentsByTicketId(id));
+            model.addAttribute("auditLogs", auditLogService.getLogsForCase(id));
+            return "ticket";
+        }
+        try {
+            comment.setCaseId(id);
+            CaseEntityDto ticket = caseService.getTicketByID(id);
+            commentService.createComment(comment, ticket);
+            redirectAttributes.addFlashAttribute("success", "Comment added successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Could not add comment");
+        }
+        return "redirect:/tickets/" + id;
     }
 }
