@@ -62,7 +62,7 @@ async function uploadNewFile(){
 }
 async function deleteFile(fileName){
     const status = document.getElementById('status');
-    if (!window.confirm(fileName + " will be deleted! Are you sure?")) {
+    if (window.confirm(fileName + " will be deleted! Are you sure?")) {
         const res = await apiReq(`/upload/api/files/delete-url?fileName=${encodeURIComponent(fileName)}`, {method: 'DELETE'});
         if(res.ok){
             await fetchAFile();
