@@ -51,6 +51,29 @@ public class CaseController {
         this.userService = userService;
     }
 
+    /**
+     * Encapsulates permission checks for a given ticket and user so the
+     * same logic is not duplicated across multiple handler methods.
+     */
+    private record TicketPermissions(
+            boolean isHandler,
+            boolean isOwner,
+            boolean isAssigned,
+            boolean canClose,
+            boolean canComment
+    ) {
+        static TicketPermissions of(CaseEntityDto ticket, UserDetails userDetails,
+                                    boolean isHandler) {
+            boolean isOwner = ticket.ownerUsername().equals(userDetails.getUsername());
+            boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
+            boolean isTicketOpen = ticket.status() != CaseStatus.CLOSED
+                    && ticket.status() != CaseStatus.SOLVED;
+            boolean canClose = isTicketOpen && (isOwner || isAssigned || isHandler);
+            boolean canComment = isOwner || isAssigned || isHandler;
+            return new TicketPermissions(isHandler, isOwner, isAssigned, canClose, canComment);
+        }
+    }
+
     @PostMapping
     public ResponseEntity<CaseEntityDto> createTicket(
             @Valid @RequestBody CreateCaseRequest request,
@@ -72,18 +95,10 @@ public class CaseController {
             Model model) {
 
         CaseEntityDto ticket = caseService.getTicketByID(id);
+        TicketPermissions perms = TicketPermissions.of(ticket, userDetails, isHandlerOrAbove(userDetails));
 
-        boolean isHandler = isHandlerOrAbove(userDetails);
-
-        if (!isHandler && caseService.isNotOwner(ticket, userDetails.getUsername()))
+        if (!perms.isHandler() && caseService.isNotOwner(ticket, userDetails.getUsername()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
-
-        boolean isTicketOpen = ticket.status() != CaseStatus.CLOSED
-                && ticket.status() != CaseStatus.SOLVED;
-        boolean isOwner = ticket.ownerUsername().equals(userDetails.getUsername());
-        boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
-        boolean canClose = isTicketOpen && (isOwner || isAssigned || isHandler);
-        boolean canComment = isOwner || isAssigned || isHandler;
 
         List<CommentDto> comments = commentService.getCommentsByTicketId(id);
         List<AuditLog> auditLogs = auditLogService.getLogsForCase(id);
@@ -92,8 +107,8 @@ public class CaseController {
         model.addAttribute("ticket", ticket);
         model.addAttribute("comments", comments);
         model.addAttribute("comment", new CreateCommentRequest());
-        model.addAttribute("canClose", canClose);
-        model.addAttribute("canComment", canComment);
+        model.addAttribute("canClose", perms.canClose());
+        model.addAttribute("canComment", perms.canComment());
         model.addAttribute("auditLogs", auditLogs);
         model.addAttribute("auditUserMap", auditUserMap);
         return "ticket";
@@ -139,12 +154,10 @@ public class CaseController {
             @PathVariable long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
+        TicketPermissions perms = TicketPermissions.of(ticket, userDetails, isHandlerOrAbove(userDetails));
 
-        boolean isHandler = isHandlerOrAbove(userDetails);
-        boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
-
-        if (!isHandler && !isAssigned && caseService.isNotOwner(ticket, userDetails.getUsername()))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
+        if (!perms.isHandler() && !perms.isAssigned() && caseService.isNotOwner(ticket, userDetails.getUsername()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to close this ticket");
 
         model.addAttribute("ticket", ticket);
         model.addAttribute("comment", new CreateCommentRequest());
@@ -159,12 +172,10 @@ public class CaseController {
             @AuthenticationPrincipal UserDetails userDetails,
             Model model) {
         CaseEntityDto ticket = caseService.getTicketByID(id);
+        TicketPermissions perms = TicketPermissions.of(ticket, userDetails, isHandlerOrAbove(userDetails));
 
-        boolean isHandler = isHandlerOrAbove(userDetails);
-        boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
-
-        if (!isHandler && !isAssigned && caseService.isNotOwner(ticket, userDetails.getUsername()))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
+        if (!perms.isHandler() && !perms.isAssigned() && caseService.isNotOwner(ticket, userDetails.getUsername()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to close this ticket");
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("ticket", ticket);
@@ -179,10 +190,7 @@ public class CaseController {
             return "close_ticket";
         }
 
-        if (isHandler) {
-            return "redirect:/handler";
-        }
-        return "redirect:/user";
+        return perms.isHandler() ? "redirect:/handler" : "redirect:/user";
     }
 
     @PostMapping("/{id}/assign")
@@ -258,27 +266,19 @@ public class CaseController {
             RedirectAttributes redirectAttributes) {
 
         CaseEntityDto ticket = caseService.getTicketByID(id);
+        TicketPermissions perms = TicketPermissions.of(ticket, userDetails, isHandlerOrAbove(userDetails));
 
-        boolean isHandler = isHandlerOrAbove(userDetails);
-        boolean isOwner = ticket.ownerUsername().equals(userDetails.getUsername());
-        boolean isAssigned = userDetails.getUsername().equals(ticket.assignedToUsername());
-        boolean canComment = isOwner || isAssigned || isHandler;
-
-        if (!canComment) {
+        if (!perms.canComment()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to comment on this ticket");
         }
-
-        boolean isTicketOpen = ticket.status() != CaseStatus.CLOSED
-                && ticket.status() != CaseStatus.SOLVED;
-        boolean canClose = isTicketOpen && (isOwner || isAssigned || isHandler);
 
         if (bindingResult.hasErrors()) {
             List<AuditLog> auditLogs = auditLogService.getLogsForCase(id);
             Map<Long, String> auditUserMap = buildAuditUserMap(auditLogs);
             model.addAttribute("ticket", ticket);
             model.addAttribute("comments", commentService.getCommentsByTicketId(id));
-            model.addAttribute("canClose", canClose);
-            model.addAttribute("canComment", canComment);
+            model.addAttribute("canClose", perms.canClose());
+            model.addAttribute("canComment", perms.canComment());
             model.addAttribute("auditLogs", auditLogs);
             model.addAttribute("auditUserMap", auditUserMap);
             return "ticket";
