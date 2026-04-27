@@ -32,11 +32,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
-                        auth ->
-                                auth.requestMatchers("/auth/**", "/", "/home", "/images/**", "/style.css", "/upload/**", "/login", "/register")
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated())
+                        auth -> auth
+                                .requestMatchers("/auth/**", "/", "/home", "/images/**", "/style.css",
+                                        "/upload/**", "/login", "/register", "/favicon.ico")
+                                .permitAll()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/handler/**").hasAnyRole("HANDLER", "SUPERVISOR", "ADMIN")
+                                .requestMatchers("/user/**").hasRole("USER")
+                                .anyRequest()
+                                .authenticated())
                 .authenticationProvider(authenticationProvider())
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -44,7 +48,10 @@ public class SecurityConfig {
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login")
-                        .permitAll());
+                        .permitAll())
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/"));
+
 
         return http.build();
     }
