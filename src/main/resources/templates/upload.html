@@ -15,11 +15,12 @@
 <main>
     <section>
         <h2>Upload File</h2>
-        <div>
+        <form>
             <input type="file" id="fileInput" multiple>
-            <button onclick="uploadNewFile()" class="button">Upload</button>
+            <button onclick="uploadNewFile()" class="submit" id="submitBtn">Upload</button>
             <p id="status"></p>
-        </div>
+        </form>
+        <div id="hidden-file-inputs"></div>
     </section>
 
     <section>
@@ -35,7 +36,9 @@
                 <tr th:each="file : ${files}">
                     <td th:text="${file}"></td>
                     <td>
-                        <button th:data-file="${file}" th:onclick="'downloadFile(\'data-file\')'" class="button">Download</button>
+                        <button th:data-file="${file}"
+                                onclick="downloadFile(this.getAttribute('data-file'))"
+                                class="button">Download</button>
                     </td>
                 </tr>
             </tbody>

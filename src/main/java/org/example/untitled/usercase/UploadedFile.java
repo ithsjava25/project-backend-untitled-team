@@ -15,7 +15,7 @@ public class UploadedFile {
     @Column(nullable = false)
     private String filename;
 
-    @Column(nullable = true)
+    @Column(name = "s3key")
     private String s3Key;
 
     @Column(nullable = false, updatable = false)

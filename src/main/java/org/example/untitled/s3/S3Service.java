@@ -107,7 +107,6 @@ public class S3Service {
         int indexOfSlash = s3Key.lastIndexOf('/');
         String fileName = s3Key.substring(indexOfSlash + 1);
         uploadedFile.setFilename(fileName);
-
         return List.of(uploadedFile);
     }
 }
