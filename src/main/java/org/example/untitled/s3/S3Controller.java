@@ -16,7 +16,7 @@ public class S3Controller {
 
     public S3Controller(S3Service s3s){this.s3Service = s3s; }
 
-    @GetMapping("/upload")
+    @GetMapping("/tickets/upload")
     public String home(Model model){
         log.info("welcome page");
         model.addAttribute("files", s3Service.listFiles());

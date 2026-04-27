@@ -2,12 +2,16 @@ package org.example.untitled.usercase.service;
 
 import org.example.untitled.s3.S3Service;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.example.untitled.user.Role;
 import org.example.untitled.user.User;
 import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.AuditAction;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.CaseStatus;
+import org.example.untitled.usercase.UploadedFile;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
@@ -46,7 +50,7 @@ public class CaseService {
     }
 
     @Transactional
-    public CaseEntityDto createTicket(CreateCaseRequest request, String username, String fileName) {
+    public CaseEntityDto createTicket(CreateCaseRequest request, String username) {
         User owner = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (caseRepository.existsByTitleAndOwner(request.getTitle(), owner)) {
@@ -56,12 +60,16 @@ public class CaseService {
         CaseEntity caseEntity = CaseMapper.toEntity(request);
         caseEntity.setOwner(owner);
         caseEntity.setStatus(CaseStatus.OPEN);
-        if(fileName != null && !fileName.isBlank()){
-            caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fileName));
+        caseEntity = caseRepository.save(caseEntity);
+        if (request.getFileNames() != null){
+            for(String fName : request.getFileNames()){
+                if (fName == null || fName.isBlank()) continue;
+                caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fName));
+            }
         }
         CaseEntity saved = caseRepository.save(caseEntity);
         auditLogService.log(AuditAction.CASE_CREATED, owner.getId(), saved.getId());
-        if (fileName != null && !fileName.isBlank()) {
+        if (request.getFileNames() != null && !request.getFileNames().isEmpty()) {
             auditLogService.log(AuditAction.FILE_UPLOADED, owner.getId(), saved.getId());
         }
         return CaseMapper.toDto(saved);
@@ -76,7 +84,7 @@ public class CaseService {
     }
 
     @Transactional
-    public CaseEntityDto updateTicket(Long id, CreateCaseRequest request, String username, String fileName) {
+    public CaseEntityDto updateTicket(Long id, CreateCaseRequest request, String username) {
         CaseEntity caseEntity = caseRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found: " + id));
@@ -88,11 +96,18 @@ public class CaseService {
         }
         caseEntity.setTitle(request.getTitle());
         caseEntity.setDescription(request.getDescription());
-        if(fileName != null && !fileName.isBlank())
-            caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fileName));
+        if (request.getFileNames() != null){
+            Set<String> existing = caseEntity.getFiles().stream()
+                    .map(UploadedFile::getS3Key)
+                    .collect(Collectors.toSet());
+            for(String fName : request.getFileNames()){
+                if (fName == null || fName.isBlank() || existing.contains(fName)) continue;
+                caseEntity.getFiles().addAll(s3Service.createFile(caseEntity, fName));
+            }
+        }
         CaseEntity saved = caseRepository.save(caseEntity);
         auditLogService.log(AuditAction.CASE_UPDATED, caseEntity.getOwner().getId(), saved.getId());
-        if (fileName != null && !fileName.isBlank()) {
+        if (request.getFileNames() != null && !request.getFileNames().isEmpty()) {
             auditLogService.log(AuditAction.FILE_UPLOADED, caseEntity.getOwner().getId(), saved.getId());
         }
         return CaseMapper.toDto(saved);

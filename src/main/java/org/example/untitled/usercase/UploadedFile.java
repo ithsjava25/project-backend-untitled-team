@@ -15,6 +15,8 @@ public class UploadedFile {
     @Column(nullable = false)
     private String filename;
 
+    @Column(nullable = true)
+    private String s3Key;
 
     @Column(nullable = false, updatable = false)
     private Instant uploadedAt;
@@ -70,5 +72,11 @@ public class UploadedFile {
 
     public void setAssociatedCase(CaseEntity associatedCaseEntity) {
         this.associatedCaseEntity = associatedCaseEntity;
+    }
+    public String getS3Key() {
+        return s3Key;
+    }
+    public void setS3Key(String s3Key) {
+        this.s3Key = s3Key;
     }
 }

@@ -13,7 +13,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +21,7 @@ public class S3Service {
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
-    private final String BUCKET_NAME = "chum-bucket";
+    private static final String BUCKET_NAME = "chum-bucket";
 
     public S3Service(S3Client s3Client, S3Presigner s3Presigner){
         this.s3Client = s3Client;
@@ -61,8 +60,15 @@ public class S3Service {
                 .toList();
     }
 
-    public S3UploadResponse generateS3PreUploadUrl(String fileName, String contentType) {
-        String fileIn = UUID.randomUUID().toString().substring(0, 8) + "-" +fileName;
+    public S3UploadResponse generateS3PreUploadUrl(Long caseId, String fileName, String contentType) {
+        if (fileName == null || fileName.contains("/") || fileName.contains("..")) {
+            throw new IllegalArgumentException("Invalid file name provided.");
+        }
+
+        String caseDir = (caseId == null) ? "new" : String.valueOf(caseId);
+        String shortUuid = UUID.randomUUID().toString().substring(0, 8);
+        String fileIn = String.format("tickets/%s/uploads/%s-%s", caseDir, shortUuid, fileName);
+
         PutObjectPresignRequest preReq = PutObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(10))
                 .putObjectRequest(objReq -> objReq
@@ -93,14 +99,15 @@ public class S3Service {
                 .key(filename));
     }
 
-    public List<UploadedFile> createFile(CaseEntity caseEntity, String fileName) {
-        List<UploadedFile> uploadedFiles = new ArrayList<>();
+    public List<UploadedFile> createFile(CaseEntity caseEntity, String s3Key) {
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setUploadedBy(caseEntity.getOwner());
         uploadedFile.setAssociatedCase(caseEntity);
+        uploadedFile.setS3Key(s3Key);
+        int indexOfSlash = s3Key.lastIndexOf('/');
+        String fileName = s3Key.substring(indexOfSlash + 1);
         uploadedFile.setFilename(fileName);
-        uploadedFiles.add(uploadedFile);
 
-        return uploadedFiles;
+        return List.of(uploadedFile);
     }
 }

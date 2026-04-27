@@ -16,7 +16,7 @@ async function fetchAFile(){
 }
 
 async function downloadFile(fileName) {
-    const res = await apiReq(`/upload/api/files/download-url?fileName=${encodeURIComponent(fileName)}`);
+    const res = await apiReq(`/tickets/upload/api/files/download-url?fileName=${encodeURIComponent(fileName)}`);
     if (!res) return;
     const {url} = await res.json();
     window.open(url, '_blank');
@@ -39,7 +39,7 @@ async function uploadNewFile(){
 
         try {
             status.innerText = `Processing file ${i + 1} of ${filesToUpload.length}: ${file.name}`;
-            const res = await apiReq(`/upload/api/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
+            const res = await apiReq(`/tickets/upload/api/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
             if (!res) continue;
             const { url, fileName: uploadedFileName } = await res.json();
             status.innerText = `Uploading ${file.name}...`;
@@ -49,7 +49,7 @@ async function uploadNewFile(){
                 headers: { 'Content-Type': file.type }
             });
             if (putRes.ok) {
-                await apiReq(`/upload/api/files/callback?fileName=${encodeURIComponent(uploadedFileName)}`, {
+                await apiReq(`/tickets/upload/api/files/callback?fileName=${encodeURIComponent(uploadedFileName)}`, {
                     method: 'POST'
                 });
 
@@ -82,7 +82,7 @@ async function uploadNewFile(){
 async function deleteFile(fileName){
     const status = document.getElementById('status');
     if (window.confirm(fileName + " will be deleted! Are you sure?")) {
-        const res = await apiReq(`/upload/api/files/delete-url?fileName=${encodeURIComponent(fileName)}`, {method: 'DELETE'});
+        const res = await apiReq(`/tickets/upload/api/files/delete-url?fileName=${encodeURIComponent(fileName)}`, {method: 'DELETE'});
         if (!res) return;
         if (res.ok) {
             await fetchAFile();

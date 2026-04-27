@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/tickets/upload/api/files")
 public class S3RestController {
 
     private final Logger log = LoggerFactory.getLogger(S3RestController.class);
@@ -17,21 +18,21 @@ public class S3RestController {
         this.s3Service = s3Service;
     }
 
-    @GetMapping("/upload/api/files")
+    @GetMapping()
     @ResponseBody
     public List<String> listFiles(){
         return s3Service.listFiles();
     }
 
-    @GetMapping("/upload/api/files/upload-url")
+    @GetMapping("/upload-url")
     @ResponseBody
-    public Map<String, String> getUploadUrl(@RequestParam String fileName, @RequestParam String contentType){
+    public Map<String, String> getUploadUrl(@RequestParam(required = false) Long caseId, @RequestParam String fileName, @RequestParam String contentType){
         log.info("uploading file " + fileName);
-        S3Service.S3UploadResponse resp = s3Service.generateS3PreUploadUrl(fileName, contentType);
+        S3Service.S3UploadResponse resp = s3Service.generateS3PreUploadUrl(caseId, fileName, contentType);
         return Map.of("url", resp.url(), "fileName", resp.fileName());
     }
 
-    @GetMapping("/upload/api/files/download-url")
+    @GetMapping("/download-url")
     @ResponseBody
     public Map<String, String> downloadFile(@RequestParam String fileName){
         log.info("Trying to download file " + fileName);
@@ -39,13 +40,13 @@ public class S3RestController {
         return Map.of("url", url);
     }
 
-    @DeleteMapping("/upload/api/files/delete-url")
+    @DeleteMapping("/delete-url")
     public void deleteFile(@RequestParam String fileName){
         log.info("Deleting file " + fileName);
         s3Service.deleteFile(fileName);
     }
 
-    @PostMapping("/upload/api/files/callback")
+    @PostMapping("/callback")
     @ResponseBody
     public Map<String, String> uploadCallback(@RequestParam String fileName) {
         log.info("Callback received: File {} has been uploaded successfully", fileName);

@@ -19,16 +19,17 @@
                 <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
             </div>
         </header>
+        <div id="hidden-file-inputs"></div>
         <div class="ticket-body">
             <label for="description">Description:</label>
             <textarea th:field="*{description}" id="description"></textarea>
             <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
-            <input type="file" id="fileInput">
+            <input type="file" id="fileInput" multiple>
             <p id="status"></p>
         </div>
         <footer class="ticket-footer">
             <div class="ticket-button">
-                <button onclick="uploadNewFile()" type="submit">Create Ticket</button>
+                <button onclick="uploadNewFile()" type="button" id="submitBtn">Create Ticket</button>
             </div>
         </footer>
     </form>
