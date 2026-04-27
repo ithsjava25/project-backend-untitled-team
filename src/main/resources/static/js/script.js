@@ -24,23 +24,27 @@ async function downloadFile(fileName) {
 
 async function uploadNewFile(){
     const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
+    const form = submitBtn?.form ?? document.querySelector('form');
+    if (submitBtn) submitBtn.disabled = true;
     const input = document.getElementById('fileInput');
     const status = document.getElementById('status');
     if (input.files.length === 0){
-        document.querySelector('form').submit();
+        if (form) form.requestSubmit();
         return;
     }
     const filesToUpload = Array.from(input.files);
     input.value = null;
-    submitBtn.innerText = "Uploading...";
+    if (submitBtn) submitBtn.innerText = "Uploading...";
     for (let i = 0; i < filesToUpload.length; i++) {
         const file = filesToUpload[i];
 
         try {
             status.innerText = `Processing file ${i + 1} of ${filesToUpload.length}: ${file.name}`;
             const res = await apiReq(`/tickets/upload/api/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
-            if (!res) continue;
+            if (!res) {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Create Ticket"; }
+                return;
+            }
             const { url, fileName: uploadedFileName } = await res.json();
             status.innerText = `Uploading ${file.name}...`;
             const putRes = await fetch(url, {
@@ -63,20 +67,19 @@ async function uploadNewFile(){
                 hiddenContainer.appendChild(input);
             } else {
                 status.innerText = `Failed to upload ${file.name}. Status: ${putRes.status}`;
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Create Ticket";
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Create Ticket"; }
+                return;
             }
         } catch (error) {
             console.error(error);
             status.innerText = `Error uploading ${file.name}: ${error.message}`;
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Create Ticket";
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Create Ticket"; }
+            return;
         }
     }
-    submitBtn.disabled = false;
-    submitBtn.innerText = "Create Ticket";
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Create Ticket"; }
     status.innerText = "All uploads completed.";
-    document.querySelector('form').submit();
+    if (form) form.requestSubmit();
 }
 
 async function deleteFile(fileName){

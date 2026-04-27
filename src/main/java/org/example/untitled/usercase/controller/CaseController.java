@@ -9,6 +9,8 @@ import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
 import org.example.untitled.usercase.dto.CreateCommentRequest;
+import org.example.untitled.usercase.AuditLog;
+import org.example.untitled.usercase.service.AuditLogService;
 import org.example.untitled.usercase.service.CaseService;
 import org.example.untitled.usercase.service.CommentService;
 import org.slf4j.Logger;
@@ -34,11 +36,13 @@ public class CaseController {
 
     private final CaseService caseService;
     private final CommentService commentService;
+    private final AuditLogService auditLogService;
     private static final Logger log = LoggerFactory.getLogger(CaseController.class);
 
-    public CaseController(CaseService caseService, CommentService commentService, S3Service s3Service) {
+    public CaseController(CaseService caseService, CommentService commentService, S3Service s3Service, AuditLogService auditLogService) {
         this.caseService = caseService;
         this.commentService = commentService;
+        this.auditLogService = auditLogService;
     }
 
     @PostMapping
@@ -73,8 +77,10 @@ public class CaseController {
 
         List<CommentDto> comments = commentService.getCommentsByTicketId(id);
         List<UploadedFile> files = caseService.getTicketFiles(id);
+        List<AuditLog> auditLogs = auditLogService.getLogsForCase(id);
         model.addAttribute("ticket", ticket);
         model.addAttribute("comments", comments);
+        model.addAttribute("auditLogs", auditLogs);
         model.addAttribute("files", files);
         return "ticket";
     }

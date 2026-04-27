@@ -1,38 +1,47 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="https://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Ticket</title>
-    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css"/>
+
     <script th:src="@{/js/script.js}" defer></script>
+    <link rel="stylesheet" th:href="@{/style.css}"/>
 </head>
 <body>
-<div>
+<div class="page-wrapper">
     <h1>Ticket Details</h1>
     <div th:object="${ticket}">
         <div class="ticket-info">
-            <div class="ticket-title">
-                <p th:text="*{title}"></p>
+            <div class="ticket-header">
+                <span class="ticket-title" th:text="*{title}"></span>
+                <span class="status-badge"
+                      th:text="*{status.displayName}"
+                      th:classappend="'status-' + *{status.name().toLowerCase().replace('_', '-')}">
+                </span>
             </div>
             <div class="ticket-body">
-                <p>Status: </p>
-                <p th:text="*{status.displayName}"></p>
-                <p>Handler: </p>
-                <p th:text="*{assignedToUsername}"></p><br>
-                <p>Description: </p>
-                <p th:text="*{description}"></p><br>
+                <p>Handler: <span th:text="*{assignedToUsername} ?: 'Unassigned'"></span></p>
+                <p th:text="*{description}"></p>
             </div>
         </div>
     </div>
-    <div>
-        <div class="ticket-comments">
-            <div th:each="comment : ${comments}" class="comment-box">
-                <p class="comment-text" th:text="${comment.text}"></p>
-                <p class="comment-author">
-                    Author: <span th:text="${comment.authorUsername}"></span>
-                </p>
+
+    <div th:if="${not #lists.isEmpty(comments)}">
+        <h2>Comments</h2>
+        <div th:each="comment : ${comments}" class="ticket-info">
+            <p class="comment-text" th:text="${comment.text}"></p>
+            <p class="assigned">Author: <span th:text="${comment.authorUsername}"></span></p>
+        </div>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(auditLogs)}">
+        <h2>Activity Log</h2>
+        <div th:each="entry : ${auditLogs}" class="ticket-info">
+            <div class="ticket-header">
+                <span class="ticket-title" th:text="${entry.action}"></span>
+                <span class="assigned" th:text="${#temporals.formatISO(entry.timestamp)}"></span>
             </div>
         </div>
     </div>
@@ -47,15 +56,17 @@
             </tr>
 
     </div>
-    <div class="ticket-footer">
-        <nav>
-            <a th:href="@{/tickets/{id}/close(id=${ticket.id})}">Close</a> |
+
+    <footer style="margin-top: 24px;">
+        <nav style="display: flex; gap: 10px;">
+            <a th:if="${ticket.status.name() != 'CLOSED' and ticket.status.name() != 'SOLVED'}"
+               th:href="@{/tickets/{id}/close(id=${ticket.id})}" class="btn btn-danger">Close</a>
             <a sec:authorize="hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')"
                th:href="@{/handler}" class="btn btn-secondary">Back</a>
             <a sec:authorize="hasRole('USER')"
                th:href="@{/user}" class="btn btn-secondary">Back</a>
         </nav>
-    </div>
+    </footer>
 </div>
 </body>
 </html>
