@@ -1,8 +1,10 @@
 package org.example.untitled.usercase.controller;
 
 import jakarta.validation.Valid;
+import org.example.untitled.s3.S3Service;
 import org.example.untitled.user.Role;
 import org.example.untitled.usercase.CaseStatus;
+import org.example.untitled.usercase.UploadedFile;
 import org.example.untitled.usercase.dto.CaseEntityDto;
 import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.dto.CreateCaseRequest;
@@ -33,11 +35,13 @@ public class CaseController {
     private final CaseService caseService;
     private final CommentService commentService;
     private static final Logger log = LoggerFactory.getLogger(CaseController.class);
+    private final S3Service s3Service;
 
 
-    public CaseController(CaseService caseService, CommentService commentService) {
+    public CaseController(CaseService caseService, CommentService commentService, S3Service s3Service) {
         this.caseService = caseService;
         this.commentService = commentService;
+        this.s3Service = s3Service;
     }
 
     @PostMapping
@@ -71,8 +75,10 @@ public class CaseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this ticket");
 
         List<CommentDto> comments = commentService.getCommentsByTicketId(id);
+        List<UploadedFile> files = caseService.getTicketFiles(id);
         model.addAttribute("ticket", ticket);
         model.addAttribute("comments", comments);
+        model.addAttribute("files", files);
         return "ticket";
     }
 

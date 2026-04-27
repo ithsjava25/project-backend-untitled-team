@@ -3,6 +3,7 @@ package org.example.untitled.s3;
 import jakarta.annotation.PostConstruct;
 import org.example.untitled.usercase.CaseEntity;
 import org.example.untitled.usercase.UploadedFile;
+import org.example.untitled.usercase.repository.UploadedFileRepository;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -99,7 +100,7 @@ public class S3Service {
                 .key(filename));
     }
 
-    public List<UploadedFile> createFile(CaseEntity caseEntity, String s3Key) {
+    public UploadedFile createFile(CaseEntity caseEntity, String s3Key) {
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setUploadedBy(caseEntity.getOwner());
         uploadedFile.setAssociatedCase(caseEntity);
@@ -107,6 +108,6 @@ public class S3Service {
         int indexOfSlash = s3Key.lastIndexOf('/');
         String fileName = s3Key.substring(indexOfSlash + 1);
         uploadedFile.setFilename(fileName);
-        return List.of(uploadedFile);
+        return uploadedFile;
     }
 }

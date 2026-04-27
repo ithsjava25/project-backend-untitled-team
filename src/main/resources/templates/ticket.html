@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <title>Ticket</title>
     <link rel="stylesheet" th:href="@{/style.css}" href="/style.css"/>
+    <script th:src="@{/js/script.js}" defer></script>
 </head>
 <body>
 <div>
@@ -34,6 +35,17 @@
                 </p>
             </div>
         </div>
+    </div>
+    <div class="show-files">
+            <tr th:each="file : ${files}">
+                <td th:text="${file.getFilename()}"></td>
+                <td>
+                    <button th:data-file="${file.getS3Key()}"
+                            onclick="downloadFile(this.getAttribute('data-file'))"
+                            class="button">Download</button>
+                </td>
+            </tr>
+
     </div>
     <div class="ticket-footer">
         <nav>
