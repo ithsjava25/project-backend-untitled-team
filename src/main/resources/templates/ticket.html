@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Ticket</title>
@@ -26,7 +28,6 @@
     <div>
         <div class="ticket-comments">
             <div th:each="comment : ${comments}" class="comment-box">
-                <p class="comment-title" th:text="${comment.title}"></p>
                 <p class="comment-text" th:text="${comment.text}"></p>
                 <p class="comment-author">
                     Author: <span th:text="${comment.authorUsername}"></span>
@@ -37,7 +38,10 @@
     <div class="ticket-footer">
         <nav>
             <a th:href="@{/tickets/{id}/close(id=${ticket.id})}">Close</a> |
-            <a th:href="@{/tickets}">Back</a>
+            <a sec:authorize="hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')"
+               th:href="@{/handler}" class="btn btn-secondary">Back</a>
+            <a sec:authorize="hasRole('USER')"
+               th:href="@{/user}" class="btn btn-secondary">Back</a>
         </nav>
     </div>
 </div>

@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -22,27 +21,37 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    public SecurityConfig(UserDetailsService userDetailsService,
+                          CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
         this.userDetailsService = userDetailsService;
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
-                        auth ->
-                                auth.requestMatchers("/auth/**", "/", "/home", "/images/**", "/style.css", "/upload/**", "/login", "/register")
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated())
+                        auth -> auth
+                                .requestMatchers("/auth/**", "/", "/home", "/images/**", "/style.css",
+                                        "/upload/**", "/login", "/register", "/favicon.ico", "/access-denied")
+                                .permitAll()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/handler/**").hasAnyRole("HANDLER", "SUPERVISOR", "ADMIN")
+                                .requestMatchers("/user/**").hasRole("USER")
+                                .anyRequest()
+                                .authenticated())
                 .authenticationProvider(authenticationProvider())
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .successHandler(customAuthenticationSuccessHandler())
+                        .successHandler(customAuthenticationSuccessHandler)
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login")
-                        .permitAll());
+                        .permitAll())
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/access-denied"));
+
 
         return http.build();
     }
@@ -61,11 +70,6 @@ public class SecurityConfig {
         } catch (Exception e) {
             throw new RuntimeException("Could not get AuthenticationManager", e);
         }
-    }
-
-    @Bean
-    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler();
     }
 
     @Bean
