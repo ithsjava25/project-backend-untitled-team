@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login")
                         .permitAll())
                 .exceptionHandling(ex -> ex
-                        .accessDeniedPage("/"));
+                        .accessDeniedPage("/access-denied"));
 
 
         return http.build();
