@@ -1,0 +1,4 @@
+ALTER TABLE audit_log
+    DROP CONSTRAINT IF EXISTS audit_log_action_check,
+    ADD CONSTRAINT audit_log_action_check
+        CHECK (action IN ('CASE_CREATED', 'CASE_ASSIGNED', 'CASE_STATUS_CHANGED', 'COMMENT_ADDED', 'FILE_UPLOADED', 'USER_ROLE_CHANGED', 'CASE_UPDATED'));

@@ -25,6 +25,7 @@ async function downloadFile(fileName) {
 async function uploadNewFile(){
     const submitBtn = document.getElementById('submitBtn');
     const form = submitBtn?.form ?? document.querySelector('form');
+    const originalText = submitBtn?.innerText ?? null;
     if (submitBtn) submitBtn.disabled = true;
     const input = document.getElementById('fileInput');
     const status = document.getElementById('status');
@@ -42,7 +43,7 @@ async function uploadNewFile(){
             status.innerText = `Processing file ${i + 1} of ${filesToUpload.length}: ${file.name}`;
             const res = await apiReq(`/tickets/upload/api/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
             if (!res) {
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Create Ticket"; }
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
                 return;
             }
             const { url, fileName: uploadedFileName } = await res.json();
@@ -67,17 +68,17 @@ async function uploadNewFile(){
                 hiddenContainer.appendChild(input);
             } else {
                 status.innerText = `Failed to upload ${file.name}. Status: ${putRes.status}`;
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Create Ticket"; }
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
                 return;
             }
         } catch (error) {
             console.error(error);
             status.innerText = `Error uploading ${file.name}: ${error.message}`;
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Create Ticket"; }
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
             return;
         }
     }
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Create Ticket"; }
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
     status.innerText = "All uploads completed.";
     if (form) form.requestSubmit();
 }
