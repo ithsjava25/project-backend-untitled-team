@@ -26,7 +26,6 @@
     <div>
         <div class="ticket-comments">
             <div th:each="comment : ${comments}" class="comment-box">
-                <p class="comment-title" th:text="${comment.title}"></p>
                 <p class="comment-text" th:text="${comment.text}"></p>
                 <p class="comment-author">
                     Author: <span th:text="${comment.authorUsername}"></span>
