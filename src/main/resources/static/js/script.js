@@ -16,25 +16,30 @@ async function fetchAFile(){
 }
 
 async function downloadFile(fileName) {
-    const res = await apiReq(`/upload/files/download-url?fileName=${encodeURIComponent(fileName)}`);
+    const res = await apiReq(`/tickets/upload/api/files/download-url?fileName=${encodeURIComponent(fileName)}`);
     if (!res) return;
     const {url} = await res.json();
     window.open(url, '_blank');
 }
 
 async function uploadNewFile(){
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
     const input = document.getElementById('fileInput');
     const status = document.getElementById('status');
-    if (input.files.length === 0) return;
+    if (input.files.length === 0){
+        document.querySelector('form').submit();
+        return;
+    }
     const filesToUpload = Array.from(input.files);
     input.value = null;
-
+    submitBtn.innerText = "Uploading...";
     for (let i = 0; i < filesToUpload.length; i++) {
         const file = filesToUpload[i];
 
         try {
             status.innerText = `Processing file ${i + 1} of ${filesToUpload.length}: ${file.name}`;
-            const res = await apiReq(`/upload/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
+            const res = await apiReq(`/tickets/upload/api/files/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
             if (!res) continue;
             const { url, fileName: uploadedFileName } = await res.json();
             status.innerText = `Uploading ${file.name}...`;
@@ -44,26 +49,40 @@ async function uploadNewFile(){
                 headers: { 'Content-Type': file.type }
             });
             if (putRes.ok) {
-                await apiReq(`/upload/files/callback?fileName=${encodeURIComponent(uploadedFileName)}`, {
+                await apiReq(`/tickets/upload/api/files/callback?fileName=${encodeURIComponent(uploadedFileName)}`, {
                     method: 'POST'
                 });
 
                 status.innerText = `Successfully uploaded ${file.name}`;
-                fetchAFile();
+
+                const hiddenContainer = document.getElementById("hidden-file-inputs");
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'fileNames';
+                input.value = uploadedFileName;
+                hiddenContainer.appendChild(input);
             } else {
                 status.innerText = `Failed to upload ${file.name}. Status: ${putRes.status}`;
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Create Ticket";
             }
         } catch (error) {
             console.error(error);
             status.innerText = `Error uploading ${file.name}: ${error.message}`;
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Create Ticket";
         }
     }
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Create Ticket";
     status.innerText = "All uploads completed.";
+    document.querySelector('form').submit();
 }
+
 async function deleteFile(fileName){
     const status = document.getElementById('status');
     if (window.confirm(fileName + " will be deleted! Are you sure?")) {
-        const res = await apiReq(`/upload/api/files/delete-url?fileName=${encodeURIComponent(fileName)}`, {method: 'DELETE'});
+        const res = await apiReq(`/tickets/upload/api/files/delete-url?fileName=${encodeURIComponent(fileName)}`, {method: 'DELETE'});
         if(res.ok){
             await fetchAFile();
         } else {
@@ -71,6 +90,7 @@ async function deleteFile(fileName){
         }
     }
 }
+
 async function apiReq(url, options = {}) {
     options.credentials = options.credentials || 'same-origin';
     options.headers = options.headers || {};
