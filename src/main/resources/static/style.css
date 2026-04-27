@@ -16,7 +16,7 @@ body {
 }
 
 /* Container */
-div {
+.form-container {
     width: 100%;
     max-width: 600px;
 }
@@ -335,4 +335,98 @@ input[type="hidden"] {
 .filter-tab.active {
     color: #38bdf8;
     border-bottom-color: #38bdf8;
+}
+
+form.inline-form {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+.ticket-select {
+    background: #0f172a;
+    color: #e5e7eb;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.ticket-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.ticket-grid .ticket-info {
+    padding: 16px 20px;
+    margin-bottom: 0;
+}
+
+.status-badge.status-open        { background: #052e16; color: #4ade80; border-color: #166534; }
+.status-badge.status-in-progress { background: #1c1917; color: #fb923c; border-color: #9a3412; }
+.status-badge.status-closed      { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+.status-badge.status-solved      { background: #0f172a; color: #a78bfa; border-color: #4c1d95; }
+
+.unassigned {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.btn-assigned {
+    background: #14532d;
+    color: #4ade80;
+    border: 1px solid #166534;
+}
+
+.btn-taken {
+    background: #1e293b;
+    color: #64748b;
+    border: 1px solid #334155;
+    cursor: not-allowed;
+}
+
+.flash-error {
+    background: #7f1d1d;
+    color: #fca5a5;
+    border: 1px solid #991b1b;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.flash-success {
+    background: #052e16;
+    color: #4ade80;
+    border: 1px solid #166534;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+main {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
 }

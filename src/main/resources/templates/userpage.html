@@ -34,7 +34,10 @@
     <div class="ticket-info" th:each="ticket : ${tickets}">
         <div class="ticket-header">
             <span class="ticket-title" th:text="${ticket.title}"></span>
-            <span class="status-badge" th:text="${ticket.status}"></span>
+            <span class="status-badge"
+                  th:text="${ticket.status.displayName}"
+                  th:classappend="'status-' + ${ticket.status.name().toLowerCase().replace('_', '-')}">
+            </span>
         </div>
         <div class="ticket-body">
             <p th:text="${ticket.description}"></p>
@@ -50,9 +53,11 @@
         </div>
     </div>
     <footer>
-        <nav>
+        <nav style="display: flex; gap: 10px;">
             <a th:href="@{/}" class="btn btn-secondary">Home</a>
-            <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
         </nav>
     </footer>
 </div>

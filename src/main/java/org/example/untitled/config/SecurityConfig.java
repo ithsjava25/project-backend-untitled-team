@@ -1,5 +1,6 @@
 package org.example.untitled.config;
 
+import org.example.untitled.user.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +40,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/user", true)
+                        .successHandler(customAuthenticationSuccessHandler())
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login")
@@ -59,6 +63,25 @@ public class SecurityConfig {
         } catch (Exception e) {
             throw new RuntimeException("Could not get AuthenticationManager", e);
         }
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return (request, response, authentication) -> {
+            Role role = authentication.getAuthorities().stream()
+                    .map(a -> Role.fromAuthority(a.getAuthority()))
+                    .flatMap(Optional::stream)
+                    .findFirst()
+                    .orElse(Role.USER);
+
+            if (role == Role.ADMIN) {
+                response.sendRedirect("/admin");
+            } else if (role == Role.HANDLER || role == Role.SUPERVISOR) {
+                response.sendRedirect("/handler");
+            } else {
+                response.sendRedirect("/user");
+            }
+        };
     }
 
     @Bean

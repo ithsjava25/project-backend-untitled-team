@@ -1,21 +1,45 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<html xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/style.css}">
-    <title>Title</title>
+    <title>Home</title>
 </head>
 <body>
-<header>
-    <h1>Landing page</h1>
-    <ul>
-        <li><a th:href="@{/login}">Login</a></li>
-        <li><a th:href="@{/register}">Register</a></li>
-        <li><a th:href="@{/user}">My tickets</a></li>
-    </ul>
-</header>
-<main>
-    <h2>Welcome to [insert name here]</h2>
-</main>
+<div class="page-wrapper">
+
+    <main>
+        <h2 sec:authorize="isAuthenticated()">
+            Welcome, <span sec:authentication="name"></span>!
+        </h2>
+
+        <h2 sec:authorize="!isAuthenticated()">
+            Welcome!
+        </h2>
+    </main>
+
+    <footer>
+        <nav style="display: flex; gap: 10px;">
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn">Login</a>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn">Register</a>
+
+            <a sec:authorize="hasRole('USER')" th:href="@{/user}" class="btn">My tickets</a>
+
+            <a sec:authorize="hasAnyRole('HANDLER','SUPERVISOR')"
+               th:href="@{/handler}" class="btn">My Dashboard</a>
+
+            <a sec:authorize="hasRole('ADMIN')"
+               th:href="@{/admin}" class="btn">My Dashboard</a>
+
+            <form sec:authorize="isAuthenticated()"
+                  th:action="@{/logout}" method="post" class="inline-form">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </nav>
+    </footer>
+
+</div>
 </body>
 </html>

@@ -74,19 +74,18 @@ class CaseServiceTest {
     }
 
     @Test
-    void assignTicket_shouldAssign_whenUserIsAdmin() {
+    void assignTicket_shouldThrow400_whenUserIsAdmin() {
         User admin = makeUser(3L, "admin", Role.ADMIN);
         User owner = makeUser(1L, "owner", Role.USER);
         CaseEntity caseEntity = makeCaseEntity(1L, owner);
 
         when(caseRepository.findById(1L)).thenReturn(Optional.of(caseEntity));
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
-        when(caseRepository.save(any())).thenReturn(caseEntity);
 
-        CaseEntityDto result = caseService.assignTicket(1L, "admin");
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> caseService.assignTicket(1L, "admin"));
 
-        assertNotNull(result);
-        assertEquals(admin, caseEntity.getAssignedTo(), "Ticket was not assigned to admin");
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
     }
 
     @Test
@@ -126,6 +125,24 @@ class CaseServiceTest {
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(e -> ((ResponseStatusException) e).getStatusCode())
                 .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void assignTicket_shouldReassign_whenAlreadyAssigned() {
+        User owner = makeUser(1L, "owner", Role.USER);
+        User handler1 = makeUser(2L, "handler1", Role.HANDLER);
+        User handler2 = makeUser(3L, "handler2", Role.HANDLER);
+        CaseEntity caseEntity = makeCaseEntity(1L, owner);
+        caseEntity.setAssignedTo(handler1);
+
+        when(caseRepository.findById(1L)).thenReturn(Optional.of(caseEntity));
+        when(userRepository.findByUsername("handler2")).thenReturn(Optional.of(handler2));
+        when(caseRepository.save(any())).thenReturn(caseEntity);
+
+        CaseEntityDto result = caseService.assignTicket(1L, "handler2");
+
+        assertNotNull(result);
+        assertEquals(handler2, caseEntity.getAssignedTo());
     }
 
     // --- createTicket ---

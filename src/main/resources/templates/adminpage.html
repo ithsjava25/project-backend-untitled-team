@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>Admin Dashboard</h1>
+    </div>
+
+    <div th:if="${error}" class="flash-error" th:text="${error}"></div>
+    <div th:if="${success}" class="flash-success" th:text="${success}"></div>
+
+    <p th:if="${#lists.isEmpty(users)}" class="empty-state">
+        No users in the system yet.
+    </p>
+
+    <div class="ticket-grid">
+        <div class="ticket-info" th:each="user : ${users}">
+            <div class="ticket-header">
+                <span class="ticket-title" th:text="${user.username()}"></span>
+                <span class="status-badge" th:text="${user.role()}"></span>
+            </div>
+            <div class="ticket-body">
+                <p th:text="${user.email()}"></p>
+                <p>Member since: <span th:text="${#temporals.format(user.createdAt(), 'yyyy-MM-dd')}"></span></p>
+            </div>
+            <div class="ticket-footer">
+                <form class="inline-form"
+                      th:action="@{/admin/users/{id}/role(id=${user.id()})}"
+                      method="post"
+                      style="display: flex; gap: 6px; align-items: center;">
+                    <input type="hidden" name="_method" value="PUT"/>
+                    <label th:for="'role-' + ${user.id()}" class="sr-only"
+                           th:text="'Role for ' + ${user.username()}"></label>
+                    <select class="ticket-select"
+                            name="role"
+                            th:id="'role-' + ${user.id()}">
+                        <option th:each="r : ${roles}"
+                                th:value="${r}"
+                                th:text="${r}"
+                                th:selected="${r == user.role()}">
+                        </option>
+                    </select>
+                    <button type="submit" class="btn btn-sm">Update role</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer style="margin-top: 40px;">
+        <nav style="display: flex; gap: 10px;">
+            <a th:href="@{/}" class="btn btn-secondary">Home</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </nav>
+    </footer>
+</div>
+</body>
+</html>

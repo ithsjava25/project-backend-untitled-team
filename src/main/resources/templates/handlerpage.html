@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${currentUserRole + ' Dashboard'}"></title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 th:text="${currentUserRole + ' Dashboard'}"></h1>
+    </div>
+
+    <div th:if="${error}" class="flash-error" th:text="${error}"></div>
+    <div th:if="${success}" class="flash-success" th:text="${success}"></div>
+
+    <div class="filter-tabs">
+        <a th:href="@{/handler}"
+           th:classappend="${filter == null or filter == 'all'} ? ' active'"
+           class="filter-tab">All</a>
+        <a th:href="@{/handler(filter='active')}"
+           th:classappend="${filter == 'active'} ? ' active'"
+           class="filter-tab">Active</a>
+        <a th:href="@{/handler(filter='closed')}"
+           th:classappend="${filter == 'closed'} ? ' active'"
+           class="filter-tab">Closed</a>
+    </div>
+
+    <p th:if="${#lists.isEmpty(tickets)}" class="empty-state">
+        No tickets here.
+    </p>
+
+    <div class="ticket-grid">
+        <div class="ticket-info" th:each="ticket : ${tickets}">
+            <div class="ticket-header">
+                <span class="ticket-title" th:text="${ticket.title}"></span>
+                <span class="status-badge"
+                      th:text="${ticket.status.displayName}"
+                      th:classappend="'status-' + ${ticket.status.name().toLowerCase().replace('_', '-')}">
+                </span>
+            </div>
+            <div class="ticket-body">
+                <p th:text="${ticket.description}"></p>
+                <p>Owner: <span th:text="${ticket.ownerUsername}"></span></p>
+                <p th:if="${ticket.assignedToUsername != null}">
+                    Assigned to: <span th:text="${ticket.assignedToUsername}"></span>
+                </p>
+                <p th:if="${ticket.assignedToUsername == null}" class="unassigned">
+                    Not yet assigned
+                </p>
+            </div>
+            <div class="ticket-footer">
+                <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-secondary btn-sm">View</a>
+                <div style="display: flex; gap: 6px; align-items: center;">
+
+                    <!-- Supervisor: dropdown för att assigna/reassigna -->
+                    <th:block th:if="${isSupervisor}">
+                        <form class="inline-form"
+                              th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post"
+                              style="display: flex; gap: 6px; align-items: center;">
+                            <label th:for="'username-' + ${ticket.id}" class="sr-only"
+                                   th:text="'Assign handler for ' + ${ticket.title}"></label>
+                            <select name="username" class="ticket-select" required
+                                    th:id="'username-' + ${ticket.id}">
+                                <option disabled selected value="">Select a handler</option>
+                                <option th:each="h : ${handlers}"
+                                        th:value="${h.username()}"
+                                        th:text="${h.username()}">
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-sm"
+                                    th:text="${ticket.assignedToUsername != null} ? 'Reassign' : 'Assign'">
+                            </button>
+                        </form>
+                    </th:block>
+
+                    <!-- Handler: assign to me-knapp -->
+                    <th:block th:if="${!isSupervisor and !isSupervisorOrAdmin}">
+                        <form class="inline-form"
+                              th:action="@{/tickets/{id}/assign(id=${ticket.id})}" method="post">
+                            <button type="submit"
+                                    th:classappend="${ticket.assignedToUsername == currentUser} ? ' btn-assigned'
+                                                   : (${ticket.assignedToUsername != null} ? ' btn-taken' : '')"
+                                    th:text="${ticket.assignedToUsername == currentUser} ? 'Assigned to you'
+                                            : (${ticket.assignedToUsername != null} ? 'Taken' : 'Assign to me')"
+                                    th:disabled="${ticket.assignedToUsername != null}"
+                                    class="btn btn-sm">
+                            </button>
+                        </form>
+                    </th:block>
+
+                    <!-- Update status -->
+                    <form class="inline-form"
+                          th:if="${isSupervisorOrAdmin or ticket.assignedToUsername == currentUser}"
+                          th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post"
+                          style="display: flex; gap: 6px; align-items: center;">
+                        <label th:for="'status-' + ${ticket.id}" class="sr-only"
+                               th:text="'Status for ' + ${ticket.title}"></label>
+                        <select name="statusParam" class="ticket-select"
+                                th:id="'status-' + ${ticket.id}">
+                            <option th:each="s : ${statuses}"
+                                    th:value="${s}"
+                                    th:text="${s}"
+                                    th:selected="${s == ticket.status}">
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-sm">Update</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="margin-top: 40px;">
+        <nav style="display: flex; gap: 10px;">
+            <a th:href="@{/}" class="btn btn-secondary">Home</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </nav>
+    </footer>
+</div>
+</body>
+</html>
