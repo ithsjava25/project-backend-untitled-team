@@ -38,7 +38,7 @@
     <div class="ticket-footer">
         <nav>
             <a th:href="@{/tickets/{id}/close(id=${ticket.id})}">Close</a> |
-            <a sec:authorize="hasAnyRole('HANDLER', 'SUPERVISOR')"
+            <a sec:authorize="hasAnyRole('HANDLER', 'SUPERVISOR', 'ADMIN')"
                th:href="@{/handler}" class="btn btn-secondary">Back</a>
             <a sec:authorize="hasRole('USER')"
                th:href="@{/user}" class="btn btn-secondary">Back</a>

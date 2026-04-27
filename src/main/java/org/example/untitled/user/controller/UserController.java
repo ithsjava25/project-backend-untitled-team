@@ -6,6 +6,7 @@ import org.example.untitled.exception.EmailAlreadyExistsException;
 import org.example.untitled.exception.UserAlreadyExistsException;
 import org.example.untitled.user.service.UserService;
 import org.example.untitled.usercase.service.CaseService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/user")
+    @PreAuthorize("hasRole('USER')")
     public String userLanding(Model model,
                               @AuthenticationPrincipal UserDetails userDetails,
                               @RequestParam(required = false) String filter) {
