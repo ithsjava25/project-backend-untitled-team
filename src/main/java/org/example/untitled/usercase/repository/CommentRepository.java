@@ -9,6 +9,11 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+/**
+ * Repository for managing {@link Comment} entities.
+ * Provides a custom query for retrieving comments associated with a specific ticket,
+ * ordered chronologically.
+ */
 public interface CommentRepository extends ListCrudRepository<Comment, Long> {
 
     @Query("SELECT new org.example.untitled.usercase.dto.CommentDto(" +
