@@ -29,9 +29,12 @@
                 <p>Handler: <span th:text="*{assignedToUsername} ?: 'Unassigned'"></span></p>
                 <p th:text="*{description}"></p>
                 <p>Files</p>
-                <ul th:each="file : ${files}">
-                    <li><a th:text="${file.getFilename()}" th:data-file="${file.getS3Key()}"
-                           onclick="downloadFile(this.getAttribute('data-file'))"></a>
+                <ul class="file-list">
+                    <li th:each="file : ${files}">
+                        <a href="#"
+                           th:text="${file.getFilename()}"
+                           th:attr="data-file=${file.getS3Key()}"
+                           onclick="event.preventDefault(); downloadFile(this.dataset.file)"></a>
                     </li>
                 </ul>
             </div>
