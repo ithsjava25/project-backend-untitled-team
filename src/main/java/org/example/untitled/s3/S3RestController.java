@@ -14,11 +14,9 @@ public class S3RestController {
 
     private final Logger log = LoggerFactory.getLogger(S3RestController.class);
     private final S3Service s3Service;
-    private final CaseService caseService;
 
     public S3RestController(S3Service s3Service, CaseService caseService){
         this.s3Service = s3Service;
-        this.caseService = caseService;
     }
 
     @GetMapping()
@@ -47,7 +45,6 @@ public class S3RestController {
     public void deleteFile(@RequestParam String fileName){
         log.info("Deleting file " + fileName);
         s3Service.deleteFile(fileName);
-        caseService.deleteFile(fileName);
     }
 
     @PostMapping("/callback")
