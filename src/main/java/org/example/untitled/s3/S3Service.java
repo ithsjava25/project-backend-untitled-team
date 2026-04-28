@@ -97,6 +97,7 @@ public class S3Service {
         s3Client.deleteObject(req -> req
                 .bucket(BUCKET_NAME)
                 .key(filename));
+
     }
 
     public UploadedFile createFile(CaseEntity caseEntity, String s3Key) {

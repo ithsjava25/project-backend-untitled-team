@@ -461,3 +461,7 @@ main {
     padding-bottom: 8px;
     border-bottom: 1px solid #1e3a5f;
 }
+
+li{
+    list-style-type: none;
+}

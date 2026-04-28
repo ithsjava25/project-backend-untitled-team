@@ -15,4 +15,6 @@ public interface UploadedFileRepository extends ListCrudRepository<UploadedFile,
     UploadedFile getUploadedFilesByFilename(String filename);
 
     List<UploadedFile> getUploadedFilesByUploadedBy(User uploadedBy);
+
+    void deleteUploadedFileByS3Key(String s3Key);
 }

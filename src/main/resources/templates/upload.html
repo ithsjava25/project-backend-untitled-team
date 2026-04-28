@@ -17,26 +17,18 @@
         </div>
     </div>
     <section>
-        <table>
-            <thead>
-            <tr>
-                <th>File Name</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="file : ${files}">
-                <td th:text="${file.getFilename()}"></td>
-                <td>
-                    <button th:data-file="${file.getS3Key()}"
-                            onclick="downloadFile(this.getAttribute('data-file'))"
-                            class="button">Download</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <ul class="file-list">
+            <li th:each="file : ${files}">
+            <a href="#"
+               th:text="${file.getFilename()}"
+               th:attr="data-file=${file.getS3Key()}"
+               onclick="event.preventDefault(); downloadFile(this.dataset.file)"></a>
+            </li>
+        </ul>
+
+
+        </ul>
     </section>
-    <p><a th:href="@{/user}"></a></p>
 </div>
 
 </main>

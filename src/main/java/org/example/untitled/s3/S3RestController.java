@@ -1,5 +1,6 @@
 package org.example.untitled.s3;
 
+import org.example.untitled.usercase.service.CaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ public class S3RestController {
     private final Logger log = LoggerFactory.getLogger(S3RestController.class);
     private final S3Service s3Service;
 
-    public S3RestController(S3Service s3Service){
+    public S3RestController(S3Service s3Service, CaseService caseService){
         this.s3Service = s3Service;
     }
 
