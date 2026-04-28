@@ -28,6 +28,12 @@
             <div class="ticket-body">
                 <p>Handler: <span th:text="*{assignedToUsername} ?: 'Unassigned'"></span></p>
                 <p th:text="*{description}"></p>
+                <p>Files</p>
+                <ul th:each="file : ${files}">
+                    <li><a th:text="${file.getFilename()}" th:data-file="${file.getS3Key()}"
+                           onclick="downloadFile(this.getAttribute('data-file'))"></a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -52,7 +58,7 @@
         <h2 class="section-title">Add Comment</h2>
         <form th:action="@{/tickets/{id}/comments(id=${ticket.id})}"
               th:object="${comment}"
-              method="post">
+              method="POST">
             <div>
                 <label for="text">Comment:</label>
                 <textarea id="text" th:field="*{text}" placeholder="Write your comment here..."></textarea>
@@ -60,14 +66,9 @@
                       th:errors="*{text}"
                       class="field-error"></span>
             </div>
-            <div>
-                <input type="hidden" id="fileNameHidden">
-                <input type="file" id="fileInput" multiple>
-                <p id="status"></p>
-            </div>
             <div id="hidden-file-inputs"></div>
             <div style="margin-top: 12px;">
-                <button onclick="uploadNewFile()" type="submit" class="btn" id="submitBtn">Add Comment</button>
+                <button type="submit" class="btn">Add Comment</button>
             </div>
         </form>
     </div>
@@ -84,17 +85,6 @@
                    th:text="${#temporals.format(entry.timestamp, 'yyyy-MM-dd HH:mm')}"></p>
             </div>
         </div>
-    </div>
-    <div class="show-files">
-            <tr th:each="file : ${files}">
-                <td th:text="${file.getFilename()}"></td>
-                <td>
-                    <button th:data-file="${file.getS3Key()}"
-                            onclick="downloadFile(this.getAttribute('data-file'))"
-                            class="button">Download</button>
-                </td>
-            </tr>
-
     </div>
 
     <footer style="margin-top: 24px;">
