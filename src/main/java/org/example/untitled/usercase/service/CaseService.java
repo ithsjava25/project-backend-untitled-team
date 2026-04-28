@@ -18,6 +18,7 @@ import org.example.untitled.usercase.dto.CreateCommentRequest;
 import org.example.untitled.usercase.mapper.CaseMapper;
 import org.example.untitled.usercase.repository.CaseRepository;
 import org.example.untitled.usercase.repository.UploadedFileRepository;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -193,5 +194,11 @@ public class CaseService {
 
     public boolean isNotOwner(CaseEntityDto ticket, String username) {
         return !ticket.ownerUsername().equals(username);
+    }
+
+    public @Nullable List<UploadedFile> getUserFiles(String username) {
+        User actor = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return uploadedFileRepository.getUploadedFilesByUploadedBy(actor);
     }
 }

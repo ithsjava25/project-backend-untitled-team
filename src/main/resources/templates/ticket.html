@@ -60,8 +60,14 @@
                       th:errors="*{text}"
                       class="field-error"></span>
             </div>
+            <div>
+                <input type="hidden" id="fileNameHidden">
+                <input type="file" id="fileInput" multiple>
+                <p id="status"></p>
+            </div>
+            <div id="hidden-file-inputs"></div>
             <div style="margin-top: 12px;">
-                <button type="submit" class="btn">Add Comment</button>
+                <button onclick="uploadNewFile()" type="submit" class="btn" id="submitBtn">Add Comment</button>
             </div>
         </form>
     </div>

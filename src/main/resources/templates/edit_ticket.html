@@ -23,7 +23,7 @@
             <textarea th:field="*{description}" id="description"></textarea>
             <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
             <input type="hidden" id="fileNameHidden" th:field="*{fileNames}">
-            <input type="file" id="fileInput">
+            <input type="file" id="fileInput" multiple>
             <p id="status"></p>
         </div>
         <div id="hidden-file-inputs"></div>
