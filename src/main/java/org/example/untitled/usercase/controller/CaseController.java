@@ -1,7 +1,6 @@
 package org.example.untitled.usercase.controller;
 
 import jakarta.validation.Valid;
-import org.example.untitled.s3.S3Service;
 import org.example.untitled.user.Role;
 import org.example.untitled.user.service.UserService;
 import org.example.untitled.usercase.AuditLog;
