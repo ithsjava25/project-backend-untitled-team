@@ -1,5 +1,6 @@
 package org.example.untitled.usercase.service;
 
+import org.example.untitled.user.repository.UserRepository;
 import org.example.untitled.usercase.dto.CommentDto;
 import org.example.untitled.usercase.AuditAction;
 import org.example.untitled.usercase.dto.CaseEntityDto;
@@ -18,27 +19,31 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CaseRepository caseRepository;
     private final AuditLogService auditLogService;
+    private final UserRepository userRepository;
 
-
-    public CommentService(CommentRepository commentRepository, CaseRepository caseRepository, AuditLogService auditLogService) {
+    public CommentService(CommentRepository commentRepository, CaseRepository caseRepository,
+                          AuditLogService auditLogService, UserRepository userRepository) {
         this.commentRepository = commentRepository;
         this.caseRepository = caseRepository;
         this.auditLogService = auditLogService;
+        this.userRepository = userRepository;
     }
 
     @Transactional
-    public void createComment(CreateCommentRequest comment, CaseEntityDto ticket) {
+    public void createComment(CreateCommentRequest comment, CaseEntityDto ticket, String username) {
         if (comment == null)
             throw new IllegalArgumentException("CreateCommentRequest can't be null");
         if (ticket == null)
             throw new IllegalArgumentException("CaseEntityDTO can't be null");
         var caseEntity = caseRepository.findById(ticket.id())
                 .orElseThrow(() -> new IllegalArgumentException("Ticket not found: " + ticket.id()));
+        var author = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
         var entity = CommentMapper.toEntity(comment);
-        entity.setAuthor(caseEntity.getOwner());
+        entity.setAuthor(author);
         entity.setCaseEntity(caseEntity);
         commentRepository.save(entity);
-        auditLogService.log(AuditAction.COMMENT_ADDED, entity.getAuthor().getId(), caseEntity.getId()); // lägg till
+        auditLogService.log(AuditAction.COMMENT_ADDED, author.getId(), caseEntity.getId());
     }
 
     public List<CommentDto> getCommentsByTicketId(Long id) {

@@ -430,3 +430,34 @@ main {
     margin: 40px auto;
     padding: 0 20px;
 }
+
+/* Comment section */
+
+.comment-box {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+}
+
+.comment-author {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 8px;
+}
+
+.comment-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1e3a5f;
+}
